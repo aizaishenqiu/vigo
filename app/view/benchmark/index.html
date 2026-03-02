@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <script src="/static/js/echarts.min.js"></script>
+    <style>
+        /* 深色主题 */
+        :root { 
+            --bg-color:#020617; 
+            --card-bg:#111827; 
+            --text-primary:#f9fafb; 
+            --text-secondary:#9ca3af; 
+            --accent-color:#3b82f6; 
+            --success-color:#10b981; 
+            --danger-color:#ef4444; 
+            --warning-color:#f59e0b; 
+            --purple-color:#8b5cf6; 
+            --border-color:#374151; 
+            --input-bg:#1f2937; 
+            --input-border:#4b5563;
+        }
+        
+        /* 浅色主题 */
+        [data-theme="light"] {
+            --bg-color:#f8fafc; 
+            --card-bg:#ffffff; 
+            --text-primary:#1e293b; 
+            --text-secondary:#64748b; 
+            --accent-color:#3b82f6; 
+            --success-color:#10b981; 
+            --danger-color:#ef4444; 
+            --warning-color:#f59e0b; 
+            --purple-color:#8b5cf6; 
+            --border-color:#e2e8f0; 
+            --input-bg:#f1f5f9; 
+            --input-border:#cbd5e1;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            min-width: 1366px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand h1 { font-size: 20px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .navbar-brand .subtitle { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+
+        .system-monitor {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: var(--input-bg);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+        .tab-btn:hover:not(.active) {
+            background: var(--border-color);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Config Panel */
+        .config-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            align-items: end;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-group { display: flex; flex-direction: column; gap: 6px; }
+        .config-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+
+        input[type="number"], input[type="text"], select {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 100%;
+            height: 36px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent-color); }
+        
+        .module-group {
+            grid-column: span 3;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            height: 36px;
+            background: var(--input-bg);
+            padding: 0 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .module-group label { color: var(--text-primary); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none; margin: 0; }
+
+        .actions {
+            grid-column: span 3;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn {
+            border: none;
+            padding: 0 24px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-secondary { background: var(--border-color); color: var(--text-primary); }
+        .btn-purple { background: var(--purple-color); color: white; }
+        .btn:hover { filter: brightness(110%); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--input-bg);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .status-badge.connected {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .status-badge.disconnected {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 16px;
+        }
+        .metric-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .metric-value { font-size: 28px; font-weight: 700; color: var(--accent-color); margin: 8px 0; }
+        .metric-label { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            height: 100%;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .chart-card > div {
+            flex: 1;
+        }
+        h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="navbar-brand">
+                <h1>Vigo 压测监控大屏</h1>
+                <div class="subtitle">实时全链路性能监控系统 | 支持中间件压测 + HTTP 压测</div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <a href="/" class="btn" style="background: var(--accent-color); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">返回首页</a>
+                <div class="system-monitor">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">CPU</span>
+                        <div style="width: 100px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+                            <div id="bar-cpu" style="width: 0%; height: 100%; background: #3b82f6; transition: width 0.5s;"></div>
+                        </div>
+                        <span id="val-cpu" style="font-size: 12px; font-weight: bold; width: 45px; color: #e2e8f0; text-align: right;">0%</span>
+                    </div>
+                    <div style="width: 1px; height: 16px; background: #334155;"></div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">MEM</span>
+                        <div style="width: 100px; height: 6px; background: #334155; border-radius: 3px; overflow: hidden;">
+                            <div id="bar-mem" style="width: 0%; height: 100%; background: #f59e0b; transition: width 0.5s;"></div>
+                        </div>
+                        <span id="val-mem" style="font-size: 12px; font-weight: bold; color: #e2e8f0;">0 / 0 GB</span>
+                    </div>
+                    <div style="width: 1px; height: 16px; background: #334155;"></div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">NET</span>
+                        <span id="val-net" style="font-size: 12px; font-weight: bold; color: #10b981;">0 KB/s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('middleware')">中间件压测 (DB/Redis/MQ)</button>
+            <button class="tab-btn" onclick="switchTab('http')">HTTP 接口压测</button>
+        </div>
+
+        <!-- Middleware Test Config -->
+        <div id="tab-middleware" class="tab-content active">
+            <div class="config-panel">
+                <div class="config-group">
+                    <label>并发用户数</label>
+                    <input type="number" id="concurrency" value="50" min="1" max="500">
+                </div>
+                <div class="config-group">
+                    <label>持续时间 (s)</label>
+                    <input type="number" id="duration" value="10" min="1" max="300">
+                </div>
+                <div class="config-group">
+                    <label>DB总操作量</label>
+                    <input type="number" id="db_count" value="10000" min="0" max="1000000">
+                </div>
+                <div class="config-group">
+                    <label>MQ总消息量</label>
+                    <input type="number" id="mq_count" value="10000" min="0" max="1000000">
+                </div>
+                <div class="config-group">
+                    <label>压测模式 (DB)</label>
+                    <select id="db_mode">
+                        <option value="read">读模式 (Select)</option>
+                        <option value="write">写模式 (Insert)</option>
+                    </select>
+                </div>
+                <div class="config-group">
+                    <label>内存负载 (MB)</label>
+                    <input type="number" id="memory_load" value="0">
+                </div>
+                
+                <div class="module-group">
+                    <span style="color: var(--text-secondary); font-size: 12px; font-weight: 500;">启用模块:</span>
+                    <label><input type="checkbox" id="enable_db" checked> MySQL</label>
+                    <label><input type="checkbox" id="enable_redis" checked> Redis</label>
+                    <label><input type="checkbox" id="enable_mq"> MQ</label>
+                </div>
+                
+                <div class="actions">
+                    <button id="startBtn" class="btn btn-primary" onclick="startTest()">开始压测</button>
+                    <button id="stopBtn" class="btn btn-danger" onclick="stopTest()" disabled>停止</button>
+                    <button class="btn btn-secondary" onclick="clearData()">清除数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HTTP Test Config -->
+        <div id="tab-http" class="tab-content">
+            <div class="config-panel" style="grid-template-columns: repeat(5, 1fr);">
+                <div class="config-group">
+                    <label>并发连接数</label>
+                    <input type="number" id="http_concurrency" value="50" min="1" max="1000">
+                </div>
+                <div class="config-group">
+                    <label>持续时间 (s)</label>
+                    <input type="number" id="http_duration" value="10" min="1" max="300">
+                </div>
+                <div class="config-group" style="grid-column: span 2;">
+                    <label>目标 URL</label>
+                    <input type="text" id="http_target" value="http://127.0.0.1:8080/health" placeholder="http://127.0.0.1:8080/hello">
+                </div>
+                <div class="config-group">
+                    <label>请求方法</label>
+                    <select id="http_method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+                
+                <div class="actions" style="grid-column: span 5;">
+                    <button id="httpStartBtn" class="btn btn-purple" onclick="startHTTPTest()">开始 HTTP 压测</button>
+                    <button id="httpStopBtn" class="btn btn-danger" onclick="stopTest()" disabled>停止</button>
+                    <button class="btn btn-secondary" onclick="clearData()">清除数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-badge" id="status-write-db">
+                <div class="status-dot"></div>
+                <span>主数据库: 检测中</span>
+            </div>
+            <div class="status-badge" id="status-read-db">
+                <div class="status-dot"></div>
+                <span>读数据库: 检测中</span>
+            </div>
+            <div class="status-badge" id="status-redis">
+                <div class="status-dot"></div>
+                <span>Redis: 检测中</span>
+            </div>
+            <div class="status-badge" id="status-mq">
+                <div class="status-dot"></div>
+                <span>MQ: 检测中</span>
+            </div>
+            <div class="status-badge" id="status-mode" style="margin-left: auto; border-color: rgba(139,92,246,0.3); color: #8b5cf6; background: rgba(139,92,246,0.1);">
+                <span>待命</span>
+            </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">当前 QPS</div>
+                <div class="metric-value" id="val-qps">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">平均延迟 (ms)</div>
+                <div class="metric-value" id="val-latency" style="color: var(--warning-color)">0.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">P95 延迟 (ms)</div>
+                <div class="metric-value" id="val-p95" style="color: #f97316">0.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">P99 延迟 (ms)</div>
+                <div class="metric-value" id="val-p99" style="color: var(--danger-color)">0.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">活跃并发</div>
+                <div class="metric-value" id="val-workers" style="color: var(--success-color)">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">剩余时间 (s)</div>
+                <div class="metric-value" id="val-remaining" style="color: var(--text-primary)">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">总请求数</div>
+                <div class="metric-value" id="val-total">0</div>
+            </div>
+        </div>
+
+        <div id="error-alert" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 14px;">
+            <strong>错误警告:</strong> <span id="error-msg"></span>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>QPS & 吞吐量趋势</h3>
+                <div id="chart-qps" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="chart-card">
+                <h3>响应延迟分布 (ms) - Avg / P95 / P99</h3>
+                <div id="chart-latency" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="chart-card">
+                <h3>CPU 使用率 (%)</h3>
+                <div id="chart-cpu" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="chart-card">
+                <h3>内存使用 (GB)</h3>
+                <div id="chart-memory" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="chart-card">
+                <h3>中间件吞吐 (Ops/sec)</h3>
+                <div id="chart-middleware" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div class="chart-card">
+                <h3>请求成功/失败速率</h3>
+                <div id="chart-success" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function initTheme() {
+            const savedTheme = localStorage.getItem('vigo-theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        initTheme();
+        
+        let isRunning = false;
+        let currentTab = 'middleware';
+        let ws = null;
+        let wsReconnectTimer = null;
+        let wsConnected = false;
+
+        let lastStats = {
+            qps: 0,
+            latency: 0,
+            p95: 0,
+            p99: 0,
+            redisOps: 0,
+            mysqlOps: 0,
+            mqOps: 0,
+            httpOps: 0,
+            workers: 0
+        };
+
+        const charts = {
+            qps: echarts.init(document.getElementById('chart-qps')),
+            latency: echarts.init(document.getElementById('chart-latency')),
+            cpu: echarts.init(document.getElementById('chart-cpu')),
+            memory: echarts.init(document.getElementById('chart-memory')),
+            middleware: echarts.init(document.getElementById('chart-middleware')),
+            success: echarts.init(document.getElementById('chart-success'))
+        };
+
+        const data = {
+            time: [], qps: [], latency: [], p95: [], p99: [],
+            mq: [], redis: [], mysql: [], http: [],
+            success: [], failed: [],
+            cpu: [], memUsed: [], memTotal: []
+        };
+
+        const commonOption = {
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            textStyle: { color: '#94a3b8' },
+            xAxis: { type: 'category', boundaryGap: false, data: data.time },
+            yAxis: { type: 'value', splitLine: { lineStyle: { color: '#334155' } } }
+        };
+
+        function initCharts() {
+            charts.qps.setOption({
+                ...commonOption,
+                series: [{
+                    name: 'QPS', type: 'line', smooth: true, data: data.qps,
+                    itemStyle: { color: '#3b82f6' }, areaStyle: { opacity: 0.2 }
+                }]
+            });
+            charts.latency.setOption({
+                ...commonOption,
+                legend: { textStyle: { color: '#94a3b8' }, top: 0 },
+                series: [
+                    { name: 'Avg', type: 'line', smooth: true, data: data.latency, itemStyle: { color: '#f59e0b' }, areaStyle: { opacity: 0.1 } },
+                    { name: 'P95', type: 'line', smooth: true, data: data.p95, itemStyle: { color: '#f97316' }, lineStyle: { type: 'dashed' } },
+                    { name: 'P99', type: 'line', smooth: true, data: data.p99, itemStyle: { color: '#ef4444' }, lineStyle: { type: 'dashed' } }
+                ]
+            });
+            charts.cpu.setOption({
+                ...commonOption,
+                yAxis: { ...commonOption.yAxis, max: 100, axisLabel: { formatter: '{value}%' } },
+                series: [{
+                    name: 'CPU', type: 'line', smooth: true, data: data.cpu,
+                    itemStyle: { color: '#3b82f6' }, areaStyle: { opacity: 0.3 },
+                    markLine: {
+                        silent: true,
+                        lineStyle: { color: '#f59e0b', type: 'dashed' },
+                        data: [{ yAxis: 80, label: { formatter: '警告线 80%', color: '#f59e0b' } }]
+                    }
+                }]
+            });
+            charts.memory.setOption({
+                ...commonOption,
+                legend: { textStyle: { color: '#94a3b8' }, top: 0 },
+                series: [
+                    { name: '已用', type: 'line', smooth: true, data: data.memUsed, itemStyle: { color: '#f59e0b' }, areaStyle: { opacity: 0.2 } },
+                    { name: '总量', type: 'line', smooth: true, data: data.memTotal, itemStyle: { color: '#6b7280' }, lineStyle: { type: 'dashed' } }
+                ]
+            });
+            charts.middleware.setOption({
+                ...commonOption,
+                legend: { textStyle: { color: '#94a3b8' }, top: 0 },
+                series: [
+                    { name: 'Redis', type: 'line', smooth: true, data: data.redis, itemStyle: { color: '#ef4444' } },
+                    { name: 'MySQL', type: 'line', smooth: true, data: data.mysql, itemStyle: { color: '#3b82f6' } },
+                    { name: 'RabbitMQ', type: 'line', smooth: true, data: data.mq, itemStyle: { color: '#10b981' } },
+                    { name: 'HTTP', type: 'line', smooth: true, data: data.http, itemStyle: { color: '#8b5cf6' } }
+                ]
+            });
+            charts.success.setOption({
+                ...commonOption,
+                legend: { textStyle: { color: '#94a3b8' }, top: 0 },
+                series: [
+                    { name: 'Success', type: 'line', smooth: true, data: data.success, itemStyle: { color: '#10b981' }, areaStyle: { opacity: 0.1 } },
+                    { name: 'Failed', type: 'line', smooth: true, data: data.failed, itemStyle: { color: '#ef4444' }, areaStyle: { opacity: 0.1 } }
+                ]
+            });
+
+            window.addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', (i === 0 && tab === 'middleware') || (i === 1 && tab === 'http'));
+            });
+            document.getElementById('tab-middleware').classList.toggle('active', tab === 'middleware');
+            document.getElementById('tab-http').classList.toggle('active', tab === 'http');
+        }
+
+        // ============================================================
+        // WebSocket 连接管理（替代 HTTP 轮询）
+        // ============================================================
+        function connectWebSocket() {
+            if (ws && ws.readyState <= 1) return;
+
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${location.host}/benchmark/ws?channel=benchmark`;
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                wsConnected = true;
+                console.log('[WS] 已连接');
+                updateWsStatus(true);
+                if (wsReconnectTimer) {
+                    clearTimeout(wsReconnectTimer);
+                    wsReconnectTimer = null;
+                }
+            };
+
+            ws.onmessage = (event) => {
+                // 支持多行合并消息（writePump 可能合并多条）
+                const lines = event.data.split('\n');
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const msg = JSON.parse(line);
+                        handleWsMessage(msg);
+                    } catch (e) {
+                        console.warn('[WS] 解析错误:', e);
+                    }
+                }
+            };
+
+            ws.onclose = () => {
+                wsConnected = false;
+                updateWsStatus(false);
+                console.log('[WS] 连接关闭，3 秒后重连...');
+                wsReconnectTimer = setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error('[WS] 错误:', err);
+                ws.close();
+            };
+        }
+
+        function updateWsStatus(connected) {
+            const el = document.getElementById('status-mode');
+            if (!el) return;
+            if (connected) {
+                el.querySelector('span').textContent = 'WS 已连接 · 待命';
+                el.className = 'status-badge connected';
+            } else {
+                el.querySelector('span').textContent = 'WS 断开';
+                el.className = 'status-badge disconnected';
+            }
+        }
+
+        // 发送 WS 控制指令
+        function sendCommand(action, params = {}) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                console.warn('[WS] 未连接，回退到 HTTP');
+                return false;
+            }
+            ws.send(JSON.stringify({
+                type: 'command',
+                channel: 'benchmark',
+                data: { action, ...params }
+            }));
+            return true;
+        }
+
+        // 处理服务端推送的消息
+        function handleWsMessage(msg) {
+            if (msg.type === 'stats' && msg.channel === 'benchmark') {
+                applyStats(msg.data);
+            } else if (msg.type === 'response' && msg.channel === 'benchmark') {
+                const resp = msg.data;
+                if (resp.code !== 0) {
+                    alert(resp.msg || '操作失败');
+                }
+            }
+        }
+
+        // 统一的 stats 数据应用函数（WS 推送和 HTTP 降级共用）
+        function applyStats(stats) {
+            document.getElementById('val-total').innerText = stats.total_requests.toLocaleString();
+
+            // System Monitor
+            if (stats.cpu_usage !== undefined) {
+                const cpuColor = stats.cpu_usage > 80 ? '#ef4444' : stats.cpu_usage > 60 ? '#f59e0b' : '#3b82f6';
+                document.getElementById('bar-cpu').style.width = stats.cpu_usage + '%';
+                document.getElementById('bar-cpu').style.background = cpuColor;
+                document.getElementById('val-cpu').innerText = stats.cpu_usage.toFixed(1) + '%';
+            }
+            if (stats.memory_used !== undefined && stats.memory_total > 0) {
+                const memPercent = (stats.memory_used / stats.memory_total) * 100;
+                document.getElementById('bar-mem').style.width = memPercent + '%';
+                document.getElementById('val-mem').innerText = (stats.memory_used / 1024).toFixed(1) + ' / ' + (stats.memory_total / 1024).toFixed(1) + ' GB';
+            }
+            if (stats.net_sent !== undefined) {
+                const formatSpeed = (bytes) => {
+                    if (bytes > 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB/s';
+                    return (bytes / 1024).toFixed(1) + ' KB/s';
+                };
+                document.getElementById('val-net').innerText = `${formatSpeed(stats.net_sent)} / ${formatSpeed(stats.net_recv)}`;
+            }
+
+            // Status Bar
+            const updateStatus = (id, status, name) => {
+                const el = document.getElementById(id);
+                if (status) {
+                    el.className = 'status-badge connected';
+                    el.querySelector('span').textContent = `${name}: 已连接`;
+                } else {
+                    el.className = 'status-badge disconnected';
+                    el.querySelector('span').textContent = `${name}: 未连接`;
+                }
+            };
+            updateStatus('status-write-db', stats.write_db_status, '主数据库');
+            updateStatus('status-read-db', stats.read_db_status, '读数据库');
+            updateStatus('status-redis', stats.redis_status, 'Redis');
+            updateStatus('status-mq', stats.mq_status, 'MQ');
+
+            // Test Mode
+            const modeMap = {
+                'idle': '待命', 'http': 'HTTP 压测中', 'db_read': 'DB 读压测',
+                'db_write': 'DB 写压测', 'redis': 'Redis 压测', 'mq': 'MQ 压测', 'mixed': '混合压测'
+            };
+            document.getElementById('status-mode').querySelector('span').textContent = modeMap[stats.test_mode] || stats.test_mode;
+            if (wsConnected) {
+                document.getElementById('status-mode').className = 'status-badge connected';
+            }
+
+            const testActive = stats.test_mode && stats.test_mode !== 'idle';
+
+            if (testActive || stats.active_workers > 0) {
+                document.getElementById('val-qps').innerText = stats.qps.toLocaleString();
+                document.getElementById('val-latency').innerText = stats.avg_latency_ms.toFixed(2);
+                document.getElementById('val-p95').innerText = (stats.p95_latency_ms || 0).toFixed(2);
+                document.getElementById('val-p99').innerText = (stats.p99_latency_ms || 0).toFixed(2);
+                document.getElementById('val-workers').innerText = stats.active_workers;
+                document.getElementById('val-remaining').innerText = stats.remaining_time || 0;
+
+                // 保存最后一次有效值
+                if (stats.qps > 0) {
+                    lastStats.qps = stats.qps;
+                }
+                if (stats.avg_latency_ms > 0) {
+                    lastStats.latency = stats.avg_latency_ms;
+                }
+                if (stats.p95_latency_ms > 0) {
+                    lastStats.p95 = stats.p95_latency_ms;
+                }
+                if (stats.p99_latency_ms > 0) {
+                    lastStats.p99 = stats.p99_latency_ms;
+                }
+                if (stats.redis_ops !== undefined) {
+                    lastStats.redisOps = stats.redis_ops;
+                }
+                if (stats.mysql_ops !== undefined) {
+                    lastStats.mysqlOps = stats.mysql_ops;
+                }
+                if (stats.mq_throughput !== undefined) {
+                    lastStats.mqOps = stats.mq_throughput;
+                }
+                if (stats.http_ops !== undefined) {
+                    lastStats.httpOps = stats.http_ops;
+                }
+                if (stats.active_workers > 0) {
+                    lastStats.workers = stats.active_workers;
+                }
+
+                // 处理错误警告
+                if (stats.last_error && stats.last_error !== "") {
+                    document.getElementById('error-alert').style.display = 'block';
+                    document.getElementById('error-msg').innerText = stats.last_error;
+                } else {
+                    document.getElementById('error-alert').style.display = 'none';
+                }
+
+                if (stats.qps > 0) {
+                    const now = new Date().toLocaleTimeString();
+                    const maxPoints = 60;
+                    if (data.time.length > maxPoints) {
+                        Object.keys(data).forEach(k => data[k].shift());
+                    }
+
+                    data.time.push(now);
+                    data.qps.push(stats.qps);
+                    data.latency.push(stats.avg_latency_ms);
+                    data.p95.push(stats.p95_latency_ms || 0);
+                    data.p99.push(stats.p99_latency_ms || 0);
+                    data.redis.push(stats.redis_ops);
+                    data.mysql.push(stats.mysql_ops);
+                    data.mq.push(stats.mq_throughput);
+                    data.http.push(stats.http_ops || 0);
+                    data.success.push(stats.success_qps || 0);
+                    data.failed.push(stats.failed_qps || 0);
+                    
+                    // CPU 和内存数据（始终更新，无论是否有 QPS）
+                    data.cpu.push(stats.cpu_usage || 0);
+                    const memUsedGB = stats.memory_used ? (stats.memory_used / 1024) : 0;
+                    const memTotalGB = stats.memory_total ? (stats.memory_total / 1024) : 0;
+                    data.memUsed.push(parseFloat(memUsedGB.toFixed(2)));
+                    data.memTotal.push(parseFloat(memTotalGB.toFixed(2)));
+
+                    charts.qps.setOption({ xAxis: { data: data.time }, series: [{ data: data.qps }] });
+                    charts.latency.setOption({ xAxis: { data: data.time }, series: [{ data: data.latency }, { data: data.p95 }, { data: data.p99 }] });
+                    charts.cpu.setOption({ xAxis: { data: data.time }, series: [{ data: data.cpu }] });
+                    charts.memory.setOption({ xAxis: { data: data.time }, series: [{ data: data.memUsed }, { data: data.memTotal }] });
+                    charts.middleware.setOption({ xAxis: { data: data.time }, series: [{ data: data.redis }, { data: data.mysql }, { data: data.mq }, { data: data.http }] });
+                    charts.success.setOption({ xAxis: { data: data.time }, series: [{ data: data.success }, { data: data.failed }] });
+                } else {
+                    // 即使没有 QPS，也要更新 CPU 和内存图表
+                    const now = new Date().toLocaleTimeString();
+                    const maxPoints = 60;
+                    if (data.time.length > maxPoints) {
+                        Object.keys(data).forEach(k => data[k].shift());
+                    }
+                    
+                    data.time.push(now);
+                    data.cpu.push(stats.cpu_usage || 0);
+                    const memUsedGB = stats.memory_used ? (stats.memory_used / 1024) : 0;
+                    const memTotalGB = stats.memory_total ? (stats.memory_total / 1024) : 0;
+                    data.memUsed.push(parseFloat(memUsedGB.toFixed(2)));
+                    data.memTotal.push(parseFloat(memTotalGB.toFixed(2)));
+                    
+                    charts.cpu.setOption({ xAxis: { data: data.time }, series: [{ data: data.cpu }] });
+                    charts.memory.setOption({ xAxis: { data: data.time }, series: [{ data: data.memUsed }, { data: data.memTotal }] });
+                }
+
+                if (!isRunning) setRunningState(true);
+            } else {
+                // 测试结束，使用保存的最后一次有效值
+                document.getElementById('val-qps').innerText = lastStats.qps.toLocaleString();
+                document.getElementById('val-p95').innerText = lastStats.p95.toFixed(2);
+                document.getElementById('val-p99').innerText = lastStats.p99.toFixed(2);
+                document.getElementById('val-latency').innerText = lastStats.latency.toFixed(2);
+                document.getElementById('val-workers').innerText = lastStats.workers;
+                document.getElementById('val-remaining').innerText = 0;
+                // 仅在不处于"刚启动等待"状态时才重置按钮
+                if (isRunning && stats.test_mode === 'idle') {
+                    setRunningState(false);
+                }
+                // 隐藏错误警告
+                document.getElementById('error-alert').style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // 控制操作（优先走 WS，失败回退 HTTP）
+        // ============================================================
+        function startTest() {
+            resetCharts();
+            const params = {
+                action: 'start',
+                concurrency: parseInt(document.getElementById('concurrency').value) || 10,
+                duration: parseInt(document.getElementById('duration').value) || 10,
+                db_count: parseInt(document.getElementById('db_count').value) || 0,
+                mq_count: parseInt(document.getElementById('mq_count').value) || 0,
+                enable_insert: document.getElementById('db_mode').value === 'write',
+                memory_load_mb: parseInt(document.getElementById('memory_load').value) || 0,
+                enable_db: document.getElementById('enable_db').checked,
+                enable_redis: document.getElementById('enable_redis').checked,
+                enable_mq: document.getElementById('enable_mq').checked,
+            };
+
+            if (sendCommand('start', params)) {
+                isRunning = true;
+                setRunningState(true);
+            } else {
+                startTestHTTP();
+            }
+        }
+
+        function startHTTPTest() {
+            resetCharts();
+            const params = {
+                action: 'start-http',
+                concurrency: parseInt(document.getElementById('http_concurrency').value) || 10,
+                duration: parseInt(document.getElementById('http_duration').value) || 10,
+                target_url: document.getElementById('http_target').value,
+                method: document.getElementById('http_method').value || 'GET',
+            };
+
+            if (sendCommand('start-http', params)) {
+                isRunning = true;
+                setRunningState(true);
+            } else {
+                startHTTPTestHTTP();
+            }
+        }
+
+        function stopTest() {
+            if (sendCommand('stop')) {
+                setRunningState(false);
+                isRunning = false;
+            } else {
+                stopTestHTTP();
+            }
+        }
+
+        function clearData() {
+            if (sendCommand('reset')) {
+                resetCharts();
+                resetDisplayValues();
+                isRunning = false;
+                setRunningState(false);
+            } else {
+                clearDataHTTP();
+            }
+        }
+
+        function resetDisplayValues() {
+            document.getElementById('val-qps').innerText = "0";
+            document.getElementById('val-latency').innerText = "0.0";
+            document.getElementById('val-p95').innerText = "0.0";
+            document.getElementById('val-p99').innerText = "0.0";
+            document.getElementById('val-workers').innerText = "0";
+            document.getElementById('val-remaining').innerText = "0";
+            document.getElementById('val-total').innerText = "0";
+            document.getElementById('error-alert').style.display = 'none';
+            lastStats = {
+                qps: 0,
+                latency: 0,
+                p95: 0,
+                p99: 0,
+                redisOps: 0,
+                mysqlOps: 0,
+                mqOps: 0,
+                httpOps: 0,
+                workers: 0
+            };
+        }
+
+        // ============================================================
+        // HTTP 降级方案（WS 不可用时自动回退）
+        // ============================================================
+        async function startTestHTTP() {
+            const params = new URLSearchParams();
+            params.append('concurrency', document.getElementById('concurrency').value);
+            params.append('duration', document.getElementById('duration').value);
+            params.append('db_count', document.getElementById('db_count').value);
+            params.append('mq_count', document.getElementById('mq_count').value);
+            params.append('enable_insert', document.getElementById('db_mode').value === 'write');
+            params.append('memory_load_mb', document.getElementById('memory_load').value);
+            params.append('enable_db', document.getElementById('enable_db').checked);
+            params.append('enable_redis', document.getElementById('enable_redis').checked);
+            params.append('enable_mq', document.getElementById('enable_mq').checked);
+            try {
+                const res = await fetch('/benchmark/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+                const json = await res.json();
+                if (json.code !== 0) { alert('启动失败: ' + json.msg); return; }
+                isRunning = true;
+                setRunningState(true);
+            } catch (e) { alert('请求错误: ' + e); }
+        }
+
+        async function startHTTPTestHTTP() {
+            const params = new URLSearchParams();
+            params.append('concurrency', document.getElementById('http_concurrency').value);
+            params.append('duration', document.getElementById('http_duration').value);
+            params.append('target_url', document.getElementById('http_target').value);
+            params.append('method', document.getElementById('http_method').value);
+            try {
+                const res = await fetch('/benchmark/start-http', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+                const json = await res.json();
+                if (json.code !== 0) { alert('启动失败: ' + json.msg); return; }
+                isRunning = true;
+                setRunningState(true);
+            } catch (e) { alert('请求错误: ' + e); }
+        }
+
+        async function stopTestHTTP() {
+            try {
+                const c = new AbortController();
+                setTimeout(() => c.abort(), 3000);
+                await fetch('/benchmark/stop', { method: 'POST', signal: c.signal });
+            } catch (e) { console.warn("Stop:", e.message); }
+            setRunningState(false);
+            isRunning = false;
+        }
+
+        async function clearDataHTTP() {
+            try {
+                const c = new AbortController();
+                setTimeout(() => c.abort(), 3000);
+                await fetch('/benchmark/reset', { method: 'POST', signal: c.signal });
+            } catch (e) { console.warn("Reset:", e.message); }
+            resetCharts();
+            resetDisplayValues();
+            isRunning = false;
+            setRunningState(false);
+        }
+
+        // ============================================================
+        // 通用工具
+        // ============================================================
+        function resetCharts() {
+            Object.keys(data).forEach(k => data[k] = []);
+            commonOption.xAxis.data = data.time;
+            charts.qps.setOption({ xAxis: { data: [] }, series: [{ data: [] }] });
+            charts.latency.setOption({ xAxis: { data: [] }, series: [{ data: [] }, { data: [] }, { data: [] }] });
+            charts.cpu.setOption({ xAxis: { data: [] }, series: [{ data: [] }] });
+            charts.memory.setOption({ xAxis: { data: [] }, series: [{ data: [] }, { data: [] }] });
+            charts.middleware.setOption({ xAxis: { data: [] }, series: [{ data: [] }, { data: [] }, { data: [] }, { data: [] }] });
+            charts.success.setOption({ xAxis: { data: [] }, series: [{ data: [] }, { data: [] }] });
+        }
+
+        function setRunningState(running) {
+            isRunning = running;
+            document.getElementById('startBtn').disabled = running;
+            document.getElementById('stopBtn').disabled = !running;
+            document.getElementById('httpStartBtn').disabled = running;
+            document.getElementById('httpStopBtn').disabled = !running;
+            ['concurrency', 'duration', 'db_count', 'mq_count', 'db_mode', 'memory_load',
+             'http_concurrency', 'http_duration', 'http_target', 'http_method'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = running;
+            });
+        }
+
+        // 启动
+        initCharts();
+        // 页面加载时先调用后端 reset 清除数据
+        (async function init() {
+            try {
+                const c = new AbortController();
+                setTimeout(() => c.abort(), 3000);
+                await fetch('/benchmark/reset', { method: 'POST', signal: c.signal });
+            } catch (e) { console.warn("Init Reset:", e.message); }
+            resetCharts();
+            resetDisplayValues();
+            connectWebSocket();
+        })();
+    </script>
+</body>
+</html>

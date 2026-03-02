@@ -1,0 +1,544 @@
+# ==============================================
+# Vigo 框架配置文件
+# 支持环境变量占位符格式: ${ENV_VAR} 或 ${ENV_VAR:default_value}
+# ==============================================
+
+# ==============================================
+# 应用基础配置
+# ==============================================
+app:
+  # 应用名称
+  name: vago
+  # 应用版本号
+  version: 1.0.1
+  # HTTP 服务监听端口
+  port: 8080
+  # 是否开启调试模式（生产环境建议关闭）
+  debug: false
+  # 运行模式：dev | test | prod
+  mode: prod
+  # 是否显示控制台输出
+  console: true
+  # 启动时是否自动杀掉占用端口的进程
+  auto_kill_port: true
+
+# ==============================================
+# 安全防护配置
+# ==============================================
+security:
+  # 是否启用全局安全中间件（强烈建议启用）
+  # 启用后会自动拦截 SQL 注入、XSS、命令注入等攻击
+  enable_security_middleware: true
+  
+  # 是否启用 CSRF 保护
+  enable_csrf_protection: false
+  
+  # 是否启用速率限制
+  enable_rate_limit: false
+  # 速率限制：每秒请求数
+  rate_limit: 100
+  
+  # 是否启用 CORS 域名验证（生产环境必须启用）
+  # 开发环境自动禁用 CORS 限制
+  # Electron 桌面应用会自动放行（file://, app://, localhost）
+  enable_cors_domain_check: true
+  
+  # 允许的域名列表（生产环境）
+  # 开发环境自动允许所有域名
+  # Electron 桌面应用无需配置，自动放行
+  allowed_domains:
+    - "https://www.example.com"
+    - "https://api.example.com"
+    - "https://admin.example.com"
+  
+  # IP 白名单（可选，为空则不限制）
+  ip_whitelist: []
+  
+  # IP 黑名单
+  ip_blacklist: []
+
+# ==============================================
+# 支付配置（支付宝、微信支付）
+# ==============================================
+payment:
+  # 支付宝配置
+  alipay:
+    # 是否启用
+    enabled: false
+    # 应用 ID
+    app_id: ""
+    # 应用私钥
+    app_private_key: ""
+    # 支付宝公钥
+    alipay_public_key: ""
+    # 回调地址
+    notify_url: ""
+    # 返回地址
+    return_url: ""
+    # 服务商模式（true=服务商，false=个体）
+    is_provider: false
+    # 服务商 PID（服务商模式必填）
+    provider_pid: ""
+  
+  # 微信支付配置
+  wechat_pay:
+    # 是否启用
+    enabled: false
+    # 商户号
+    mch_id: ""
+    # API 密钥
+    api_key: ""
+    # 应用 ID
+    app_id: ""
+    # 回调地址
+    notify_url: ""
+    # 服务商模式（true=服务商，false=个体）
+    is_provider: false
+    # 服务商商户号（服务商模式必填）
+    provider_mch_id: ""
+
+# ==============================================
+# 第三方登录配置
+# ==============================================
+oauth:
+  # QQ 登录配置
+  qq:
+    # 是否启用
+    enabled: false
+    # App ID
+    app_id: ""
+    # App Key
+    app_key: ""
+    # 回调地址
+    redirect_uri: ""
+  
+  # 微信登录配置
+  wechat:
+    # 是否启用
+    enabled: false
+    # App ID
+    app_id: ""
+    # App Secret
+    app_secret: ""
+    # 回调地址
+    redirect_uri: ""
+  
+  # 支付宝登录配置
+  alipay:
+    # 是否启用
+    enabled: false
+    # App ID
+    app_id: ""
+    # 应用私钥
+    app_private_key: ""
+    # 支付宝公钥
+    alipay_public_key: ""
+    # 回调地址
+    redirect_uri: ""
+
+# ==============================================
+# 数据库配置（主库 - 默认数据库）
+# 必须通过环境变量配置: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+# ==============================================
+database:
+  # 数据库驱动类型: mysql | postgres | sqlite | mssql
+  driver: mysql
+  # 主库主机地址（写库）
+  host: ${DB_HOST}
+  # 主库端口
+  port: ${DB_PORT:3306}
+  # 数据库名称
+  name: ${DB_NAME}
+  # 数据库用户名
+  user: ${DB_USER}
+  # 数据库密码
+  pass: ${DB_PASSWORD}
+  # 数据库字符集
+  charset: utf8mb4
+
+  # ==============================================
+  # 连接池配置（10万并发优化）
+  # ==============================================
+  # 最大打开连接数（单机推荐: 1000，分布式推荐: 300-500）
+  max_open_conns: 1000
+  # 最大空闲连接数（建议为 max_open_conns 的 50%）
+  max_idle_conns: 500
+  # 连接最大生命周期（秒），建议 1800-3600
+  conn_max_lifetime: 1800
+  # 空闲连接回收时间（秒），超过该时间的空闲连接会被关闭
+  conn_max_idletime: 300
+
+  # ==============================================
+  # 读写分离配置（分布式部署必须启用）
+  # ==============================================
+  # 是否开启读写分离
+  rw_split: false
+
+  # ==============================================
+  # 多主库配置（写入负载均衡）
+  # 配置多个主库时，写入操作会轮询分配到各主库
+  # ==============================================
+  writes: []
+  # 示例配置:
+  # writes:
+  #   - host: 192.168.1.10
+  #     port: 3306
+  #     user: writer1
+  #     pass: write-pass-1
+  #     charset: utf8mb4
+  #   - host: 192.168.1.11
+  #     port: 3306
+  #     user: writer2
+  #     pass: write-pass-2
+  #     charset: utf8mb4
+
+  # ==============================================
+  # 只读从库配置（读取负载均衡）
+  # 配置多个从库时，读取操作会轮询分配到各从库
+  # ==============================================
+  reads: []
+  # 示例配置:
+  # reads:
+  #   - host: 192.168.1.20
+  #     port: 3306
+  #     user: reader1
+  #     pass: read-pass-1
+  #     charset: utf8mb4
+  #   - host: 192.168.1.21
+  #     port: 3306
+  #     user: reader2
+  #     pass: read-pass-2
+  #     charset: utf8mb4
+  #   - host: 192.168.1.22
+  #     port: 3306
+  #     user: reader3
+  #     pass: read-pass-3
+  #     charset: utf8mb4
+
+# ==============================================
+# 多数据库配置（不同业务独立数据库）
+# 每个业务库都可以独立配置读写分离
+# ==============================================
+databases: {}
+# 示例配置:
+# databases:
+#   # 用户中心数据库
+#   user_center:
+#     driver: mysql
+#     host: 192.168.2.10
+#     port: 3306
+#     name: user_center
+#     user: user_admin
+#     pass: user-pass
+#     charset: utf8mb4
+#     max_open_conns: 500
+#     max_idle_conns: 100
+#     conn_max_lifetime: 1800
+#     conn_max_idletime: 300
+#     rw_split: true
+#     reads:
+#       - host: 192.168.2.20
+#         port: 3306
+#         user: user_reader
+#         pass: user-read-pass
+#         charset: utf8mb4
+#
+#   # 订单数据库
+#   order_db:
+#     driver: mysql
+#     host: 192.168.3.10
+#     port: 3306
+#     name: order_db
+#     user: order_admin
+#     pass: order-pass
+#     charset: utf8mb4
+#     max_open_conns: 800
+#     max_idle_conns: 200
+#     conn_max_lifetime: 1800
+#     conn_max_idletime: 300
+#     rw_split: true
+#     writes:
+#       - host: 192.168.3.11
+#         port: 3306
+#         user: order_writer
+#         pass: order-write-pass
+#         charset: utf8mb4
+#     reads:
+#       - host: 192.168.3.20
+#         port: 3306
+#         user: order_reader
+#         pass: order-read-pass
+#         charset: utf8mb4
+#       - host: 192.168.3.21
+#         port: 3306
+#         user: order_reader
+#         pass: order-read-pass
+#         charset: utf8mb4
+#
+#   # 日志数据库（使用 PostgreSQL）
+#   log_db:
+#     driver: postgres
+#     host: 192.168.4.10
+#     port: 5432
+#     name: log_db
+#     user: log_admin
+#     pass: log-pass
+#     charset: utf8
+#     max_open_conns: 200
+#     max_idle_conns: 50
+#     conn_max_lifetime: 3600
+#     conn_max_idletime: 600
+#     rw_split: false
+#     reads: []
+#
+#   # 配置数据库（使用 SQLite）
+#   config_db:
+#     driver: sqlite3
+#     name: ./data/config.db
+#     max_open_conns: 10
+#     max_idle_conns: 5
+#     conn_max_lifetime: 3600
+#     conn_max_idletime: 600
+#     rw_split: false
+#     reads: []
+
+# ==============================================
+# Nacos 配置中心 & 服务发现
+# ==============================================
+nacos:
+  # Nacos 服务地址
+  host: ${NACOS_HOST:127.0.0.1}
+  # Nacos 服务端口
+  port: ${NACOS_PORT:8848}
+  # Nacos 命名空间 ID（留空使用 public）
+  namespace: ${NACOS_NAMESPACE:}
+  # 配置数据 ID
+  data_id: ${NACOS_DATA_ID:vigo-config}
+  # 配置分组
+  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  # Nacos 安装路径（用于自动启动 Nacos 服务）
+  install_path: ${NACOS_INSTALL_PATH:}
+
+  # ==============================================
+  # 服务发现配置
+  # ==============================================
+  discovery:
+    # 是否启用服务发现
+    enabled: false
+    # 注册到 Nacos 的服务名称
+    service_name: ${NACOS_SERVICE_NAME:}
+    # 是否自动注册服务
+    auto_register: true
+    # 心跳间隔（秒）
+    heartbeat: 5
+
+  # ==============================================
+  # 管理界面配置
+  # ==============================================
+  admin:
+    # 是否启用管理界面（启用后启动时显示访问地址和密码）
+    enabled: false
+    # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
+    username: ${NACOS_ADMIN_USER:}
+    # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
+    password: ${NACOS_ADMIN_PASSWORD:}
+    # 管理界面端口
+    port: ${NACOS_PORT:8848}
+
+# ==============================================
+# Benchmark 压力测试配置
+# ==============================================
+benchmark:
+  # 内存限制百分比（超过该限制会停止压测）
+  mem_limit_percent: 95
+  # CPU 限制百分比（超过该限制会停止压测）
+  # 注意：压测工具本身会消耗 CPU，建议设置为 95 或更高
+  cpu_limit_percent: 95
+
+# ==============================================
+# RabbitMQ 消息队列配置
+# 必须通过环境变量配置: RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD
+# ==============================================
+rabbitmq:
+  # 是否启用 RabbitMQ（10万并发场景强烈建议启用）
+  enabled: false
+  # RabbitMQ 主机地址
+  host: ${RABBITMQ_HOST}
+  # RabbitMQ 端口
+  port: ${RABBITMQ_PORT:5672}
+  # RabbitMQ 用户名
+  user: ${RABBITMQ_USER}
+  # RabbitMQ 密码
+  pass: ${RABBITMQ_PASSWORD}
+  # 虚拟主机
+  vhost: ${RABBITMQ_VHOST:/}
+  # 连接超时时间（秒）
+  conn_timeout: 5
+  # 心跳间隔（秒）
+  heartbeat: 10
+  # 重连延迟（秒）
+  reconnect_delay: 3
+  # 最大重连次数
+  max_retries: 3
+
+  # ==============================================
+  # 管理界面配置
+  # ==============================================
+  admin:
+    # 是否启用管理界面
+    enabled: false
+    # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
+    username: ${RABBITMQ_ADMIN_USER:}
+    # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
+    password: ${RABBITMQ_ADMIN_PASSWORD:}
+    # 管理界面端口
+    port: 15672
+
+# ==============================================
+# Redis 缓存配置（高并发优化版）
+# 必须通过环境变量配置: REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+# ==============================================
+redis:
+  # Redis 主机地址（单实例模式）
+  host: ${REDIS_HOST}
+  # Redis 端口
+  port: ${REDIS_PORT:6379}
+  # Redis 密码
+  password: ${REDIS_PASSWORD}
+  # Redis 数据库编号（0-15）
+  db: ${REDIS_DB:0}
+
+  # ==============================================
+  # 连接池配置（10万并发优化）
+  # ==============================================
+  # 最大连接池大小（单机推荐: 2000，分布式推荐: 1000）
+  pool_size: 2000
+  # 最小空闲连接数（保持一定数量的空闲连接以提高响应速度）
+  min_idle_conns: 200
+  # 最大空闲连接数（超过该数量的空闲连接会被回收）
+  max_idle_conns: 1000
+
+  # ==============================================
+  # Redis 集群配置（分布式部署启用）
+  # ==============================================
+  cluster:
+    # 是否启用集群模式
+    enabled: false
+    # 集群节点地址列表
+    addrs: []
+    # 示例配置:
+    # - "redis-1:6379"
+    # - "redis-2:6379"
+    # - "redis-3:6379"
+    # - "redis-4:6379"
+    # - "redis-5:6379"
+    # - "redis-6:6379"
+
+# ==============================================
+# gRPC 微服务配置
+# ==============================================
+grpc:
+  # 是否启用 gRPC 服务
+  enabled: false
+  # gRPC 服务端口
+  port: 9090
+  # 服务名称
+  service_name: vigo
+  # 是否启用 panic 恢复
+  enable_recovery: true
+  # 是否启用日志
+  enable_logger: true
+  # 最大接收消息大小（MB）
+  max_recv_msg_size: 4
+  # 最大发送消息大小（MB）
+  max_send_msg_size: 4
+
+# ==============================================
+# 安全配置
+# ==============================================
+security:
+  # ==============================================
+  # JWT 认证配置
+  # ==============================================
+  jwt:
+    # JWT 密钥（生产环境必须修改）
+    secret: ${JWT_SECRET}
+    # Token 过期时间（秒）
+    expire: 7200
+    # Token 签发者
+    issuer: vigo
+
+  # ==============================================
+  # Session 会话配置
+  # ==============================================
+  session:
+    # 会话生命周期（秒）
+    lifetime: 120
+    # 是否仅通过 HTTPS 传输
+    secure: true
+    # 是否禁止 JavaScript 访问 Cookie
+    httponly: true
+    # SameSite 策略: strict | lax | none
+    samesite: strict
+
+  # ==============================================
+  # 密码策略配置
+  # ==============================================
+  password:
+    # 最小密码长度
+    min_length: 8
+    # 是否必须包含大写字母
+    require_uppercase: true
+    # 是否必须包含小写字母
+    require_lowercase: true
+    # 是否必须包含数字
+    require_number: true
+    # 是否必须包含特殊字符
+    require_special: false
+
+  # ==============================================
+  # CORS 跨域配置
+  # ==============================================
+  cors:
+    # 允许的来源列表（空表示允许所有）
+    allow_origins: []
+    # 允许的 HTTP 方法
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    # 允许的请求头
+    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
+    # 预检请求缓存时间（秒）
+    max_age: 86400
+
+  # ==============================================
+  # DoS 防护 / 限流配置
+  # ==============================================
+  dos:
+    # 是否启用限流
+    enable: true
+    # 每个 IP 的请求限制（10万并发场景建议: 1000）
+    limit: 1000
+    # 限流时间窗口（秒）
+    window: 60
+    # IP 黑名单列表
+    black_ip: []
+
+# ==============================================
+# 视图配置（ThinkPHP 风格）
+# ==============================================
+view:
+  # 视图文件存放目录（支持绝对路径或相对路径）
+  # 相对路径相对于项目根目录
+  path: "app/view"
+
+  # 视图文件后缀
+  suffix: ".html"
+
+  # 视图引擎类型
+  # 支持: template（默认模板引擎）、blade（Laravel 风格）
+  type: "template"
+
+  # 是否启用视图缓存
+  cache: false
+
+  # 缓存目录
+  cache_path: "runtime/view_cache"

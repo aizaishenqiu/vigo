@@ -1,0 +1,291 @@
+# ==============================================
+# Vigo 框架配置文件
+# 支持环境变量占位符格式: ${ENV_VAR} 或 ${ENV_VAR:default_value}
+# ==============================================
+
+# ==============================================
+# 应用基础配置
+# ==============================================
+app:
+  # 应用名称
+  name: vigo
+  # 应用版本号
+  version: 1.0.1
+  # HTTP 服务监听端口
+  port: 8080
+  # 是否开启调试模式（生产环境建议关闭）
+  debug: false
+  # 运行模式: dev | test | prod
+  mode: prod
+  # 是否显示控制台输出
+  console: true
+  # 启动时是否自动杀掉占用端口的进程
+  auto_kill_port: true
+
+# ==============================================
+# 数据库配置（高并发优化版）
+# 必须通过环境变量配置: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+# ==============================================
+database:
+  # 数据库驱动类型: mysql | postgres | sqlite | mssql
+  driver: mysql
+  # 数据库主机地址
+  host: ${DB_HOST}
+  # 数据库端口
+  port: ${DB_PORT:3306}
+  # 数据库名称
+  name: ${DB_NAME}
+  # 数据库用户名
+  user: ${DB_USER}
+  # 数据库密码
+  pass: ${DB_PASSWORD}
+  # 数据库字符集
+  charset: utf8mb4
+
+  # ==============================================
+  # 连接池配置（10万并发优化）
+  # ==============================================
+  # 最大打开连接数（单机推荐: 1000，分布式推荐: 300-500）
+  max_open_conns: 1000
+  # 最大空闲连接数（建议为 max_open_conns 的 50%）
+  max_idle_conns: 500
+  # 连接最大生命周期（秒），建议 1800-3600
+  conn_max_lifetime: 1800
+  # 空闲连接回收时间（秒），超过该时间的空闲连接会被关闭
+  conn_max_idletime: 300
+
+  # ==============================================
+  # 读写分离配置（分布式部署必须启用）
+  # ==============================================
+  # 是否开启读写分离
+  rw_split: false
+  # 只读数据库节点列表（主库负责写，从库负责读）
+  reads: []
+  # 示例配置:
+  # - host: read-db-1.example.com
+  #   port: 3306
+  #   user: ${DB_USER}
+  #   pass: ${DB_PASSWORD}
+  # - host: read-db-2.example.com
+  #   port: 3306
+  #   user: ${DB_USER}
+  #   pass: ${DB_PASSWORD}
+
+# ==============================================
+# Nacos 配置中心 & 服务发现
+# ==============================================
+nacos:
+  # Nacos 服务地址
+  host: ${NACOS_HOST:127.0.0.1}
+  # Nacos 服务端口
+  port: ${NACOS_PORT:8848}
+  # Nacos 命名空间 ID（留空使用 public）
+  namespace: ${NACOS_NAMESPACE:}
+  # 配置数据 ID
+  data_id: ${NACOS_DATA_ID:vigo-config}
+  # 配置分组
+  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  # Nacos 安装路径（用于自动启动 Nacos 服务）
+  install_path: ${NACOS_INSTALL_PATH:}
+
+  # ==============================================
+  # 服务发现配置
+  # ==============================================
+  discovery:
+    # 是否启用服务发现
+    enabled: false
+    # 注册到 Nacos 的服务名称
+    service_name: ${NACOS_SERVICE_NAME:}
+    # 是否自动注册服务
+    auto_register: true
+    # 心跳间隔（秒）
+    heartbeat: 5
+
+  # ==============================================
+  # 管理界面配置
+  # ==============================================
+  admin:
+    # 是否启用管理界面（启用后启动时显示访问地址和密码）
+    enabled: false
+    # 管理界面用户名
+    username: ${NACOS_ADMIN_USER:}
+    # 管理界面密码
+    password: ${NACOS_ADMIN_PASSWORD:}
+    # 管理界面端口
+    port: ${NACOS_PORT:8848}
+
+# ==============================================
+# Benchmark 压力测试配置
+# ==============================================
+benchmark:
+  # 内存限制百分比（超过该限制会停止压测）
+  mem_limit_percent: 90
+  # CPU 限制百分比（超过该限制会停止压测）
+  cpu_limit_percent: 90
+
+# ==============================================
+# RabbitMQ 消息队列配置
+# 必须通过环境变量配置: RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD
+# ==============================================
+rabbitmq:
+  # 是否启用 RabbitMQ（10万并发场景强烈建议启用）
+  enabled: false
+  # RabbitMQ 主机地址
+  host: ${RABBITMQ_HOST}
+  # RabbitMQ 端口
+  port: ${RABBITMQ_PORT:5672}
+  # RabbitMQ 用户名
+  user: ${RABBITMQ_USER}
+  # RabbitMQ 密码
+  pass: ${RABBITMQ_PASSWORD}
+  # 虚拟主机
+  vhost: ${RABBITMQ_VHOST:/}
+  # 连接超时时间（秒）
+  conn_timeout: 5
+  # 心跳间隔（秒）
+  heartbeat: 10
+  # 重连延迟（秒）
+  reconnect_delay: 3
+  # 最大重连次数
+  max_retries: 3
+
+  # ==============================================
+  # 管理界面配置
+  # ==============================================
+  admin:
+    # 是否启用管理界面
+    enabled: false
+    # 管理界面用户名
+    username: ${RABBITMQ_ADMIN_USER:}
+    # 管理界面密码
+    password: ${RABBITMQ_ADMIN_PASSWORD:}
+    # 管理界面端口
+    port: 15672
+
+# ==============================================
+# Redis 缓存配置（高并发优化版）
+# 必须通过环境变量配置: REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+# ==============================================
+redis:
+  # Redis 主机地址（单实例模式）
+  host: ${REDIS_HOST}
+  # Redis 端口
+  port: ${REDIS_PORT:6379}
+  # Redis 密码
+  password: ${REDIS_PASSWORD}
+  # Redis 数据库编号（0-15）
+  db: ${REDIS_DB:0}
+
+  # ==============================================
+  # 连接池配置（10万并发优化）
+  # ==============================================
+  # 最大连接池大小（单机推荐: 2000，分布式推荐: 1000）
+  pool_size: 2000
+  # 最小空闲连接数（保持一定数量的空闲连接以提高响应速度）
+  min_idle_conns: 200
+  # 最大空闲连接数（超过该数量的空闲连接会被回收）
+  max_idle_conns: 1000
+
+  # ==============================================
+  # Redis 集群配置（分布式部署启用）
+  # ==============================================
+  cluster:
+    # 是否启用集群模式
+    enabled: false
+    # 集群节点地址列表
+    addrs: []
+    # 示例配置:
+    # - "redis-1:6379"
+    # - "redis-2:6379"
+    # - "redis-3:6379"
+    # - "redis-4:6379"
+    # - "redis-5:6379"
+    # - "redis-6:6379"
+
+# ==============================================
+# gRPC 微服务配置
+# ==============================================
+grpc:
+  # 是否启用 gRPC 服务
+  enabled: false
+  # gRPC 服务端口
+  port: 9090
+  # 服务名称
+  service_name: vigo
+  # 是否启用 panic 恢复
+  enable_recovery: true
+  # 是否启用日志
+  enable_logger: true
+  # 最大接收消息大小（MB）
+  max_recv_msg_size: 4
+  # 最大发送消息大小（MB）
+  max_send_msg_size: 4
+
+# ==============================================
+# 安全配置
+# ==============================================
+security:
+  # ==============================================
+  # JWT 认证配置
+  # ==============================================
+  jwt:
+    # JWT 密钥（生产环境必须修改）
+    secret: ${JWT_SECRET}
+    # Token 过期时间（秒）
+    expire: 7200
+    # Token 签发者
+    issuer: vigo
+
+  # ==============================================
+  # Session 会话配置
+  # ==============================================
+  session:
+    # 会话生命周期（秒）
+    lifetime: 120
+    # 是否仅通过 HTTPS 传输
+    secure: true
+    # 是否禁止 JavaScript 访问 Cookie
+    httponly: true
+    # SameSite 策略: strict | lax | none
+    samesite: strict
+
+  # ==============================================
+  # 密码策略配置
+  # ==============================================
+  password:
+    # 最小密码长度
+    min_length: 8
+    # 是否必须包含大写字母
+    require_uppercase: true
+    # 是否必须包含小写字母
+    require_lowercase: true
+    # 是否必须包含数字
+    require_number: true
+    # 是否必须包含特殊字符
+    require_special: false
+
+  # ==============================================
+  # CORS 跨域配置
+  # ==============================================
+  cors:
+    # 允许的来源列表（空表示允许所有）
+    allow_origins: []
+    # 允许的 HTTP 方法
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    # 允许的请求头
+    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
+    # 预检请求缓存时间（秒）
+    max_age: 86400
+
+  # ==============================================
+  # DoS 防护 / 限流配置
+  # ==============================================
+  dos:
+    # 是否启用限流
+    enable: true
+    # 每个 IP 的请求限制（10万并发场景建议: 1000）
+    limit: 1000
+    # 限流时间窗口（秒）
+    window: 60
+    # IP 黑名单列表
+    black_ip: []
