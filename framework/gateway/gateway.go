@@ -175,7 +175,9 @@ func copyResponse(w http.ResponseWriter, recorder *httptest.ResponseRecorder) {
 func GatewayMiddleware(config *GatewayConfig) http.HandlerFunc {
 	gw, err := NewGateway(config)
 	if err != nil {
-		panic(fmt.Sprintf("创建网关失败：%v", err))
+		return func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, fmt.Sprintf("创建网关失败：%v", err), http.StatusInternalServerError)
+		}
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {

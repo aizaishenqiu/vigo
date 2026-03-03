@@ -27,7 +27,7 @@ type RedisConfig struct {
 }
 
 // NewRedisDriver 创建 Redis 队列驱动
-func NewRedisDriver(config RedisConfig) *RedisDriver {
+func NewRedisDriver(config RedisConfig) (*RedisDriver, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", config.Host, config.Port),
 		Password: config.Password,
@@ -37,14 +37,14 @@ func NewRedisDriver(config RedisConfig) *RedisDriver {
 	// 测试连接
 	ctx := context.Background()
 	if err := client.Ping(ctx).Err(); err != nil {
-		panic(fmt.Sprintf("Redis connection failed: %v", err))
+		return nil, fmt.Errorf("redis connection failed: %w", err)
 	}
 
 	return &RedisDriver{
 		client: client,
 		queue:  config.Queue,
 		sleep:  config.Sleep,
-	}
+	}, nil
 }
 
 // Push 推入任务

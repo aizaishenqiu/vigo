@@ -294,7 +294,7 @@ func (c *Context) Get(key string) (interface{}, bool) {
 	return val, ok
 }
 
-// MustGet 从请求上下文获取值（不存在则 panic）
+// MustGet 从请求上下文获取值（不存在则返回 nil）
 // 参数：
 //   - key: 键名
 //
@@ -303,7 +303,7 @@ func (c *Context) Get(key string) (interface{}, bool) {
 func (c *Context) MustGet(key string) interface{} {
 	val, ok := c.Get(key)
 	if !ok {
-		panic(fmt.Sprintf("Key %q 不存在于 Context 中", key))
+		return nil
 	}
 	return val
 }

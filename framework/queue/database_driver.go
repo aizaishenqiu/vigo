@@ -122,8 +122,13 @@ func (d *DatabaseDriver) Delete(job *JobWrapper) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// 从数据库删除（这里简化处理，实际需要 job ID）
-	return nil
+	// 从数据库删除
+	if job.ID == "" {
+		return fmt.Errorf("job ID is required")
+	}
+
+	_, err := d.db.Exec(`DELETE FROM `+d.queue+` WHERE id = ?`, job.ID)
+	return err
 }
 
 // Release 释放任务

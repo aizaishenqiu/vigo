@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -242,10 +243,10 @@ func GetCurrentUser(c *mvc.Context) (uint, string, string, bool) {
 }
 
 // MustGetCurrentUser 获取当前登录用户信息（必须登录）
-func MustGetCurrentUser(c *mvc.Context) (uint, string, string) {
+func MustGetCurrentUser(c *mvc.Context) (uint, string, string, error) {
 	userID, username, role, ok := GetCurrentUser(c)
 	if !ok {
-		panic("user not authenticated")
+		return 0, "", "", fmt.Errorf("user not authenticated")
 	}
-	return userID, username, role
+	return userID, username, role, nil
 }
