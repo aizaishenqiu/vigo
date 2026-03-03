@@ -362,24 +362,7 @@ vigo optimize schema         # 优化数据库 Schema
 
 ---
 
-## 📈 生态系统
-
-### 官方扩展
-
-- [vigo-cli](https://github.com/yourusername/vigo-cli) - CLI 工具
-- [vigo-admin](https://github.com/yourusername/vigo-admin) - 后台管理模板
-- [vigo-auth](https://github.com/yourusername/vigo-auth) - 认证扩展
-- [vigo-logger](https://github.com/yourusername/vigo-logger) - 日志组件
-
-### 第三方扩展
-
-- [vigo-wechat](https://github.com/yourusername/vigo-wechat) - 微信生态集成
-- [vigo-aliyun](https://github.com/yourusername/vigo-aliyun) - 阿里云全家桶
-- [vigo-elasticsearch](https://github.com/yourusername/vigo-elasticsearch) - Elasticsearch 集成
-
----
-
-## 📄 许可证
+## 许可证
 
 Vigo 框架采用 [MIT 许可证](LICENSE)
 

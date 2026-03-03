@@ -362,23 +362,6 @@ Welcome to participate in Vigo framework development:
 
 ---
 
-## 📈 Ecosystem
-
-### Official Extensions
-
-- [vigo-cli](https://github.com/yourusername/vigo-cli) - CLI tools
-- [vigo-admin](https://github.com/yourusername/vigo-admin) - Admin dashboard template
-- [vigo-auth](https://github.com/yourusername/vigo-auth) - Authentication extension
-- [vigo-logger](https://github.com/yourusername/vigo-logger) - Logging component
-
-### Third-party Extensions
-
-- [vigo-wechat](https://github.com/yourusername/vigo-wechat) - WeChat ecosystem integration
-- [vigo-aliyun](https://github.com/yourusername/vigo-aliyun) - Aliyun full-stack integration
-- [vigo-elasticsearch](https://github.com/yourusername/vigo-elasticsearch) - Elasticsearch integration
-
----
-
 ## 📄 License
 
 Vigo framework is released under the [MIT License](LICENSE)
