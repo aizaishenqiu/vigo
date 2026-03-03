@@ -679,14 +679,14 @@ func main() {
 		fmt.Println("  vigo <command> [options]")
 		fmt.Println("")
 		fmt.Println("可用命令:")
-		fmt.Println("  optimize    优化命令")
-		fmt.Println("  route:list  路由列表")
-		fmt.Println("  version     版本信息")
-		fmt.Println("  make        代码生成")
+		fmt.Println("  optimize       优化命令")
+		fmt.Println("  route          路由命令")
+		fmt.Println("  version        版本信息")
+		fmt.Println("  make           代码生成")
 		fmt.Println("")
 		fmt.Println("示例:")
 		fmt.Println("  vigo optimize config")
-		fmt.Println("  vigo route:list")
+		fmt.Println("  vigo route list")
 		fmt.Println("  vigo version")
 		fmt.Println("  vigo make controller User")
 		return
@@ -699,9 +699,14 @@ func main() {
 	case "optimize":
 		cmd := &OptimizeCommand{}
 		cmd.Run(args)
-	case "route:list":
-		cmd := &RouteListCommand{}
-		cmd.Run(args)
+	case "route":
+		// route list 命令
+		if len(args) > 0 && args[0] == "list" {
+			cmd := &RouteListCommand{}
+			cmd.Run(args[1:])
+		} else {
+			fmt.Println("用法：vigo route list")
+		}
 	case "version":
 		cmd := &VersionCommand{}
 		cmd.Run(args)

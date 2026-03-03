@@ -304,15 +304,15 @@ Vigo provides powerful command-line tools to significantly improve development e
 ```bash
 # Code Generation
 vigo make:crud User          # One-click complete CRUD
-vigo make:controller User    # Generate controller
-vigo make:model User         # Generate model
-vigo make:service User       # Generate service layer
-vigo make:middleware Auth    # Generate middleware
-vigo make:validator User     # Generate validator
-vigo make:migration Users    # Generate migration
+vigo make controller User    # Generate controller
+vigo make model User         # Generate model
+vigo make service User       # Generate service layer
+vigo make middleware Auth    # Generate middleware
+vigo make validator User     # Generate validator
+vigo make migration Users    # Generate migration
 
 # Optimization Commands
-vigo route:list              # View route list
+vigo route list              # View route list
 vigo optimize config         # Optimize configuration
 vigo optimize route          # Optimize routes
 vigo optimize schema         # Optimize database schema

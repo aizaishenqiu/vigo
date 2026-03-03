@@ -304,15 +304,15 @@ Vigo 提供强大的命令行工具，大幅提升开发效率：
 ```bash
 # 代码生成
 vigo make:crud User          # 一键生成完整 CRUD
-vigo make:controller User    # 生成控制器
-vigo make:model User         # 生成模型
-vigo make:service User       # 生成服务层
-vigo make:middleware Auth    # 生成中间件
-vigo make:validator User     # 生成验证器
-vigo make:migration Users    # 生成迁移文件
+vigo make controller User    # 生成控制器
+vigo make model User         # 生成模型
+vigo make service User       # 生成服务层
+vigo make middleware Auth    # 生成中间件
+vigo make validator User     # 生成验证器
+vigo make migration Users    # 生成迁移文件
 
 # 优化命令
-vigo route:list              # 查看路由列表
+vigo route list              # 查看路由列表
 vigo optimize config         # 优化配置
 vigo optimize route          # 优化路由
 vigo optimize schema         # 优化数据库 Schema
