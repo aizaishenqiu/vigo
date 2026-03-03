@@ -225,8 +225,8 @@ MIT License
 
 ---
 
-作者：[Vigo 团队](https://github.com/vigo-team)  
-创始人：秋叶
+作者：：秋叶
 邮箱：[yjk150@qq.com](mailto:yjk150@qq.com)
+QQ群：
 
 **Vigo** - 让 Go 语言开发更简单、更高效
