@@ -6,276 +6,277 @@ import (
 	"log"
 	"sync"
 	"time"
+	"vigo/framework/mvc"
+
+	"github.com/redis/go-redis/v9"
 )
 
-// PoolMonitor 数据库连接池监控器
-// 实时监控连接池状态，提供告警和统计功能
+// PoolMonitor 连接池监控器
 type PoolMonitor struct {
-	db        *sql.DB
-	interval  time.Duration
-	statsChan chan *PoolStats
-	stopChan  chan struct{}
-	mu        sync.RWMutex
-	running   bool
-	alerts    []AlertFunc
+	dbs      []*sql.DB
+	redis    []*redis.Client
+	interval time.Duration
+	alerts   []AlertFunc
+	mu       sync.RWMutex
+	stopChan chan struct{}
 }
 
-// PoolStats 连接池统计信息
+// AlertFunc 告警函数
+type AlertFunc func(message string)
+
+// PoolStats 连接池统计
 type PoolStats struct {
-	MaxOpen           int           // 最大打开连接数
-	Open              int           // 当前打开连接数
-	InUse             int           // 正在使用连接数
-	Idle              int           // 空闲连接数
-	WaitCount         int64         // 等待连接数
-	WaitDuration      time.Duration // 等待总耗时
-	MaxIdleClosed     int64         // 因超过空闲时间关闭的连接数
-	MaxLifetimeClosed int64         // 因超过生命周期关闭的连接数
-	Timestamp         time.Time     // 统计时间戳
+	MaxOpenConnections int           // 最大连接数
+	OpenConnections    int           // 当前打开的连接数
+	InUse              int           // 正在使用的连接数
+	Idle               int           // 空闲连接数
+	WaitCount          int64         // 等待连接次数
+	WaitDuration       time.Duration // 等待总时长
+	MaxIdleClosed      int64         // 因超过空闲连接数而关闭的连接数
+	MaxIdleTimeClosed  int64         // 因超过空闲时间而关闭的连接数
+	MaxLifetimeClosed  int64         // 因超过生存时间而关闭的连接数
 }
-
-// AlertFunc 告警函数类型
-type AlertFunc func(*PoolStats)
 
 // NewPoolMonitor 创建连接池监控器
 // 参数:
-//   - db: 数据库连接对象
-//   - interval: 监控间隔
-func NewPoolMonitor(db *sql.DB, interval time.Duration) *PoolMonitor {
+//   - interval: 监控间隔（默认 10 秒）
+//   - alerts: 告警函数列表
+//
+// 示例:
+//
+//	monitor := db.NewPoolMonitor(10*time.Second, func(msg string) {
+//	    log.Printf("ALERT: %s", msg)
+//	})
+//	monitor.AddDB(GlobalDB)
+//	monitor.Start()
+func NewPoolMonitor(interval time.Duration, alerts ...AlertFunc) *PoolMonitor {
 	if interval <= 0 {
-		interval = 1 * time.Second
+		interval = 10 * time.Second
 	}
 
 	return &PoolMonitor{
-		db:        db,
-		interval:  interval,
-		statsChan: make(chan *PoolStats, 100),
-		stopChan:  make(chan struct{}),
-		alerts:    make([]AlertFunc, 0),
+		dbs:      make([]*sql.DB, 0),
+		redis:    make([]*redis.Client, 0),
+		interval: interval,
+		alerts:   alerts,
+		stopChan: make(chan struct{}),
 	}
+}
+
+// AddDB 添加数据库连接池到监控
+func (pm *PoolMonitor) AddDB(dbs ...*sql.DB) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.dbs = append(pm.dbs, dbs...)
+}
+
+// AddRedis 添加 Redis 连接池到监控
+func (pm *PoolMonitor) AddRedis(clients ...*redis.Client) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.redis = append(pm.redis, clients...)
+}
+
+// AddAlert 添加告警函数
+func (pm *PoolMonitor) AddAlert(alert AlertFunc) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.alerts = append(pm.alerts, alert)
 }
 
 // Start 启动监控
 func (pm *PoolMonitor) Start() {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-
-	if pm.running {
-		return
-	}
-
-	pm.running = true
-
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Printf("[PoolMonitor] Panic recovered: %v", r)
-			}
-		}()
-
-		ticker := time.NewTicker(pm.interval)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-ticker.C:
-				stats := pm.collectStats()
-				// 非阻塞发送，避免通道满时阻塞
-				select {
-				case pm.statsChan <- stats:
-					// 发送成功
-				default:
-					// 通道已满，跳过
-					log.Printf("[PoolMonitor] Stats channel full, skipping")
-				}
-				pm.checkAlerts(stats)
-			case <-pm.stopChan:
-				return
-			}
-		}
-	}()
-
-	log.Printf("[PoolMonitor] 监控已启动（间隔：%v）", pm.interval)
+	go pm.monitorLoop()
 }
 
 // Stop 停止监控
 func (pm *PoolMonitor) Stop() {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-
-	if !pm.running {
-		return
-	}
-
-	pm.running = false
 	close(pm.stopChan)
-
-	log.Printf("[PoolMonitor] 监控已停止")
 }
 
-// IsRunning 检查是否正在运行
-func (pm *PoolMonitor) IsRunning() bool {
-	pm.mu.RLock()
-	defer pm.mu.RUnlock()
-	return pm.running
-}
+// monitorLoop 监控循环
+func (pm *PoolMonitor) monitorLoop() {
+	ticker := time.NewTicker(pm.interval)
+	defer ticker.Stop()
 
-// collectStats 收集统计信息
-func (pm *PoolMonitor) collectStats() *PoolStats {
-	stats := pm.db.Stats()
-
-	return &PoolStats{
-		MaxOpen:           stats.MaxOpenConnections,
-		Open:              stats.OpenConnections,
-		InUse:             stats.InUse,
-		Idle:              stats.Idle,
-		WaitCount:         stats.WaitCount,
-		WaitDuration:      stats.WaitDuration,
-		MaxIdleClosed:     stats.MaxIdleClosed,
-		MaxLifetimeClosed: stats.MaxLifetimeClosed,
-		Timestamp:         time.Now(),
-	}
-}
-
-// checkAlerts 检查告警
-func (pm *PoolMonitor) checkAlerts(stats *PoolStats) {
-	// 执行所有告警函数
-	for _, alertFn := range pm.alerts {
-		alertFn(stats)
-	}
-
-	// 内置告警规则
-
-	// 1. 连接使用率过高（> 90%）
-	if stats.MaxOpen > 0 {
-		usage := float64(stats.InUse) / float64(stats.MaxOpen) * 100
-		if usage > 90 {
-			log.Printf("[PoolMonitor][警告] 连接池使用率过高：%.2f%% (使用中:%d/最大:%d)",
-				usage, stats.InUse, stats.MaxOpen)
+	for {
+		select {
+		case <-ticker.C:
+			pm.checkAll()
+		case <-pm.stopChan:
+			return
 		}
 	}
+}
 
-	// 2. 等待连接过多
+// checkAll 检查所有连接池
+func (pm *PoolMonitor) checkAll() {
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+
+	// 检查数据库连接池
+	for i, db := range pm.dbs {
+		stats := db.Stats()
+		pm.checkDBStats(i, stats)
+	}
+
+	// 检查 Redis 连接池
+	for i, client := range pm.redis {
+		pm.checkRedisStats(i, client)
+	}
+}
+
+// checkDBStats 检查数据库连接池统计
+func (pm *PoolMonitor) checkDBStats(index int, stats sql.DBStats) {
+	// 计算使用率
+	usage := float64(stats.InUse) / float64(stats.MaxOpenConnections) * 100
+
+	// 告警：连接池使用率超过 80%
+	if usage > 80 {
+		pm.alert(fmt.Sprintf("数据库连接池使用率过高：%.1f%% (当前：%d, 最大：%d)",
+			usage, stats.InUse, stats.MaxOpenConnections))
+	}
+
+	// 告警：等待队列过长
 	if stats.WaitCount > 100 {
-		log.Printf("[PoolMonitor][警告] 等待连接数过多：%d", stats.WaitCount)
+		pm.alert(fmt.Sprintf("数据库连接池等待队列过长：%d 次", stats.WaitCount))
 	}
 
-	// 3. 空闲连接过少
-	if stats.Idle < 5 && stats.Open > 10 {
-		log.Printf("[PoolMonitor][警告] 空闲连接过少：%d", stats.Idle)
+	// 告警：等待时间过长
+	if stats.WaitDuration > time.Second {
+		pm.alert(fmt.Sprintf("数据库连接池等待时间过长：%v", stats.WaitDuration))
 	}
 
-	// 4. 连接泄漏检测
-	if stats.Idle == 0 && stats.Open > int(float64(stats.MaxOpen)*0.8) {
-		log.Printf("[PoolMonitor][严重] 可能存在连接泄漏：打开连接数 %d，接近最大值 %d",
-			stats.Open, stats.MaxOpen)
-	}
-
-	// 5. 等待时间过长
-	if stats.WaitDuration > 10*time.Second {
-		log.Printf("[PoolMonitor][警告] 等待时间过长：%v", stats.WaitDuration)
-	}
+	// 日志记录
+	log.Printf("[DB Pool Monitor] 连接池#%d: 打开=%d, 使用中=%d, 空闲=%d, 等待=%d, 使用率=%.1f%%",
+		index, stats.OpenConnections, stats.InUse, stats.Idle, stats.WaitCount, usage)
 }
 
-// AddAlert 添加告警函数
-// 参数:
-//   - alertFn: 告警函数，接收统计信息
-func (pm *PoolMonitor) AddAlert(alertFn AlertFunc) {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	pm.alerts = append(pm.alerts, alertFn)
-}
+// checkRedisStats 检查 Redis 连接池统计
+func (pm *PoolMonitor) checkRedisStats(index int, client *redis.Client) {
+	// Redis 连接池统计
+	poolStats := client.PoolStats()
 
-// GetStatsChan 获取统计通道
-func (pm *PoolMonitor) GetStatsChan() <-chan *PoolStats {
-	return pm.statsChan
-}
-
-// GetStats 获取当前统计
-func (pm *PoolMonitor) GetStats() *PoolStats {
-	return pm.collectStats()
-}
-
-// PrintStats 打印统计信息
-func (pm *PoolMonitor) PrintStats() {
-	stats := pm.GetStats()
-
-	fmt.Println("=== 数据库连接池统计 ===")
-	fmt.Printf("最大连接数：%d\n", stats.MaxOpen)
-	fmt.Printf("打开连接数：%d\n", stats.Open)
-	fmt.Printf("使用中连接：%d\n", stats.InUse)
-	fmt.Printf("空闲连接：%d\n", stats.Idle)
-	fmt.Printf("等待连接数：%d\n", stats.WaitCount)
-	fmt.Printf("等待耗时：%v\n", stats.WaitDuration)
-	fmt.Printf("空闲超时关闭：%d\n", stats.MaxIdleClosed)
-	fmt.Printf("生命周期关闭：%d\n", stats.MaxLifetimeClosed)
-	fmt.Printf("统计时间：%s\n", stats.Timestamp.Format("2006-01-02 15:04:05"))
-}
-
-// GetUsage 获取连接使用率
-func (pm *PoolMonitor) GetUsage() float64 {
-	stats := pm.GetStats()
-	if stats.MaxOpen == 0 {
-		return 0
-	}
-	return float64(stats.InUse) / float64(stats.MaxOpen) * 100
-}
-
-// GetWaitRate 获取等待率
-func (pm *PoolMonitor) GetWaitRate() float64 {
-	stats := pm.GetStats()
-	if stats.Open == 0 {
-		return 0
-	}
-	return float64(stats.WaitCount) / float64(stats.Open) * 100
-}
-
-// ==================== 全局连接池监控 ====================
-
-// GlobalPoolMonitor 全局连接池监控器
-var GlobalPoolMonitor *PoolMonitor
-
-// InitGlobalPoolMonitor 初始化全局连接池监控器
-// 参数:
-//   - db: 数据库连接对象
-//   - interval: 监控间隔
-func InitGlobalPoolMonitor(db *sql.DB, interval time.Duration) {
-	GlobalPoolMonitor = NewPoolMonitor(db, interval)
-}
-
-// StartGlobalPoolMonitor 启动全局连接池监控
-func StartGlobalPoolMonitor() {
-	if GlobalPoolMonitor != nil {
-		GlobalPoolMonitor.Start()
-	}
-}
-
-// StopGlobalPoolMonitor 停止全局连接池监控
-func StopGlobalPoolMonitor() {
-	if GlobalPoolMonitor != nil {
-		GlobalPoolMonitor.Stop()
-	}
-}
-
-// GetGlobalPoolStats 获取全局连接池统计
-func GetGlobalPoolStats() *PoolStats {
-	if GlobalPoolMonitor == nil {
-		return nil
-	}
-	return GlobalPoolMonitor.GetStats()
-}
-
-// PrintGlobalPoolStats 打印全局连接池统计
-func PrintGlobalPoolStats() {
-	if GlobalPoolMonitor == nil {
-		log.Println("[PoolMonitor] 全局监控未初始化")
+	// 计算使用率（使用 TotalConns）
+	totalConns := poolStats.IdleConns + poolStats.Hits
+	if totalConns == 0 {
 		return
 	}
-	GlobalPoolMonitor.PrintStats()
+	usage := float64(poolStats.Hits) / float64(totalConns) * 100
+
+	// 告警：连接池使用率超过 80%
+	if usage > 80 {
+		pm.alert(fmt.Sprintf("Redis 连接池使用率过高：%.1f%% (Hits=%d, Misses=%d)",
+			usage, poolStats.Hits, poolStats.Misses))
+	}
+
+	// 日志记录
+	log.Printf("[Redis Pool Monitor] 连接池#%d: 空闲=%d, 命中=%d, 未命中=%d, 陈旧=%d",
+		index, poolStats.IdleConns, poolStats.Hits, poolStats.Misses, poolStats.StaleConns)
 }
 
-// AddGlobalPoolAlert 添加全局连接池告警
-func AddGlobalPoolAlert(alertFn AlertFunc) {
-	if GlobalPoolMonitor != nil {
-		GlobalPoolMonitor.AddAlert(alertFn)
+// alert 发送告警
+func (pm *PoolMonitor) alert(message string) {
+	log.Printf("[ALERT] %s", message)
+
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+
+	for _, alert := range pm.alerts {
+		alert(message)
+	}
+}
+
+// GetStats 获取所有数据库连接池统计
+func (pm *PoolMonitor) GetStats() []PoolStats {
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+
+	stats := make([]PoolStats, 0, len(pm.dbs))
+	for _, db := range pm.dbs {
+		s := db.Stats()
+		stats = append(stats, PoolStats{
+			MaxOpenConnections: s.MaxOpenConnections,
+			OpenConnections:    s.OpenConnections,
+			InUse:              s.InUse,
+			Idle:               s.Idle,
+			WaitCount:          s.WaitCount,
+			WaitDuration:       s.WaitDuration,
+			MaxIdleClosed:      s.MaxIdleClosed,
+			MaxIdleTimeClosed:  s.MaxIdleTimeClosed,
+			MaxLifetimeClosed:  s.MaxLifetimeClosed,
+		})
+	}
+
+	return stats
+}
+
+// PrintStats 打印连接池统计（用于调试）
+func (pm *PoolMonitor) PrintStats() {
+	stats := pm.GetStats()
+	for i, s := range stats {
+		fmt.Printf("连接池 #%d:\n", i)
+		fmt.Printf("  最大连接数：%d\n", s.MaxOpenConnections)
+		fmt.Printf("  当前打开：%d\n", s.OpenConnections)
+		fmt.Printf("  使用中：%d\n", s.InUse)
+		fmt.Printf("  空闲：%d\n", s.Idle)
+		fmt.Printf("  等待次数：%d\n", s.WaitCount)
+		fmt.Printf("  等待时长：%v\n", s.WaitDuration)
+		fmt.Printf("  空闲关闭：%d\n", s.MaxIdleClosed)
+		fmt.Printf("  超时关闭：%d\n", s.MaxIdleTimeClosed)
+		fmt.Printf("  寿命关闭：%d\n", s.MaxLifetimeClosed)
+		fmt.Println()
+	}
+}
+
+// ========== 全局监控器 ==========
+
+var globalPoolMonitor *PoolMonitor
+
+// InitGlobalPoolMonitor 初始化全局连接池监控器
+func InitGlobalPoolMonitor(interval time.Duration, alerts ...AlertFunc) {
+	globalPoolMonitor = NewPoolMonitor(interval, alerts...)
+	globalPoolMonitor.Start()
+}
+
+// GetGlobalPoolMonitor 获取全局连接池监控器
+func GetGlobalPoolMonitor() *PoolMonitor {
+	return globalPoolMonitor
+}
+
+// MonitorDBPool 监控数据库连接池（便捷函数）
+func MonitorDBPool(db *sql.DB, name string, interval time.Duration) {
+	monitor := NewPoolMonitor(interval, func(msg string) {
+		log.Printf("[DB Alert] %s: %s", name, msg)
+	})
+	monitor.AddDB(db)
+	monitor.Start()
+}
+
+// MonitorRedisPool 监控 Redis 连接池（便捷函数）
+func MonitorRedisPool(client *redis.Client, name string, interval time.Duration) {
+	monitor := NewPoolMonitor(interval, func(msg string) {
+		log.Printf("[Redis Alert] %s: %s", name, msg)
+	})
+	monitor.AddRedis(client)
+	monitor.Start()
+}
+
+// ========== HTTP 接口 ==========
+
+// PoolStatsHandler 连接池状态 HTTP 处理器
+func PoolStatsHandler() mvc.HandlerFunc {
+	return func(c *mvc.Context) {
+		if globalPoolMonitor == nil {
+			c.Json(500, map[string]interface{}{
+				"error": "pool monitor not initialized",
+			})
+			return
+		}
+
+		stats := globalPoolMonitor.GetStats()
+		c.Json(200, map[string]interface{}{
+			"stats": stats,
+		})
 	}
 }

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -677,98 +676,4 @@ func abs64(n int64) int64 {
 		return -n
 	}
 	return n
-}
-
-type responseCacheItem struct {
-	body       []byte
-	statusCode int
-	headers    http.Header
-	expiry     time.Time
-}
-
-type ResponseCache struct {
-	mu      sync.RWMutex
-	entries map[string]*responseCacheItem
-	ttl     time.Duration
-}
-
-var globalResponseCache = &ResponseCache{
-	entries: make(map[string]*responseCacheItem),
-	ttl:     5 * time.Second,
-}
-
-func (rc *ResponseCache) Get(key string) (*responseCacheItem, bool) {
-	rc.mu.RLock()
-	defer rc.mu.RUnlock()
-	item, ok := rc.entries[key]
-	if !ok || time.Now().After(item.expiry) {
-		return nil, false
-	}
-	return item, true
-}
-
-func (rc *ResponseCache) Set(key string, item *responseCacheItem) {
-	rc.mu.Lock()
-	defer rc.mu.Unlock()
-	item.expiry = time.Now().Add(rc.ttl)
-	rc.entries[key] = item
-}
-
-type cacheResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
-	body       *bytes.Buffer
-}
-
-func (w *cacheResponseWriter) WriteHeader(code int) {
-	w.statusCode = code
-	w.ResponseWriter.WriteHeader(code)
-}
-
-func (w *cacheResponseWriter) Write(b []byte) (int, error) {
-	w.body.Write(b)
-	return w.ResponseWriter.Write(b)
-}
-
-func (w *cacheResponseWriter) WriteString(s string) (int, error) {
-	w.body.WriteString(s)
-	return w.ResponseWriter.Write([]byte(s))
-}
-
-func ResponseCacheMiddleware(ttl time.Duration) mvc.HandlerFunc {
-	globalResponseCache.ttl = ttl
-	return func(c *mvc.Context) {
-		if c.Request.Method != "GET" {
-			c.Next()
-			return
-		}
-
-		cacheKey := c.Request.URL.Path + "?" + c.Request.URL.RawQuery
-		if item, ok := globalResponseCache.Get(cacheKey); ok {
-			for k, v := range item.headers {
-				c.Writer.Header()[k] = v
-			}
-			c.Writer.WriteHeader(item.statusCode)
-			c.Writer.Write(item.body)
-			c.Abort()
-			return
-		}
-
-		cacheWriter := &cacheResponseWriter{
-			ResponseWriter: c.Writer,
-			statusCode:     200,
-			body:           bytes.NewBuffer(nil),
-		}
-		c.Writer = cacheWriter
-
-		c.Next()
-
-		if cacheWriter.statusCode < 400 {
-			globalResponseCache.Set(cacheKey, &responseCacheItem{
-				body:       cacheWriter.body.Bytes(),
-				statusCode: cacheWriter.statusCode,
-				headers:    c.Writer.Header().Clone(),
-			})
-		}
-	}
 }

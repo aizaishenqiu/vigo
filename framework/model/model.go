@@ -24,6 +24,10 @@ type Model struct {
 	deleteTime         string // 软删除字段名
 	softDelete         bool   // 是否启用软删除
 
+	// 乐观锁配置
+	optimisticLock bool   // 是否启用乐观锁
+	versionField   string // 版本字段名，默认 "version"
+
 	// 输出控制
 	hidden  []string // 隐藏字段
 	visible []string // 可见字段
@@ -63,6 +67,8 @@ func New(table string) *Model {
 		updateTime:         "update_time",
 		deleteTime:         "delete_time",
 		softDelete:         true,
+		optimisticLock:     false,
+		versionField:       "version",
 		globalScopes:       make(map[string]func(q *db.Query) *db.Query),
 		isNew:              true,
 	}
@@ -89,6 +95,29 @@ func (m *Model) SetSoftDelete(enable bool, field ...string) *Model {
 		m.deleteTime = field[0]
 	}
 	return m
+}
+
+// WithVersionLock 启用乐观锁
+// 参数:
+//   - field: 版本字段名，默认为 "version"
+//
+// 示例:
+//
+//	model.WithVersionLock() // 使用默认 version 字段
+//	model.WithVersionLock("lock_version") // 使用自定义字段
+func (m *Model) WithVersionLock(field ...string) *Model {
+	m.optimisticLock = true
+	if len(field) > 0 {
+		m.versionField = field[0]
+	} else {
+		m.versionField = "version"
+	}
+	return m
+}
+
+// HasVersionLock 检查是否启用了乐观锁
+func (m *Model) HasVersionLock() bool {
+	return m.optimisticLock
 }
 
 // Hidden 设置隐藏字段 (输出时排除)
@@ -298,6 +327,36 @@ func (m *Model) Distinct() *Model {
 func (m *Model) Lock(mode ...string) *Model {
 	m.getQuery().Lock(mode...)
 	return m
+}
+
+// ========== 原子操作 ==========
+
+// Increment 原子递增指定字段
+func (m *Model) Increment(column string, amount int64) (int64, error) {
+	return m.getQuery().
+		Where(m.primaryKey, m.GetAttr(m.primaryKey)).
+		Increment(column, amount)
+}
+
+// Decrement 原子递减指定字段
+func (m *Model) Decrement(column string, amount int64) (int64, error) {
+	return m.getQuery().
+		Where(m.primaryKey, m.GetAttr(m.primaryKey)).
+		Decrement(column, amount)
+}
+
+// IncrementBy 原子递增（支持小数）
+func (m *Model) IncrementBy(column string, amount float64) (int64, error) {
+	return m.getQuery().
+		Where(m.primaryKey, m.GetAttr(m.primaryKey)).
+		IncrementBy(column, amount)
+}
+
+// DecrementBy 原子递减（支持小数）
+func (m *Model) DecrementBy(column string, amount float64) (int64, error) {
+	return m.getQuery().
+		Where(m.primaryKey, m.GetAttr(m.primaryKey)).
+		DecrementBy(column, amount)
 }
 
 // ========== 软删除查询修饰 ==========
@@ -551,6 +610,51 @@ func (m *Model) Save() (int64, error) {
 			updateData[m.updateTime] = now
 		}
 
+		// 乐观锁处理
+		if m.optimisticLock {
+			version := m.GetAttr(m.versionField)
+			if version == nil {
+				return 0, fmt.Errorf("optimistic lock version field is required")
+			}
+
+			// 版本号 +1
+			var newVersion interface{}
+			switch v := version.(type) {
+			case int:
+				newVersion = v + 1
+			case int32:
+				newVersion = v + 1
+			case int64:
+				newVersion = v + 1
+			default:
+				return 0, fmt.Errorf("optimistic lock version must be integer type")
+			}
+
+			// 添加版本条件
+			query := db.NewQuery(db.GlobalDB).Table(m.table).
+				Where(m.primaryKey, id).
+				Where(m.versionField, version)
+
+			affected, err := query.Update(updateData)
+
+			if err != nil {
+				return 0, err
+			}
+
+			if affected == 0 {
+				return 0, fmt.Errorf("optimistic lock failed: data has been modified by another transaction")
+			}
+
+			// 更新本地版本号
+			m.SetAttr(m.versionField, newVersion)
+
+			if err == nil && m.afterUpdate != nil {
+				m.afterUpdate(m)
+			}
+			return affected, err
+		}
+
+		// 普通更新（无乐观锁）
 		affected, err := db.NewQuery(db.GlobalDB).Table(m.table).
 			Where(m.primaryKey, id).Update(updateData)
 
@@ -570,6 +674,10 @@ func (m *Model) Save() (int64, error) {
 	if m.autoWriteTimestamp {
 		m.data[m.createTime] = now
 		m.data[m.updateTime] = now
+		// 新增时初始化版本号为 1
+		if m.optimisticLock {
+			m.data[m.versionField] = 1
+		}
 	}
 
 	newId, err := db.NewQuery(db.GlobalDB).Table(m.table).InsertGetId(m.data)

@@ -978,3 +978,63 @@ func (q *Query) buildDeleteSql() (string, []interface{}) {
 	sqlStr := fmt.Sprintf("DELETE FROM %s WHERE %s", q.table, where)
 	return sqlStr, allArgs
 }
+
+// ========== 原子操作 ==========
+
+// Increment 原子递增指定字段的值
+// 参数:
+//   - column: 字段名
+//   - amount: 递增量
+//
+// 返回: 影响的行数
+func (q *Query) Increment(column string, amount int64) (int64, error) {
+	if q.table == "" {
+		return 0, fmt.Errorf("table is not specified")
+	}
+
+	sql := fmt.Sprintf("UPDATE %s SET %s = %s + ? WHERE ", q.table, column, column)
+	whereSql, whereArgs := q.buildWhere()
+	sql += whereSql
+
+	args := append([]interface{}{amount}, whereArgs...)
+	result, err := q.db.Exec(sql, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected()
+}
+
+// Decrement 原子递减指定字段的值
+// 参数:
+//   - column: 字段名
+//   - amount: 递减量
+//
+// 返回: 影响的行数
+func (q *Query) Decrement(column string, amount int64) (int64, error) {
+	return q.Increment(column, -amount)
+}
+
+// IncrementBy 原子递增（支持小数）
+func (q *Query) IncrementBy(column string, amount float64) (int64, error) {
+	if q.table == "" {
+		return 0, fmt.Errorf("table is not specified")
+	}
+
+	sql := fmt.Sprintf("UPDATE %s SET %s = %s + ? WHERE ", q.table, column, column)
+	whereSql, whereArgs := q.buildWhere()
+	sql += whereSql
+
+	args := append([]interface{}{amount}, whereArgs...)
+	result, err := q.db.Exec(sql, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected()
+}
+
+// DecrementBy 原子递减（支持小数）
+func (q *Query) DecrementBy(column string, amount float64) (int64, error) {
+	return q.IncrementBy(column, -amount)
+}
