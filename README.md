@@ -301,6 +301,18 @@ func main() {
 
 Vigo 提供强大的命令行工具，大幅提升开发效率：
 
+### 安装 CLI 工具
+
+```bash
+# 编译并安装到 GOPATH/bin
+go install ./framework/cli
+
+# 或者编译到当前目录
+go build -o vigo ./framework/cli
+```
+
+### 使用示例
+
 ```bash
 # 代码生成
 vigo make:crud User          # 一键生成完整 CRUD

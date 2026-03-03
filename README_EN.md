@@ -301,6 +301,18 @@ func main() {
 
 Vigo provides powerful command-line tools to significantly improve development efficiency:
 
+### Installation
+
+```bash
+# Build and install to GOPATH/bin
+go install ./framework/cli
+
+# Or build to current directory
+go build -o vigo ./framework/cli
+```
+
+### Usage Examples
+
 ```bash
 # Code Generation
 vigo make:crud User          # One-click complete CRUD
