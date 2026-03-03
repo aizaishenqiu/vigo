@@ -303,12 +303,48 @@ Vigo provides powerful command-line tools to significantly improve development e
 
 ### Installation
 
-```bash
-# Build and install to GOPATH/bin
-go install ./framework/cli
+#### Windows
 
-# Or build to current directory
-go build -o vigo ./framework/cli
+```bash
+# Method 1: Using build script (Recommended)
+.\build-cli.bat
+
+# Method 2: Build to bin directory
+go build -o bin\vigo.exe ./framework/cli
+
+# Method 3: Run directly (development environment)
+go run ./framework/cli version
+```
+
+#### Linux/Mac
+
+```bash
+# Build to bin directory
+go build -o bin/vigo ./framework/cli
+
+# Or run directly (development environment)
+go run ./framework/cli version
+```
+
+### Add to System PATH (Optional)
+
+After building, you can add the CLI tool to your system PATH for global access:
+
+**Windows:**
+
+```bash
+# Copy vigo.exe to Go bin directory
+copy bin\vigo.exe %USERPROFILE%\go\bin\vigo.exe
+
+# Or add bin directory to PATH
+setx PATH "%PATH%;%CD%\bin"
+```
+
+**Linux/Mac:**
+
+```bash
+# Copy to system path
+sudo cp bin/vigo /usr/local/bin/vigo
 ```
 
 ### Usage Examples

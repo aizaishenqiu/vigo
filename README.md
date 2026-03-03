@@ -303,12 +303,48 @@ Vigo 提供强大的命令行工具，大幅提升开发效率：
 
 ### 安装 CLI 工具
 
-```bash
-# 编译并安装到 GOPATH/bin
-go install ./framework/cli
+#### Windows
 
-# 或者编译到当前目录
-go build -o vigo ./framework/cli
+```bash
+# 方法 1：使用构建脚本（推荐）
+.\build-cli.bat
+
+# 方法 2：手动编译到 bin 目录
+go build -o bin\vigo.exe ./framework/cli
+
+# 方法 3：直接运行（开发环境）
+go run ./framework/cli version
+```
+
+#### Linux/Mac
+
+```bash
+# 编译到 bin 目录
+go build -o bin/vigo ./framework/cli
+
+# 或直接运行（开发环境）
+go run ./framework/cli version
+```
+
+### 添加到系统 PATH（可选）
+
+编译完成后，可以将 CLI 工具添加到系统 PATH 以便全局使用：
+
+**Windows:**
+
+```bash
+# 复制 vigo.exe 到 Go 的 bin 目录
+copy bin\vigo.exe %USERPROFILE%\go\bin\vigo.exe
+
+# 或将 bin 目录添加到 PATH
+setx PATH "%PATH%;%CD%\bin"
+```
+
+**Linux/Mac:**
+
+```bash
+# 复制到系统路径
+sudo cp bin/vigo /usr/local/bin/vigo
 ```
 
 ### 使用示例
