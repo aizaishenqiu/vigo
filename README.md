@@ -386,7 +386,7 @@ Vigo 框架采用 [MIT 许可证](LICENSE)
 ```
 MIT License
 
-Copyright (c) 2024 Vigo Framework
+Copyright (c) 2026 Vigo Framework
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
