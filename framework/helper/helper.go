@@ -33,6 +33,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // ==================== 字符串处理 ====================
@@ -194,9 +195,17 @@ func Lcfirst(str string) string {
 	return strings.ToLower(str[:1]) + str[1:]
 }
 
-// Ucwords 每个单词首字母大写
+// Ucwords 每个单词首字母大写（使用 unicode 改进）
 func Ucwords(str string) string {
-	return strings.Title(str)
+	if str == "" {
+		return str
+	}
+	return strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) {
+			return unicode.ToUpper(r)
+		}
+		return r
+	}, str)
 }
 
 // Trim 去除字符串首尾空白字符

@@ -414,13 +414,13 @@ func (c *Client) managementAPI(method, path string) ([]byte, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("Management API 不可用: %v", err)
+		return nil, fmt.Errorf("management api 不可用：%v", err)
 	}
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != 200 && resp.StatusCode != 204 {
-		return nil, fmt.Errorf("Management API 返回 %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("management api 返回 %d: %s", resp.StatusCode, string(body))
 	}
 	return body, nil
 }
@@ -465,9 +465,9 @@ func (c *Client) ListExchanges() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 	for _, e := range exchanges {
 		result = append(result, map[string]interface{}{
-			"name":       e["name"],
-			"type":       e["type"],
-			"durable":    e["durable"],
+			"name":        e["name"],
+			"type":        e["type"],
+			"durable":     e["durable"],
 			"auto_delete": e["auto_delete"],
 		})
 	}
@@ -552,7 +552,7 @@ func (c *Client) GetQueueInfo(name string) (map[string]interface{}, error) {
 	}
 	defer ch.Close()
 
-	q, err := ch.QueueInspect(name)
+	q, err := ch.QueueDeclarePassive(name, false, false, false, false, nil)
 	if err != nil {
 		return nil, err
 	}

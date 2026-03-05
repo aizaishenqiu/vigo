@@ -52,22 +52,22 @@ func isInternalPath(path string) bool {
 var securityPattern = regexp.MustCompile(
 	`(?i)` +
 		// 完整 SQL 语句特征（多词）
-		`(\bselect\s+.*\s+from\b` +
-		`|\bunion\s+(all\s+)?select\b` +
-		`|\binsert\s+into\s+` +
-		`|\b(drop|truncate|alter|create|delete)\s+(table|database|index|view|from)\b` +
-		`|\bexec\s*\(` +
-		`|\b(load_file|into\s+outfile|into\s+dumpfile|benchmark|sleep)\s*\(` +
+		`(\bselect\s+.*\s+from` +
+		`|\bunion\s+(all\s+)?select` +
+		`|\binsert\s+into` +
+		`|\b(drop|truncate|alter|create|delete)\s+(table|database|index|view|from)` +
+		`|\bexec\s*` +
+		`|\b(load_file|into\s+outfile|into\s+dumpfile|benchmark|sleep)\s*` +
 		// SQL 注释注入
 		`|;\s*--\s*$` +
 		`|/\*.*\*/` +
 		// 命令/协议注入
-		`|\b(xp_cmdshell|shell_exec|eval\s*\(|assert\s*\(|system\s*\()\b` +
+		`|\b(xp_cmdshell|shell_exec|eval\s*\(|assert\s*\(|system\s*\()` +
 		// 路径穿越
 		`|\.\./|\.\.\\\\` +
 		// 敏感路径
 		`|etc/passwd|etc/shadow|windows\\\\system32|web\.config` +
-		`|ldap://|xpath\s*\(|javascript\s*:|vbscript\s*:`,
+		`|ldap://|xpath\s*\(|javascript\s*:|vbscript\s*:)`,
 )
 
 // SecurityMiddleware 统一安全验证中间件（兜底保护）

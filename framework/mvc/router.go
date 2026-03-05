@@ -1,18 +1,19 @@
 package mvc
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+	"vigo/framework/radixtree"
 )
 
 // Router 路由结构体（支持动态参数和路由分组）
 type Router struct {
-	staticRoutes  map[string]map[string][]HandlerFunc // 精确匹配: path -> method -> handler chain
-	dynamicRoutes []dynamicRoute                      // 动态参数路由
+	staticRoutes  map[string]map[string][]HandlerFunc // 精确匹配：path -> method -> handler chain
+	dynamicRoutes []dynamicRoute                      // 动态参数路由（保留向后兼容）
+	radixTree     *radixtree.RadixTree                // 高性能 Radix Tree 路由器
 	fileHandlers  map[string]http.Handler             // 静态资源路由
 	middlewares   []HandlerFunc                       // 全局中间件
 	ReadTimeout   time.Duration                       // 读取超时 (Slow Loris 防护)
@@ -28,7 +29,7 @@ type Engine interface {
 // dynamicRoute 动态路由项
 type dynamicRoute struct {
 	method   string
-	pattern  string      // 原始模式: /user/:id
+	pattern  string      // 原始模式：/user/:id
 	parts    []routePart // 解析后的路由段
 	handlers []HandlerFunc
 }
@@ -52,6 +53,7 @@ func NewRouter() *Router {
 	r := &Router{
 		staticRoutes:  make(map[string]map[string][]HandlerFunc),
 		dynamicRoutes: make([]dynamicRoute, 0),
+		radixTree:     radixtree.New(), // 初始化 Radix Tree
 		fileHandlers:  make(map[string]http.Handler),
 		middlewares:   make([]HandlerFunc, 0),
 		ReadTimeout:   10 * time.Second,
@@ -100,6 +102,8 @@ func (r *Router) AddRoute(method string, pattern string, handler HandlerFunc) {
 	chain = append(chain, handler)
 
 	if isDynamic(pattern) {
+		// 动态路由同时添加到 Radix Tree 和旧数组（向后兼容）
+		r.radixTree.Add(method, pattern, chain)
 		r.dynamicRoutes = append(r.dynamicRoutes, dynamicRoute{
 			method:   method,
 			pattern:  pattern,
@@ -107,6 +111,8 @@ func (r *Router) AddRoute(method string, pattern string, handler HandlerFunc) {
 			handlers: chain,
 		})
 	} else {
+		// 静态路由添加到 Radix Tree
+		r.radixTree.Add(method, pattern, chain)
 		if _, ok := r.staticRoutes[pattern]; !ok {
 			r.staticRoutes[pattern] = make(map[string][]HandlerFunc)
 		}
@@ -122,6 +128,7 @@ func (r *Router) addRouteWithMiddlewares(method string, pattern string, handler 
 	chain = append(chain, handler)
 
 	if isDynamic(pattern) {
+		r.radixTree.Add(method, pattern, chain)
 		r.dynamicRoutes = append(r.dynamicRoutes, dynamicRoute{
 			method:   method,
 			pattern:  pattern,
@@ -129,51 +136,12 @@ func (r *Router) addRouteWithMiddlewares(method string, pattern string, handler 
 			handlers: chain,
 		})
 	} else {
+		r.radixTree.Add(method, pattern, chain)
 		if _, ok := r.staticRoutes[pattern]; !ok {
 			r.staticRoutes[pattern] = make(map[string][]HandlerFunc)
 		}
 		r.staticRoutes[pattern][method] = chain
 	}
-}
-
-// matchDynamic 匹配动态路由，返回 handlers 和提取的参数
-func (r *Router) matchDynamic(method, path string) ([]HandlerFunc, map[string]string) {
-	segments := strings.Split(strings.Trim(path, "/"), "/")
-
-	for _, route := range r.dynamicRoutes {
-		if route.method != method {
-			continue
-		}
-		params := make(map[string]string)
-		matched := true
-
-		if len(route.parts) == 0 && len(segments) == 0 {
-			return route.handlers, params
-		}
-
-		for i, part := range route.parts {
-			if part.isWild {
-				// 通配符匹配剩余所有段
-				params[part.value] = strings.Join(segments[i:], "/")
-				return route.handlers, params
-			}
-			if i >= len(segments) {
-				matched = false
-				break
-			}
-			if part.isParam {
-				params[part.value] = segments[i]
-			} else if part.value != segments[i] {
-				matched = false
-				break
-			}
-		}
-
-		if matched && len(route.parts) == len(segments) {
-			return route.handlers, params
-		}
-	}
-	return nil, nil
 }
 
 // Handle 注册静态资源处理
@@ -193,32 +161,16 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	// 2. 精确匹配静态路由
-	if methods, ok := r.staticRoutes[path]; ok {
-		if handlers, ok := methods[req.Method]; ok {
-			c := r.pool.Get().(*Context)
-			c.Reset(w, req)
-			c.handlers = handlers
-			if r.viewEngine != nil {
-				c.ViewEngine = r.viewEngine
-			}
-			c.Next()
-			r.pool.Put(c)
-			return
-		}
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// 3. 动态路由匹配
-	if handlers, params := r.matchDynamic(req.Method, path); handlers != nil {
+	// 2. 使用 Radix Tree 快速匹配（性能优化）
+	result := r.radixTree.Get(req.Method, path)
+	if result != nil {
 		c := r.pool.Get().(*Context)
 		c.Reset(w, req)
-		c.handlers = handlers
+		c.handlers = result.Handlers.([]HandlerFunc)
 		if r.viewEngine != nil {
 			c.ViewEngine = r.viewEngine
 		}
-		for k, v := range params {
+		for k, v := range result.Params {
 			c.Params[k] = v
 		}
 		c.Next()
@@ -300,55 +252,37 @@ func (g *RouteGroup) fullPath(path string) string {
 	return g.prefix + path
 }
 
+// RouteGroup 路由注册方法
 func (g *RouteGroup) GET(pattern string, handler HandlerFunc) {
 	g.router.addRouteWithMiddlewares("GET", g.fullPath(pattern), handler, g.middlewares)
 }
+
 func (g *RouteGroup) POST(pattern string, handler HandlerFunc) {
 	g.router.addRouteWithMiddlewares("POST", g.fullPath(pattern), handler, g.middlewares)
 }
+
 func (g *RouteGroup) PUT(pattern string, handler HandlerFunc) {
 	g.router.addRouteWithMiddlewares("PUT", g.fullPath(pattern), handler, g.middlewares)
 }
+
 func (g *RouteGroup) DELETE(pattern string, handler HandlerFunc) {
 	g.router.addRouteWithMiddlewares("DELETE", g.fullPath(pattern), handler, g.middlewares)
 }
+
 func (g *RouteGroup) PATCH(pattern string, handler HandlerFunc) {
 	g.router.addRouteWithMiddlewares("PATCH", g.fullPath(pattern), handler, g.middlewares)
 }
+
+func (g *RouteGroup) OPTIONS(pattern string, handler HandlerFunc) {
+	g.router.addRouteWithMiddlewares("OPTIONS", g.fullPath(pattern), handler, g.middlewares)
+}
+
+func (g *RouteGroup) HEAD(pattern string, handler HandlerFunc) {
+	g.router.addRouteWithMiddlewares("HEAD", g.fullPath(pattern), handler, g.middlewares)
+}
+
 func (g *RouteGroup) Any(pattern string, handler HandlerFunc) {
 	for _, method := range []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"} {
 		g.router.addRouteWithMiddlewares(method, g.fullPath(pattern), handler, g.middlewares)
 	}
-}
-
-// Group 嵌套分组
-func (g *RouteGroup) Group(prefix string, middlewares ...HandlerFunc) *RouteGroup {
-	combined := make([]HandlerFunc, 0, len(g.middlewares)+len(middlewares))
-	combined = append(combined, g.middlewares...)
-	combined = append(combined, middlewares...)
-	return &RouteGroup{
-		prefix:      g.prefix + prefix,
-		router:      g.router,
-		middlewares: combined,
-	}
-}
-
-// Use 为分组添加中间件
-func (g *RouteGroup) Use(middlewares ...HandlerFunc) {
-	g.middlewares = append(g.middlewares, middlewares...)
-}
-
-// ==================== 启动方法 ====================
-
-// Run 启动服务
-func (r *Router) Run(addr string) error {
-	fmt.Printf("Listening on %s\n", addr)
-	server := &http.Server{
-		Addr:         addr,
-		Handler:      r,
-		ReadTimeout:  r.ReadTimeout,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  120 * time.Second,
-	}
-	return server.ListenAndServe()
 }

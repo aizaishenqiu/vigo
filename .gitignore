@@ -81,3 +81,4 @@ config.*.local.yaml
 *.rar
 
 # 文档文件
+admin-gui/

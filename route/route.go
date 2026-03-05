@@ -53,8 +53,7 @@ func Init(r *mvc.Router) {
 
 	// 登录接口 (添加限流保护防暴力破解)
 	auth := &controller.AuthController{}
-	loginGroup := r.Group("/api")
-	loginGroup.Use(middleware.IPBasedRateLimitMiddleware(10)) // 限制每个IP每秒最多10次请求
+	loginGroup := r.Group("/api", middleware.IPBasedRateLimitMiddleware(10)) // 限制每个 IP 每秒最多 10 次请求
 	loginGroup.POST("/login", auth.Login)
 	loginGroup.GET("/login", auth.Login)
 

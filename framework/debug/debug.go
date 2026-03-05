@@ -134,7 +134,9 @@ func (dt *DebugToolbar) injectToolbar(c *mvc.Context, html string, debugData map
 	// 在</body>前插入
 	html = strings.Replace(html, "</body>", toolbarHTML+"</body>", 1)
 
-	c.String(http.StatusOK, html)
+	c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	c.Writer.WriteHeader(http.StatusOK)
+	c.Writer.Write([]byte(html))
 }
 
 // generateToolbarHTML 生成调试工具栏 HTML

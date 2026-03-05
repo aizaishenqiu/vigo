@@ -34,12 +34,13 @@ func NewRateLimiter(rate int) *RateLimiter {
 		for range limiter.refill.C {
 			limiter.mu.Lock()
 			// 填充令牌直到达到容量
+		fillLoop:
 			for len(limiter.tokens) < limiter.capacity {
 				select {
 				case limiter.tokens <- struct{}{}:
 				default:
 					// 通道已满，跳出循环
-					break
+					break fillLoop
 				}
 			}
 			limiter.mu.Unlock()

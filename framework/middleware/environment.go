@@ -4,7 +4,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"sync"
 	"vigo/config"
 	"vigo/framework/mvc"
 )
@@ -231,45 +230,4 @@ func CORSPreflightMiddleware() mvc.HandlerFunc {
 		}
 		c.Next()
 	}
-}
-
-// 域名验证缓存（减少 DNS 查询）
-var (
-	domainCache      = make(map[string][]net.IP)
-	domainCacheMutex sync.RWMutex
-)
-
-// validateDomainIP 验证域名解析的 IP 是否匹配
-func validateDomainIP(domain string, expectedIP string) bool {
-	domainCacheMutex.RLock()
-	ips, cached := domainCache[domain]
-	domainCacheMutex.RUnlock()
-
-	if !cached {
-		// DNS 查询
-		ips, err := net.LookupIP(domain)
-		if err != nil {
-			return false
-		}
-
-		domainCacheMutex.Lock()
-		domainCache[domain] = ips
-		domainCacheMutex.Unlock()
-	}
-
-	// 检查是否包含预期 IP
-	for _, ip := range ips {
-		if ip.String() == expectedIP {
-			return true
-		}
-	}
-
-	return false
-}
-
-// ClearDomainCache 清空域名缓存（用于配置更新后）
-func ClearDomainCache() {
-	domainCacheMutex.Lock()
-	defer domainCacheMutex.Unlock()
-	domainCache = make(map[string][]net.IP)
 }

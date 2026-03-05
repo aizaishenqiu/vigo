@@ -1,6 +1,6 @@
 # ==============================================
 # Vigo 框架配置文件
-# 支持环境变量占位符格式: ${ENV_VAR} 或 ${ENV_VAR:default_value}
+# 支持环境变量默认值展示格式：默认：XXX
 # ==============================================
 
 # ==============================================
@@ -8,9 +8,8 @@
 # ==============================================
 app:
   # 应用名称
-  name: vago
-  # 应用版本号
-  version: 1.0.1
+  name: vago-12
+  # 应用版本：version: 2.0.1
   # HTTP 服务监听端口
   port: 8080
   # 是否开启调试模式（生产环境建议关闭）
@@ -29,20 +28,20 @@ security:
   # 是否启用全局安全中间件（强烈建议启用）
   # 启用后会自动拦截 SQL 注入、XSS、命令注入等攻击
   enable_security_middleware: true
-  
+
   # 是否启用 CSRF 保护
   enable_csrf_protection: false
-  
+
   # 是否启用速率限制
   enable_rate_limit: false
   # 速率限制：每秒请求数
   rate_limit: 100
-  
+
   # 是否启用 CORS 域名验证（生产环境必须启用）
   # 开发环境自动禁用 CORS 限制
   # Electron 桌面应用会自动放行（file://, app://, localhost）
   enable_cors_domain_check: true
-  
+
   # 允许的域名列表（生产环境）
   # 开发环境自动允许所有域名
   # Electron 桌面应用无需配置，自动放行
@@ -50,10 +49,10 @@ security:
     - "https://www.example.com"
     - "https://api.example.com"
     - "https://admin.example.com"
-  
+
   # IP 白名单（可选，为空则不限制）
   ip_whitelist: []
-  
+
   # IP 黑名单
   ip_blacklist: []
 
@@ -75,11 +74,11 @@ payment:
     notify_url: ""
     # 返回地址
     return_url: ""
-    # 服务商模式（true=服务商，false=个体）
+    # 服务商模式（true=服务商 | false=个体）
     is_provider: false
     # 服务商 PID（服务商模式必填）
     provider_pid: ""
-  
+
   # 微信支付配置
   wechat_pay:
     # 是否启用
@@ -92,7 +91,7 @@ payment:
     app_id: ""
     # 回调地址
     notify_url: ""
-    # 服务商模式（true=服务商，false=个体）
+    # 服务商模式（true=服务商 | false=个体）
     is_provider: false
     # 服务商商户号（服务商模式必填）
     provider_mch_id: ""
@@ -111,7 +110,7 @@ oauth:
     app_key: ""
     # 回调地址
     redirect_uri: ""
-  
+
   # 微信登录配置
   wechat:
     # 是否启用
@@ -122,7 +121,7 @@ oauth:
     app_secret: ""
     # 回调地址
     redirect_uri: ""
-  
+
   # 支付宝登录配置
   alipay:
     # 是否启用
@@ -138,28 +137,28 @@ oauth:
 
 # ==============================================
 # 数据库配置（主库 - 默认数据库）
-# 必须通过环境变量配置: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 # ==============================================
 database:
-  # 数据库驱动类型: mysql | postgres | sqlite | mssql
+  # 数据库驱动类型：mysql | postgres | sqlite | mssql
   driver: mysql
   # 主库主机地址（写库）
-  host: ${DB_HOST}
-  # 主库端口
-  port: ${DB_PORT:3306}
+  host: 127.0.0.1
+  # 主库端口 默认：3306
+  port: "3306"
   # 数据库名称
-  name: ${DB_NAME}
+  name: "vago"
   # 数据库用户名
-  user: ${DB_USER}
+  user: "root"
   # 数据库密码
-  pass: ${DB_PASSWORD}
+  pass: "123456"
+  # 默认密码，建议修改
   # 数据库字符集
   charset: utf8mb4
 
   # ==============================================
-  # 连接池配置（10万并发优化）
+  # 连接池配置（10 万并发优化）
   # ==============================================
-  # 最大打开连接数（单机推荐: 1000，分布式推荐: 300-500）
+  # 最大打开连接数（单机推荐：1000，分布式推荐：300-500）
   max_open_conns: 1000
   # 最大空闲连接数（建议为 max_open_conns 的 50%）
   max_idle_conns: 500
@@ -306,16 +305,16 @@ databases: {}
 # Nacos 配置中心 & 服务发现
 # ==============================================
 nacos:
-  # Nacos 服务地址
-  host: ${NACOS_HOST:127.0.0.1}
-  # Nacos 服务端口
-  port: ${NACOS_PORT:8848}
+  # Nacos 服务地址 默认：127.0.0.1
+  host: "默认：127.0.0.1"
+  # Nacos 服务端口 默认：8848
+  port: "默认：8848"
   # Nacos 命名空间 ID（留空使用 public）
-  namespace: ${NACOS_NAMESPACE:}
+  namespace: "默认：public"
   # 配置数据 ID
-  data_id: ${NACOS_DATA_ID:vigo-config}
+  data_id: "默认：vigo-config"
   # 配置分组
-  group: ${NACOS_GROUP:DEFAULT_GROUP}
+  group: "默认：DEFAULT_GROUP"
   # Nacos 安装路径（用于自动启动 Nacos 服务）
   install_path: ${NACOS_INSTALL_PATH:}
 
@@ -326,7 +325,7 @@ nacos:
     # 是否启用服务发现
     enabled: false
     # 注册到 Nacos 的服务名称
-    service_name: ${NACOS_SERVICE_NAME:}
+    service_name: "默认：vigo-service"
     # 是否自动注册服务
     auto_register: true
     # 心跳间隔（秒）
@@ -339,11 +338,11 @@ nacos:
     # 是否启用管理界面（启用后启动时显示访问地址和密码）
     enabled: false
     # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
-    username: ${NACOS_ADMIN_USER:}
+    username: "默认：nacos"
     # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
-    password: ${NACOS_ADMIN_PASSWORD:}
+    password: "默认：nacos"
     # 管理界面端口
-    port: ${NACOS_PORT:8848}
+    port: "默认：8848"
 
 # ==============================================
 # Benchmark 压力测试配置
@@ -352,26 +351,25 @@ benchmark:
   # 内存限制百分比（超过该限制会停止压测）
   mem_limit_percent: 95
   # CPU 限制百分比（超过该限制会停止压测）
-  # 注意：压测工具本身会消耗 CPU，建议设置为 95 或更高
+  # 注意：压测工具本身会消耗大量 CPU，建议设置为 95 或更高
   cpu_limit_percent: 95
 
 # ==============================================
 # RabbitMQ 消息队列配置
-# 必须通过环境变量配置: RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD
 # ==============================================
 rabbitmq:
-  # 是否启用 RabbitMQ（10万并发场景强烈建议启用）
+  # 是否启用 RabbitMQ（10 万并发场景强烈建议启用）
   enabled: false
-  # RabbitMQ 主机地址
-  host: ${RABBITMQ_HOST}
-  # RabbitMQ 端口
-  port: ${RABBITMQ_PORT:5672}
-  # RabbitMQ 用户名
-  user: ${RABBITMQ_USER}
-  # RabbitMQ 密码
-  pass: ${RABBITMQ_PASSWORD}
-  # 虚拟主机
-  vhost: ${RABBITMQ_VHOST:/}
+  # RabbitMQ 主机地址 默认：127.0.0.1
+  host: "默认：127.0.0.1"
+  # RabbitMQ 端口 默认：5672
+  port: "默认：5672"
+  # RabbitMQ 用户名 默认：guest
+  user: "默认：guest"
+  # RabbitMQ 密码 默认：guest
+  pass: "默认：guest"
+  # 虚拟主机 默认：/
+  vhost: "默认：/"
   # 连接超时时间（秒）
   conn_timeout: 5
   # 心跳间隔（秒）
@@ -388,30 +386,29 @@ rabbitmq:
     # 是否启用管理界面
     enabled: false
     # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
-    username: ${RABBITMQ_ADMIN_USER:}
+    username: "默认：guest"
     # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
-    password: ${RABBITMQ_ADMIN_PASSWORD:}
-    # 管理界面端口
-    port: 15672
+    password: "默认：guest"
+    # 管理界面端口 默认：15672
+    port: "默认：15672"
 
 # ==============================================
 # Redis 缓存配置（高并发优化版）
-# 必须通过环境变量配置: REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
 # ==============================================
 redis:
-  # Redis 主机地址（单实例模式）
-  host: ${REDIS_HOST}
-  # Redis 端口
-  port: ${REDIS_PORT:6379}
-  # Redis 密码
-  password: ${REDIS_PASSWORD}
+  # Redis 主机地址（单实例模式）默认：127.0.0.1
+  host: "默认：127.0.0.1"
+  # Redis 端口 默认：6379
+  port: "默认：6379"
+  # Redis 密码 默认：""
+  password: "123456"
   # Redis 数据库编号（0-15）
-  db: ${REDIS_DB:0}
+  db: "默认：0"
 
   # ==============================================
-  # 连接池配置（10万并发优化）
+  # 连接池配置（10 万并发优化）
   # ==============================================
-  # 最大连接池大小（单机推荐: 2000，分布式推荐: 1000）
+  # 最大连接池大小（单机推荐：2000，分布式推荐：1000）
   pool_size: 2000
   # 最小空闲连接数（保持一定数量的空闲连接以提高响应速度）
   min_idle_conns: 200
@@ -454,91 +451,3 @@ grpc:
   max_send_msg_size: 4
 
 # ==============================================
-# 安全配置
-# ==============================================
-security:
-  # ==============================================
-  # JWT 认证配置
-  # ==============================================
-  jwt:
-    # JWT 密钥（生产环境必须修改）
-    secret: ${JWT_SECRET}
-    # Token 过期时间（秒）
-    expire: 7200
-    # Token 签发者
-    issuer: vigo
-
-  # ==============================================
-  # Session 会话配置
-  # ==============================================
-  session:
-    # 会话生命周期（秒）
-    lifetime: 120
-    # 是否仅通过 HTTPS 传输
-    secure: true
-    # 是否禁止 JavaScript 访问 Cookie
-    httponly: true
-    # SameSite 策略: strict | lax | none
-    samesite: strict
-
-  # ==============================================
-  # 密码策略配置
-  # ==============================================
-  password:
-    # 最小密码长度
-    min_length: 8
-    # 是否必须包含大写字母
-    require_uppercase: true
-    # 是否必须包含小写字母
-    require_lowercase: true
-    # 是否必须包含数字
-    require_number: true
-    # 是否必须包含特殊字符
-    require_special: false
-
-  # ==============================================
-  # CORS 跨域配置
-  # ==============================================
-  cors:
-    # 允许的来源列表（空表示允许所有）
-    allow_origins: []
-    # 允许的 HTTP 方法
-    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    # 允许的请求头
-    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
-    # 预检请求缓存时间（秒）
-    max_age: 86400
-
-  # ==============================================
-  # DoS 防护 / 限流配置
-  # ==============================================
-  dos:
-    # 是否启用限流
-    enable: true
-    # 每个 IP 的请求限制（10万并发场景建议: 1000）
-    limit: 1000
-    # 限流时间窗口（秒）
-    window: 60
-    # IP 黑名单列表
-    black_ip: []
-
-# ==============================================
-# 视图配置（ThinkPHP 风格）
-# ==============================================
-view:
-  # 视图文件存放目录（支持绝对路径或相对路径）
-  # 相对路径相对于项目根目录
-  path: "app/view"
-
-  # 视图文件后缀
-  suffix: ".html"
-
-  # 视图引擎类型
-  # 支持: template（默认模板引擎）、blade（Laravel 风格）
-  type: "template"
-
-  # 是否启用视图缓存
-  cache: false
-
-  # 缓存目录
-  cache_path: "runtime/view_cache"

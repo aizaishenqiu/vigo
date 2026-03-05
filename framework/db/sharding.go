@@ -120,7 +120,7 @@ func (r *ShardingRouter) GetAllShards() []ShardInfo {
 
 	for i := 0; i < r.config.ShardCount; i++ {
 		var targetDB *sql.DB
-		if r.config.DatabaseMap != nil && len(r.config.DatabaseMap) > 0 {
+		if len(r.config.DatabaseMap) > 0 {
 			dbIndex := i % len(r.config.DatabaseMap)
 			targetDB = r.config.DatabaseMap[dbIndex]
 		} else {

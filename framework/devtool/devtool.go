@@ -7,7 +7,18 @@ import (
 	"strings"
 	"text/template"
 	"time"
+	"unicode"
 )
+
+// toTitle 将字符串首字母大写（替代已废弃的 strings.Title）
+func toTitle(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
 
 // DevTool 开发者工具包
 type DevTool struct {
@@ -101,7 +112,7 @@ func (c *{{.Name}}Controller) Delete(ctx *mvc.Context) {
 `
 
 	data := map[string]string{
-		"Name": strings.Title(name),
+		"Name": toTitle(name),
 	}
 
 	t := template.Must(template.New("controller").Parse(tmpl))
@@ -179,7 +190,7 @@ func (m *{{.Name}}) Lists(page, pageSize int) ([]map[string]interface{}, int64, 
 `
 
 	data := map[string]string{
-		"Name":  strings.Title(name),
+		"Name":  toTitle(name),
 		"Table": strings.ToLower(name) + "s",
 	}
 
@@ -249,7 +260,7 @@ func (s *{{.Name}}Service) Delete(id int64) error {
 `
 
 	data := map[string]string{
-		"Name": strings.Title(name),
+		"Name": toTitle(name),
 	}
 
 	t := template.Must(template.New("service").Parse(tmpl))
@@ -304,7 +315,7 @@ func (m *{{.Name}}) Down() error {
 `
 
 	data := map[string]string{
-		"Name":  strings.Title(name) + "Migration",
+		"Name":  toTitle(name) + "Migration",
 		"Table": strings.ToLower(name) + "s",
 	}
 
@@ -347,7 +358,7 @@ func {{.Name}}Middleware() mvc.HandlerFunc {
 `
 
 	data := map[string]string{
-		"Name": strings.Title(name),
+		"Name": toTitle(name),
 	}
 
 	t := template.Must(template.New("middleware").Parse(tmpl))
@@ -400,7 +411,7 @@ func (v *{{.Name}}Validator) Validate(data map[string]interface{}) error {
 `
 
 	data := map[string]string{
-		"Name": strings.Title(name),
+		"Name": toTitle(name),
 	}
 
 	t := template.Must(template.New("validator").Parse(tmpl))

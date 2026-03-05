@@ -209,7 +209,7 @@ func (q *Queue) worker(queue string) {
 			// 检查任务是否可执行（延迟队列）
 			if time.Now().Before(job.AvailableAt) {
 				// 还未到执行时间，释放回队列
-				q.Release(job, job.AvailableAt.Sub(time.Now()))
+				q.Release(job, time.Until(job.AvailableAt))
 				continue
 			}
 

@@ -346,8 +346,3 @@ func Verify(password, hash string) bool {
 func base64Encode(data []byte) string {
 	return base64.URLEncoding.EncodeToString(data)
 }
-
-// base64Decode Base64 解码
-func base64Decode(s string) ([]byte, error) {
-	return base64.URLEncoding.DecodeString(s)
-}

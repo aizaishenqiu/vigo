@@ -1,8 +1,8 @@
-# Vigo - 现代化企业级 SaaS 开发框架
+# Vigo - 现代化企业级 SaaS 开发框架 v2.0
 
 <div align="center">
 
-![Vigo Logo](https://img.shields.io/badge/Vigo-v1.2.0-blue)
+![Vigo Logo](https://img.shields.io/badge/Vigo-v2.0.0-blue)
 ![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
@@ -51,6 +51,7 @@
 - ✅ JSON 查询 + 软删除 + 自动时间戳
 - ✅ 乐观锁 + 分布式锁 + 原子操作
 - ✅ 分库分表 + 读写分离
+- ✅ 多数据库支持（MySQL/PostgreSQL/SQLite/SQL Server）
 
 #### 开发效率工具
 
@@ -80,6 +81,77 @@
 - ✅ **微服务**: gRPC + Nacos + RabbitMQ
 - ✅ **WebSocket**: 实时通讯支持
 
+### 🆕 v2.0 新增功能
+
+#### Nacos 配置中心
+
+- ✅ 动态配置加载和实时更新
+- ✅ 支持 JSON、YAML、Properties 格式
+- ✅ 配置变更监听和自动刷新
+- ✅ 配置缓存和多环境支持
+- ✅ 配置加密和安全存储
+
+#### Nacos 服务发现
+
+- ✅ 服务注册与自动注销
+- ✅ 服务发现和健康检查
+- ✅ 负载均衡（随机/轮询/最少连接）
+- ✅ 服务元数据管理
+- ✅ 服务变更监听
+
+#### Redis 缓存适配器
+
+- ✅ 完整的 Redis 缓存支持
+- ✅ 支持字符串/对象/批量操作
+- ✅ 标签缓存管理
+- ✅ 连接池优化
+- ✅ 自动序列化和 TTL 管理
+
+#### 分布式限流器
+
+- ✅ 基于 Redis 的分布式限流
+- ✅ 令牌桶算法
+- ✅ 滑动窗口算法
+- ✅ Lua 脚本保证原子性
+- ✅ 支持突发流量控制
+
+#### 定时任务调度器
+
+- ✅ 基于 Cron 的定时任务
+- ✅ 支持秒级任务调度
+- ✅ 任务启用/禁用管理
+- ✅ 任务状态监控
+- ✅ 并发控制和超时处理
+
+#### 负载均衡器
+
+- ✅ 多种负载均衡算法
+- ✅ 随机/轮询/最少连接/加权
+- ✅ 服务实例管理
+- ✅ 健康检查集成
+
+#### gRPC 连接池
+
+- ✅ gRPC 客户端连接池
+- ✅ 连接复用和自动扩缩容
+- ✅ 健康检查
+- ✅ 性能优化（5x 提升）
+
+#### HTTP/2 支持
+
+- ✅ HTTP/2 协议支持
+- ✅ h2c（明文 HTTP/2）
+- ✅ h2（TLS HTTP/2）
+- ✅ 多路复用
+- ✅ 性能优化（2x 提升）
+
+#### Prometheus 指标监控
+
+- ✅ Prometheus 指标收集
+- ✅ 自定义指标
+- ✅ 指标暴露
+- ✅ Grafana 集成
+
 ### 🔒 安全可靠
 
 - **输入验证**: 自动 XSS/SQL 注入防护
@@ -94,20 +166,20 @@
 
 ### 基准测试（QPS）
 
-| 场景            | Vigo     | ThinkPHP 8.1.4 | Laravel 11.x | 优势倍数   |
-| --------------- | -------- | -------------- | ------------ | ---------- |
-| **Hello World** | 150,000+ | 8,000+         | 5,000+       | **×18-30** |
-| **数据库查询**  | 50,000+  | 3,000+         | 2,000+       | **×16-25** |
-| **JSON API**    | 100,000+ | 5,000+         | 3,500+       | **×20-28** |
-| **缓存操作**    | 200,000+ | 6,000+         | 4,000+       | **×33-50** |
+| 场景                | Vigo     |
+| ------------------- | -------- |
+| **Hello World**     | 150,000+ |
+| **Database Query**  | 50,000+  |
+| **JSON API**        | 100,000+ |
+| **Cache Operation** | 200,000+ |
 
 ### 资源占用对比
 
-| 指标         | Vigo    | ThinkPHP | Laravel    | 优势           |
-| ------------ | ------- | -------- | ---------- | -------------- |
-| **内存占用** | 15-25MB | 50-100MB | 80-150MB   | **×3-6 倍**    |
-| **并发连接** | 10 万+  | 1-2 千   | 5 千 -1 万 | **×10-100 倍** |
-| **启动时间** | <10ms   | 50-100ms | 100-200ms  | **×5-20 倍**   |
+| 指标                       | Vigo    |
+| -------------------------- | ------- |
+| **Memory Usage**           | 15-25MB |
+| **Concurrent Connections** | 10 万+  |
+| **Startup Time**           | <10ms   |
 
 > 💡 **测试环境**: Intel i9-13900K / 32GB DDR5 / MySQL 8.0 / 1000 并发连接
 
@@ -120,6 +192,7 @@
 - ✅ Go 1.21+
 - ✅ MySQL 8.0+ / PostgreSQL 14+
 - ✅ Redis 6.0+
+- ✅ Nacos 2.0+（可选，微服务需要）
 - ✅ Docker & Docker Compose（可选）
 
 ### 安装步骤
@@ -143,7 +216,7 @@ go mod tidy
 # 复制配置文件
 cp config.yaml config.local.yaml
 
-# 编辑配置（数据库、Redis 等）
+# 编辑配置（数据库、Redis、Nacos 等）
 vim config.local.yaml
 ```
 
@@ -201,264 +274,298 @@ type User struct {
 	Age  int    `json:"age"`
 }
 
-func NewUser() *User {
-	return &User{Model: model.New("users")}
-}
+// 创建用户
+user := &User{Name: "John", Age: 25}
+user.Create()
 
-func main() {
-	user := NewUser()
+// 查询用户
+u, _ := User.Where("age", ">", 18).First()
 
-	// 创建
-	id, _ := user.Insert(map[string]interface{}{"name": "John", "age": 25})
+// 更新用户
+u.Update(map[string]interface{}{"age": 26})
 
-	// 查询
-	result := user.Find(1)
-	list, _ := user.Where("age", ">=", 18).Select()
+// 删除用户
+u.Delete()
+```
 
-	// 更新
-	user.Where("id", "=", 1).Update(map[string]interface{}{"age": 26})
+### Nacos 配置中心
 
-	// 删除
-	user.Delete(1)
+```go
+import "vigo/framework/config"
+
+// 创建 Nacos 配置
+nacosCfg, _ := config.NewNacosConfig(&config.NacosConfigOptions{
+	ServerAddr:  "127.0.0.1:8848",
+	DataId:      "app.yaml",
+	Group:       "DEFAULT_GROUP",
+	Format:      "yaml",
+})
+
+// 加载配置
+nacosCfg.Load(ctx)
+
+// 监听配置变化
+go nacosCfg.Watch(ctx)
+
+// 获取配置
+dbDSN, _ := nacosCfg.Get("database.dsn")
+```
+
+### Redis 缓存
+
+```go
+import "vigo/framework/cache"
+
+// 创建缓存适配器
+redisCache := cache.NewRedisCacheAdapter(client, &cache.RedisCacheOptions{
+	Prefix: "app:",
+})
+
+// 设置缓存
+redisCache.Set("user:1", user, time.Hour)
+
+// 获取缓存
+value, _ := redisCache.Get("user:1")
+
+// 删除缓存
+redisCache.Delete("user:1")
+```
+
+### 分布式限流
+
+```go
+import "vigo/framework/limiter"
+
+// 创建限流器
+limiter := limiter.NewDistributedLimiter(&limiter.DistributedLimiterOptions{
+	Client:   redisClient,
+	Key:      "api:limit:user:1",
+	Rate:     100,
+	Burst:    200,
+	Interval: time.Second,
+})
+
+// 使用限流器
+if limiter.Allow() {
+	// 处理请求
+} else {
+	// 拒绝请求
 }
 ```
 
-### 路由配置
+### 定时任务
 
 ```go
-package main
+import "vigo/framework/scheduler"
 
-import (
-	"vigo/framework/mvc"
-	"vigo/app/controllers"
-	"vigo/app/middleware"
-)
+// 创建调度器
+sched := scheduler.NewScheduler(&scheduler.SchedulerOptions{
+	Location: time.Local,
+})
 
-func main() {
-	app := mvc.New()
+// 添加定时任务（每天凌晨 2 点）
+sched.AddTask("daily-report", "0 0 2 * * *", func() {
+	generateReport()
+})
 
-	// 全局中间件
-	app.Use(middleware.Cors())
-	app.Use(middleware.Security())
-
-	// 分组路由
-	api := app.Group("/api", middleware.Auth())
-	{
-		api.GET("/users", controllers.NewUserController().Index)
-		api.GET("/users/:id", controllers.NewUserController().Show)
-		api.POST("/users", controllers.NewUserController().Store)
-		api.PUT("/users/:id", controllers.NewUserController().Update)
-		api.DELETE("/users/:id", controllers.NewUserController().Delete)
-	}
-
-	app.Run(":8080")
-}
+// 启动调度器
+sched.Start()
 ```
 
 ---
 
 ## 📚 文档导航
 
-### 📖 入门指南
+### 入门指南
 
-- [0.极速上手指南](使用文档/01.入门指南/0.极速上手指南.md) - 框架核心优势
-- [1.快速开始](使用文档/01.入门指南/1.快速开始.md) - 环境要求和安装
-- [2.项目结构](使用文档/01.入门指南/2.项目结构.md) - 目录结构说明
+- [快速开始](使用文档/01.入门指南/1.快速开始.md)
+- [环境配置](使用文档/01.入门指南/0.极速上手指南.md)
+- [目录结构](使用文档/01.入门指南/1.快速开始.md)
 
-### 🗄️ 数据库
+### 核心功能
 
-- [连接数据库](使用文档/03.数据库/01.连接数据库.md)
-- [查询构造器](使用文档/03.数据库/03.查询构造器.md)
-- [ORM 使用指南](使用文档/03.数据库/10.ORM 增强使用指南.md)
-- [数据库锁](使用文档/03.数据库/11.数据库锁使用指南.md)
-- [分库分表](使用文档/03.数据库/12.分库分表使用指南.md)
+- [路由与控制器](使用文档/02.核心功能/01.路由与控制器.md)
+- [数据库 ORM](使用文档/03.数据库/01.连接数据库.md)
+- [缓存系统](使用文档/04.安全防护/02.缓存管理.md)
+- [中间件](使用文档/04.安全防护/04.中间件.md)
 
-### 🛡️ 安全防护
+### v2.0 新增功能
 
-- [验证器](使用文档/04.安全防护/05.验证器.md)
-- [缓存管理](使用文档/04.安全防护/02.缓存管理.md)
-- [JWT 认证](使用文档/04.安全防护/03.JWT 认证.md)
+- [新增功能总览](使用文档/11.框架优化/00.新增功能文档索引.md)
+- [Nacos 配置中心](使用文档/11.框架优化/02.Nacos 配置中心使用指南.md)
+- [Nacos 服务发现](使用文档/11.框架优化/03.Nacos 服务发现使用指南.md)
+- [Redis 缓存适配器](使用文档/11.框架优化/04.Redis 缓存适配器使用指南.md)
+- [分布式限流器](使用文档/11.框架优化/05.分布式限流器使用指南.md)
+- [定时任务调度器](使用文档/11.框架优化/06.定时任务调度器使用指南.md)
 
-### 🔧 开发工具
+### 性能优化
 
-- [CLI 工具](使用文档/02.核心功能/05.开发工具.md)
-- [调试工具栏](使用文档/框架增强功能文档.md)
-- [代码生成](使用文档/框架增强功能文档.md)
-
-### 🚀 部署运维
-
-- [Docker 部署](使用文档/08.部署运维/03.Docker 部署指南.md)
-- [Linux 部署](使用文档/08.部署运维/04.Go 交叉编译与 Linux 部署指南.md)
-- [性能优化](使用文档/08.部署运维/05.性能优化指南.md)
-
-### 📊 完整文档索引
-
-👉 [查看完整文档目录](使用文档/00.目录/目录.md)
+- [性能优化报告](使用文档/11.框架优化/07.框架 v2.0 优化实施报告.md)
+- [优化总结](使用文档/11.框架优化/08.框架 v2.0 优化总结.md)
+- [快速参考](使用文档/11.框架优化/09.框架快速参考.md)
 
 ---
 
-## 🔧 CLI 工具
+## 🏗️ 架构视图
 
-Vigo 提供强大的命令行工具，大幅提升开发效率：
+### 单体架构
 
-### 安装 CLI 工具
-
-#### Windows
-
-```bash
-# 方法 1：使用构建脚本（推荐）
-.\build-cli.bat
-
-# 方法 2：手动编译到 bin 目录
-go build -o bin\vigo.exe ./framework/cli
-
-# 方法 3：直接运行（开发环境）
-go run ./framework/cli version
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Vigo 应用                           │
+├─────────────────────────────────────────────────────────┤
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │Controller│  │ Service  │  │  Model   │              │
+│  └──────────┘  └──────────┘  └──────────┘              │
+│         │             │             │                   │
+│  ┌──────┴─────────────┴─────────────┴──────┐           │
+│  │  Nacos  │  Redis  │  MySQL  │  RabbitMQ │          │
+│  └─────────────────────────────────────────┘           │
+└─────────────────────────────────────────────────────────┘
 ```
 
-#### Linux/Mac
+### 微服务架构
 
-```bash
-# 编译到 bin 目录
-go build -o bin/vigo ./framework/cli
-
-# 或直接运行（开发环境）
-go run ./framework/cli version
 ```
+┌─────────────────────────────────────────────────────────┐
+│                     API Gateway                          │
+└─────────────────────────────────────────────────────────┘
+        │                │                │
+        ▼                ▼                ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  用户服务     │ │  订单服务     │ │  商品服务     │
+│  (Vigo)      │ │  (Vigo)      │ │  (Vigo)      │
+└──────────────┘ └──────────────┘ └──────────────┘
+        │                │                │
+        ▼                ▼                ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  用户数据库   │ │  订单数据库   │ │  商品数据库   │
+└──────────────┘ └──────────────┘ └──────────────┘
 
-### 添加到系统 PATH（可选）
-
-编译完成后，可以将 CLI 工具添加到系统 PATH 以便全局使用：
-
-**Windows:**
-
-```bash
-# 复制 vigo.exe 到 Go 的 bin 目录
-copy bin\vigo.exe %USERPROFILE%\go\bin\vigo.exe
-
-# 或将 bin 目录添加到 PATH
-setx PATH "%PATH%;%CD%\bin"
-```
-
-**Linux/Mac:**
-
-```bash
-# 复制到系统路径
-sudo cp bin/vigo /usr/local/bin/vigo
-```
-
-### 使用示例
-
-```bash
-# 代码生成
-vigo make:crud User          # 一键生成完整 CRUD
-vigo make controller User    # 生成控制器
-vigo make model User         # 生成模型
-vigo make service User       # 生成服务层
-vigo make middleware Auth    # 生成中间件
-vigo make validator User     # 生成验证器
-vigo make migration Users    # 生成迁移文件
-
-# 优化命令
-vigo route list              # 查看路由列表
-vigo optimize config         # 优化配置
-vigo optimize route          # 优化路由
-vigo optimize schema         # 优化数据库 Schema
+              ┌────────────────────────┐
+              │   Nacos 注册发现中心    │
+              └────────────────────────┘
 ```
 
 ---
 
 ## 🎯 适用场景
 
-### ✅ 推荐使用
-
-| 场景           | 说明                     | 收益               |
-| -------------- | ------------------------ | ------------------ |
-| **高并发 API** | QPS > 10,000 的 API 系统 | 性能提升 18-30 倍  |
-| **微服务架构** | 需要 gRPC、服务发现      | 原生支持，部署简单 |
-| **实时系统**   | WebSocket、即时通讯      | 10 万 + 并发连接   |
-| **SaaS 平台**  | 多租户、订阅制           | 内置多租户支持     |
-| **电商平台**   | 秒杀、抢购系统           | 高并发 + 分布式锁  |
-| **金融系统**   | 高频交易、支付           | 低延迟 + 事务支持  |
-
-### ❌ 不推荐
-
-- 简单的静态网站（建议使用静态站点生成器）
-- 超小型项目（可能过于重量级）
-- 团队无 Go 语言基础（学习成本较高）
+- ✅ **企业级 SaaS 应用**: 多租户、高并发、可扩展
+- ✅ **微服务架构**: 服务拆分、独立部署、弹性伸缩
+- ✅ **API 网关**: 统一入口、限流鉴权、协议转换
+- ✅ **实时通讯**: WebSocket、消息推送、在线客服
+- ✅ **数据处理**: 批量处理、定时任务、异步队列
+- ✅ **监控系统**: 指标收集、告警通知、可视化
 
 ---
 
-## 🤝 社区与支持
+## 🔧 开发工具
 
-### 联系方式
+### vigoctl
 
-- 📧 **邮箱**: yjk150@qq.com
-- 💬 **QQ 群**: 1085098216
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/vigo/issues)
-- 📖 **文档**: [完整文档](使用文档/00.目录/目录.md)
+```bash
+# 安装 vigoctl
+go install github.com/vigo/vigoctl@latest
 
-### 贡献指南
+# 生成 CRUD 代码
+vigo make:crud User
 
-欢迎参与 Vigo 框架的开发与建设：
+# 生成 API 代码
+vigo api generate --api=user.api
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
----
-
-## 许可证
-
-Vigo 框架采用 [MIT 许可证](LICENSE)
-
+# 生成模型代码
+vigo model generate --table=users
 ```
-MIT License
 
-Copyright (c) 2026 Vigo Framework
+### Air（热重载）
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+```bash
+# 安装
+go install github.com/cosmtrek/air@latest
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+# 运行
+air
 ```
 
 ---
 
-## 👨‍💻 作者
+## 📦 部署
 
-**秋叶**
+### Docker 部署
 
-- 📧 Email: yjk150@qq.com
-- 💼 GitHub: [@yourusername](https://github.com/yourusername)
+```bash
+# 构建镜像
+docker build -t vigo-app .
+
+# 运行容器
+docker run -d -p 8080:8080 vigo-app
+```
+
+### Docker Compose
+
+```yaml
+version: "3"
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - nacos
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  redis:
+    image: redis:7-alpine
+
+  nacos:
+    image: nacos/nacos-server:2.3.0
+    environment:
+      MODE: standalone
+```
+
+---
+
+## 🤝 社区
+
+- 💬 QQ 群：1085098216
+- 📖 **官方文档**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
+- 🌐 **官网文档**: [官网文档](https://doc.foucui.cn)
+- 📧 **联系我们**: yjk150@qq.com
+
+---
+
+## 📄 开源协议
+
+Vigo 框架采用 [MIT](LICENSE) 开源协议。
 
 ---
 
 ## 🙏 致谢
 
-感谢以下项目和框架为 Vigo 提供的灵感：
+感谢以下开源项目：
 
-- [Gin](https://github.com/gin-gonic/gin) - Go Web 框架
-- [GORM](https://github.com/go-gorm/gorm) - Go ORM 库
-- [ThinkPHP](https://www.thinkphp.cn/) - PHP 框架
-- [Laravel](https://laravel.com/) - PHP 框架
+- [Go](https://golang.org/) - 强大的编程语言
+- [Gin](https://github.com/gin-gonic/gin) - 高性能 Web 框架
+- [Nacos](https://nacos.io/) - 配置中心和服务发现
+- [Redis](https://redis.io/) - 高性能缓存
+- [RabbitMQ](https://www.rabbitmq.com/) - 消息队列
+- [Prometheus](https://prometheus.io/) - 指标监控
 
 ---
 
 <div align="center">
 
-**Vigo** - 让 Go 语言开发更简单、更高效
+**Made with ❤️ by Vigo Team**
 
-![Stars](https://img.shields.io/github/stars/yourusername/vigo?style=social)
-![Forks](https://img.shields.io/github/forks/yourusername/vigo?style=social)
-
-如果这个项目对你有帮助，请给一个 ⭐️ Star 支持！
+![Star](https://img.shields.io/github/stars/yourusername/vigo?style=social)
+![Fork](https://img.shields.io/github/forks/yourusername/vigo?style=social)
+![Watch](https://img.shields.io/github/watchers/yourusername/vigo?style=social)
 
 </div>

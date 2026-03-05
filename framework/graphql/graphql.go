@@ -5,14 +5,12 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"sync"
 )
 
 // GraphQL GraphQL 处理器
 type GraphQL struct {
 	schema    *Schema
 	resolvers map[string]ResolverFunc
-	mu        sync.RWMutex
 }
 
 // Schema GraphQL Schema

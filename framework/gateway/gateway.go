@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
-	"sync"
 	"time"
 	"vigo/framework/circuit"
 	"vigo/framework/middleware"
@@ -22,7 +21,6 @@ type Gateway struct {
 	retryCount     int
 	retryDelay     time.Duration
 	timeout        time.Duration
-	mu             sync.RWMutex
 }
 
 // GatewayConfig 网关配置

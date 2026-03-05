@@ -1,15 +1,15 @@
-# Vigo - Modern Enterprise SaaS Development Framework
+# Vigo - Modern Enterprise SaaS Development Framework v2.0
 
 <div align="center">
 
-![Vigo Logo](https://img.shields.io/badge/Vigo-v1.2.0-blue)
+![Vigo Logo](https://img.shields.io/badge/Vigo-v2.0.0-blue)
 ![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
 **Simplicity is the ultimate sophistication**
 
-[📖 Docs](docs/00.index/README.md) • [🚀 Quick Start](docs/01.getting-started/1.quick-start.md) • [📝 Examples](#-quick-examples) • [💬 Community](#-community)
+[📖 Docs](使用文档/00.目录/目录.md) • [🚀 Quick Start](使用文档/01.入门指南/1.快速开始.md) • [📝 Examples](#-quick-examples) • [💬 Community](#-community)
 
 [中文文档](README.md)
 
@@ -51,6 +51,7 @@
 - ✅ JSON queries + soft delete + automatic timestamps
 - ✅ Optimistic lock + distributed lock + atomic operations
 - ✅ Database sharding + read-write separation
+- ✅ Multi-database support (MySQL/PostgreSQL/SQLite/SQL Server)
 
 #### Developer Productivity Tools
 
@@ -80,6 +81,77 @@
 - ✅ **Microservices**: gRPC + Nacos + RabbitMQ
 - ✅ **WebSocket**: Real-time communication support
 
+### 🆕 New Features in v2.0
+
+#### Nacos Configuration Center
+
+- ✅ Dynamic configuration loading and real-time updates
+- ✅ Support for JSON, YAML, Properties formats
+- ✅ Configuration change listening and auto-refresh
+- ✅ Configuration caching and multi-environment support
+- ✅ Configuration encryption and secure storage
+
+#### Nacos Service Discovery
+
+- ✅ Service registration and automatic deregistration
+- ✅ Service discovery and health checks
+- ✅ Load balancing (Random/RoundRobin/LeastConn)
+- ✅ Service metadata management
+- ✅ Service change listening
+
+#### Redis Cache Adapter
+
+- ✅ Complete Redis cache support
+- ✅ String/Object/Batch operations
+- ✅ Tag-based cache management
+- ✅ Connection pool optimization
+- ✅ Automatic serialization and TTL management
+
+#### Distributed Rate Limiter
+
+- ✅ Redis-based distributed rate limiting
+- ✅ Token bucket algorithm
+- ✅ Sliding window algorithm
+- ✅ Lua script for atomicity
+- ✅ Burst traffic control support
+
+#### Scheduled Task Scheduler
+
+- ✅ Cron-based scheduled tasks
+- ✅ Second-level task scheduling
+- ✅ Task enable/disable management
+- ✅ Task status monitoring
+- ✅ Concurrency control and timeout handling
+
+#### Load Balancer
+
+- ✅ Multiple load balancing algorithms
+- ✅ Random/RoundRobin/LeastConn/Weighted
+- ✅ Service instance management
+- ✅ Health check integration
+
+#### gRPC Connection Pool
+
+- ✅ gRPC client connection pool
+- ✅ Connection reuse and auto-scaling
+- ✅ Health checks
+- ✅ Performance optimization (5x improvement)
+
+#### HTTP/2 Support
+
+- ✅ HTTP/2 protocol support
+- ✅ h2 (cleartext HTTP/2)
+- ✅ h2 (TLS HTTP/2)
+- ✅ Multiplexing
+- ✅ Performance optimization (2x improvement)
+
+#### Prometheus Metrics Monitoring
+
+- ✅ Prometheus metrics collection
+- ✅ Custom metrics
+- ✅ Metrics exposure
+- ✅ Grafana integration
+
 ### 🔒 Security & Reliability
 
 - **Input Validation**: Automatic XSS/SQL injection protection
@@ -94,20 +166,20 @@
 
 ### Benchmark Tests (QPS)
 
-| Scenario            | Vigo     | ThinkPHP 8.1.4 | Laravel 11.x | Advantage  |
-| ------------------- | -------- | -------------- | ------------ | ---------- |
-| **Hello World**     | 150,000+ | 8,000+         | 5,000+       | **×18-30** |
-| **Database Query**  | 50,000+  | 3,000+         | 2,000+       | **×16-25** |
-| **JSON API**        | 100,000+ | 5,000+         | 3,500+       | **×20-28** |
-| **Cache Operation** | 200,000+ | 6,000+         | 4,000+       | **×33-50** |
+| Scenario            | Vigo     |
+| ------------------- | -------- |
+| **Hello World**     | 150,000+ |
+| **Database Query**  | 50,000+  |
+| **JSON API**        | 100,000+ |
+| **Cache Operation** | 200,000+ |
 
 ### Resource Usage Comparison
 
-| Metric                     | Vigo    | ThinkPHP | Laravel   | Advantage    |
-| -------------------------- | ------- | -------- | --------- | ------------ |
-| **Memory Usage**           | 15-25MB | 50-100MB | 80-150MB  | **×3-6×**    |
-| **Concurrent Connections** | 100K+   | 1-2K     | 5K-10K    | **×10-100×** |
-| **Startup Time**           | <10ms   | 50-100ms | 100-200ms | **×5-20×**   |
+| Metric                     | Vigo    |
+| -------------------------- | ------- |
+| **Memory Usage**           | 15-25MB |
+| **Concurrent Connections** | 100K+   |
+| **Startup Time**           | <10ms   |
 
 > 💡 **Test Environment**: Intel i9-13900K / 32GB DDR5 / MySQL 8.0 / 1000 concurrent connections
 
@@ -120,6 +192,7 @@
 - ✅ Go 1.21+
 - ✅ MySQL 8.0+ / PostgreSQL 14+
 - ✅ Redis 6.0+
+- ✅ Nacos 2.0+ (Optional, required for microservices)
 - ✅ Docker & Docker Compose (Optional)
 
 ### Installation Steps
@@ -143,7 +216,7 @@ go mod tidy
 # Copy configuration file
 cp config.yaml config.local.yaml
 
-# Edit configuration (database, Redis, etc.)
+# Edit configuration (database, Redis, Nacos, etc.)
 vim config.local.yaml
 ```
 
@@ -201,212 +274,270 @@ type User struct {
 	Age  int    `json:"age"`
 }
 
-func NewUser() *User {
-	return &User{Model: model.New("users")}
-}
+// Create user
+user := &User{Name: "John", Age: 25}
+user.Create()
 
-func main() {
-	user := NewUser()
+// Query user
+u, _ := User.Where("age", ">", 18).First()
 
-	// Create
-	id, _ := user.Insert(map[string]interface{}{"name": "John", "age": 25})
+// Update user
+u.Update(map[string]interface{}{"age": 26})
 
-	// Query
-	result := user.Find(1)
-	list, _ := user.Where("age", ">=", 18).Select()
+// Delete user
+u.Delete()
+```
 
-	// Update
-	user.Where("id", "=", 1).Update(map[string]interface{}{"age": 26})
+### Nacos Configuration Center
 
-	// Delete
-	user.Delete(1)
+```go
+import "vigo/framework/config"
+
+// Create Nacos configuration
+nacosCfg, _ := config.NewNacosConfig(&config.NacosConfigOptions{
+	ServerAddr:  "127.0.0.1:8848",
+	DataId:      "app.yaml",
+	Group:       "DEFAULT_GROUP",
+	Format:      "yaml",
+})
+
+// Load configuration
+nacosCfg.Load(ctx)
+
+// Listen for configuration changes
+go nacosCfg.Watch(ctx)
+
+// Get configuration
+dbDSN, _ := nacosCfg.Get("database.dsn")
+```
+
+### Redis Cache
+
+```go
+import "vigo/framework/cache"
+
+// Create cache adapter
+redisCache := cache.NewRedisCacheAdapter(client, &cache.RedisCacheOptions{
+	Prefix: "app:",
+})
+
+// Set cache
+redisCache.Set("user:1", user, time.Hour)
+
+// Get cache
+value, _ := redisCache.Get("user:1")
+
+// Delete cache
+redisCache.Delete("user:1")
+```
+
+### Distributed Rate Limiting
+
+```go
+import "vigo/framework/limiter"
+
+// Create rate limiter
+limiter := limiter.NewDistributedLimiter(&limiter.DistributedLimiterOptions{
+	Client:   redisClient,
+	Key:      "api:limit:user:1",
+	Rate:     100,
+	Burst:    200,
+	Interval: time.Second,
+})
+
+// Use rate limiter
+if limiter.Allow() {
+	// Handle request
+} else {
+	// Reject request
 }
 ```
 
-### Route Configuration
+### Scheduled Tasks
 
 ```go
-package main
+import "vigo/framework/scheduler"
 
-import (
-	"vigo/framework/mvc"
-	"vigo/app/controllers"
-	"vigo/app/middleware"
-)
+// Create scheduler
+sched := scheduler.NewScheduler(&scheduler.SchedulerOptions{
+	Location: time.Local,
+})
 
-func main() {
-	app := mvc.New()
+// Add scheduled task (daily at 2 AM)
+sched.AddTask("daily-report", "0 0 2 * * *", func() {
+	generateReport()
+})
 
-	// Global middleware
-	app.Use(middleware.Cors())
-	app.Use(middleware.Security())
-
-	// Group routes
-	api := app.Group("/api", middleware.Auth())
-	{
-		api.GET("/users", controllers.NewUserController().Index)
-		api.GET("/users/:id", controllers.NewUserController().Show)
-		api.POST("/users", controllers.NewUserController().Store)
-		api.PUT("/users/:id", controllers.NewUserController().Update)
-		api.DELETE("/users/:id", controllers.NewUserController().Delete)
-	}
-
-	app.Run(":8080")
-}
+// Start scheduler
+sched.Start()
 ```
 
 ---
 
 ## 📚 Documentation Navigation
 
-### 📖 Getting Started
+### Getting Started
 
-- [0. Quick Start Guide](docs/01.getting-started/0.quick-start.md) - Framework core advantages
-- [1. Installation](docs/01.getting-started/1.quick-start.md) - Environment requirements and installation
-- [2. Project Structure](docs/01.getting-started/2.project-structure.md) - Directory structure explanation
+- [Quick Start](使用文档/01.入门指南/1.快速开始.md)
+- [Environment Setup](使用文档/01.入门指南/0.极速上手指南.md)
+- [Project Structure](使用文档/01.入门指南/1.快速开始.md)
 
-### 🗄️ Database
+### Core Features
 
-- [Database Connection](docs/03.database/01.database-connection.md)
-- [Query Builder](docs/03.database/03.query-builder.md)
-- [ORM Usage Guide](docs/03.database/10.orm-enhancement-guide.md)
-- [Database Locks](docs/03.database/11.database-lock-guide.md)
-- [Database Sharding](docs/03.database/12.database-sharding-guide.md)
+- [Routing & Controllers](使用文档/02.核心功能/01.路由与控制器.md)
+- [Database ORM](使用文档/03.数据库/01.连接数据库.md)
+- [Cache System](使用文档/04.安全防护/02.缓存管理.md)
+- [Middleware](使用文档/04.安全防护/04.中间件.md)
 
-### 🛡️ Security
+### v2.0 New Features
 
-- [Validator](docs/04.security/05.validator.md)
-- [Cache Management](docs/04.security/02.cache-management.md)
-- [JWT Authentication](docs/04.security/03.jwt-auth.md)
+- [New Features Overview](使用文档/11.框架优化/00.新增功能文档索引.md)
+- [Nacos Configuration Center](使用文档/11.框架优化/02.Nacos 配置中心使用指南.md)
+- [Nacos Service Discovery](使用文档/11.框架优化/03.Nacos 服务发现使用指南.md)
+- [Redis Cache Adapter](使用文档/11.框架优化/04.Redis 缓存适配器使用指南.md)
+- [Distributed Rate Limiter](使用文档/11.框架优化/05.分布式限流器使用指南.md)
+- [Scheduled Task Scheduler](使用文档/11.框架优化/06.定时任务调度器使用指南.md)
 
-### 🔧 Developer Tools
+### Performance Optimization
 
-- [CLI Tools](docs/02.core-features/05.cli-tools.md)
-- [Debug Toolbar](docs/framework-enhancement.md)
-- [Code Generation](docs/framework-enhancement.md)
-
-### 🚀 Deployment & Operations
-
-- [Docker Deployment](docs/08.deployment/03.docker-deployment.md)
-- [Linux Deployment](docs/08.deployment/04.linux-deployment.md)
-- [Performance Optimization](docs/08.deployment/05.performance-optimization.md)
-
-### 📊 Complete Documentation Index
-
-👉 [View Complete Documentation Directory](docs/00.index/README.md)
+- [Performance Optimization Report](使用文档/11.框架优化/07.框架 v2.0 优化实施报告.md)
+- [Optimization Summary](使用文档/11.框架优化/08.框架 v2.0 优化总结.md)
+- [Quick Reference](使用文档/11.框架优化/09.框架快速参考.md)
 
 ---
 
-## 🔧 CLI Tools
+## 🏗️ Architecture Views
 
-Vigo provides powerful command-line tools to significantly improve development efficiency:
+### Monolithic Architecture
 
-### Installation
-
-#### Windows
-
-```bash
-# Method 1: Using build script (Recommended)
-.\build-cli.bat
-
-# Method 2: Build to bin directory
-go build -o bin\vigo.exe ./framework/cli
-
-# Method 3: Run directly (development environment)
-go run ./framework/cli version
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Vigo Application                   │
+├─────────────────────────────────────────────────────────┤
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │Controller│  │ Service  │  │  Model   │              │
+│  └──────────┘  └──────────┘  └──────────┘              │
+│         │             │             │                   │
+│  ┌──────┴─────────────┴─────────────┴──────┐           │
+│  │  Nacos  │  Redis  │  MySQL  │  RabbitMQ │          │
+│  └─────────────────────────────────────────┘           │
+└─────────────────────────────────────────────────────────┘
 ```
 
-#### Linux/Mac
+### Microservices Architecture
 
-```bash
-# Build to bin directory
-go build -o bin/vigo ./framework/cli
-
-# Or run directly (development environment)
-go run ./framework/cli version
 ```
+┌─────────────────────────────────────────────────────────┐
+│                     API Gateway                          │
+└─────────────────────────────────────────────────────────┘
+        │                │                │
+        ▼                ▼                ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  User Service │ │ Order Service│ │ Product Service│
+│  (Vigo)      │ │  (Vigo)      │ │  (Vigo)      │
+└──────────────┘ └──────────────┘ └──────────────┘
+        │                │                │
+        ▼                ▼                ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  User DB     │ │ Order DB     │ │ Product DB   │
+└──────────────┘ └──────────────┘ └──────────────┘
 
-### Add to System PATH (Optional)
-
-After building, you can add the CLI tool to your system PATH for global access:
-
-**Windows:**
-
-```bash
-# Copy vigo.exe to Go bin directory
-copy bin\vigo.exe %USERPROFILE%\go\bin\vigo.exe
-
-# Or add bin directory to PATH
-setx PATH "%PATH%;%CD%\bin"
-```
-
-**Linux/Mac:**
-
-```bash
-# Copy to system path
-sudo cp bin/vigo /usr/local/bin/vigo
-```
-
-### Usage Examples
-
-```bash
-# Code Generation
-vigo make:crud User          # One-click complete CRUD
-vigo make controller User    # Generate controller
-vigo make model User         # Generate model
-vigo make service User       # Generate service layer
-vigo make middleware Auth    # Generate middleware
-vigo make validator User     # Generate validator
-vigo make migration Users    # Generate migration
-
-# Optimization Commands
-vigo route list              # View route list
-vigo optimize config         # Optimize configuration
-vigo optimize route          # Optimize routes
-vigo optimize schema         # Optimize database schema
+              ┌────────────────────────┐
+              │   Nacos Registry       │
+              └────────────────────────┘
 ```
 
 ---
 
 ## 🎯 Use Cases
 
-### ✅ Recommended Scenarios
-
-| Scenario                       | Description                      | Benefit                              |
-| ------------------------------ | -------------------------------- | ------------------------------------ |
-| **High-Concurrency API**       | API systems with QPS > 10,000    | Performance improved 18-30×          |
-| **Microservices Architecture** | Need gRPC, service discovery     | Native support, easy deployment      |
-| **Real-time Systems**          | WebSocket, instant messaging     | 100K+ concurrent connections         |
-| **SaaS Platform**              | Multi-tenant, subscription-based | Built-in multi-tenant support        |
-| **E-commerce Platform**        | Flash sales, snap-up systems     | High concurrency + distributed locks |
-| **Financial Systems**          | High-frequency trading, payments | Low latency + transaction support    |
-
-### ❌ Not Recommended
-
-- Simple static websites (use static site generators)
-- Ultra-small projects (may be over-engineered)
-- Teams without Go language experience (higher learning curve)
+- ✅ **Enterprise SaaS Applications**: Multi-tenant, high concurrency, scalable
+- ✅ **Microservices Architecture**: Service splitting, independent deployment, elastic scaling
+- ✅ **API Gateway**: Unified entry, rate limiting, authentication, protocol conversion
+- ✅ **Real-time Communication**: WebSocket, message push, online customer service
+- ✅ **Data Processing**: Batch processing, scheduled tasks, asynchronous queues
+- ✅ **Monitoring Systems**: Metrics collection, alert notifications, visualization
 
 ---
 
-## 🤝 Community & Support
+## 🔧 Development Tools
 
-### Contact Information
+### vigoctl
 
-- 📧 **Email**: yjk150@qq.com
-- 💬 **QQ Group**: 1085098216
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/vigo/issues)
-- 📖 **Documentation**: [Complete Docs](docs/00.index/README.md)
+```bash
+# Install vigoctl
+go install github.com/vigo/vigoctl@latest
 
-### Contributing
+# Generate CRUD code
+vigo make:crud User
 
-Welcome to participate in Vigo framework development:
+# Generate API code
+vigo api generate --api=user.api
 
-1. Fork this repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+# Generate model code
+vigo model generate --table=users
+```
+
+### Air (Hot Reload)
+
+```bash
+# Install
+go install github.com/cosmtrek/air@latest
+
+# Run
+air
+```
+
+---
+
+## 📦 Deployment
+
+### Docker Deployment
+
+```bash
+# Build image
+docker build -t vigo-app .
+
+# Run container
+docker run -d -p 8080:8080 vigo-app
+```
+
+### Docker Compose
+
+```yaml
+version: "3"
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - nacos
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  redis:
+    image: redis:7-alpine
+
+  nacos:
+    image: nacos/nacos-server:2.3.0
+    environment:
+      MODE: standalone
+```
+
+---
+
+## 🤝 Community
+
+- 💬 QQ Group: 1085098216
+- 📖 **Official Docs**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
+- 🌐 **Website**: [官网文档](https://doc.foucui.cn)
+- 📧 **Contact Us**: yjk150@qq.com
 
 ---
 
@@ -414,51 +545,27 @@ Welcome to participate in Vigo framework development:
 
 Vigo framework is released under the [MIT License](LICENSE)
 
-```
-MIT License
-
-Copyright (c) 2026 Vigo Framework
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
----
-
-## 👨‍💻 Author
-
-**Qiu Ye (Autumn Leaf)**
-
-- 📧 Email: yjk150@qq.com
-- 💼 GitHub: [@yourusername](https://github.com/yourusername)
-
 ---
 
 ## 🙏 Acknowledgments
 
 Thanks to the following projects and frameworks for inspiring Vigo:
 
-- [Gin](https://github.com/gin-gonic/gin) - Go web framework
-- [GORM](https://github.com/go-gorm/gorm) - Go ORM library
-- [ThinkPHP](https://www.thinkphp.cn/) - PHP framework
-- [Laravel](https://laravel.com/) - PHP framework
+- [Go](https://golang.org/) - Powerful programming language
+- [Gin](https://github.com/gin-gonic/gin) - High-performance web framework
+- [Nacos](https://nacos.io/) - Configuration center and service discovery
+- [Redis](https://redis.io/) - High-performance cache
+- [RabbitMQ](https://www.rabbitmq.com/) - Message queue
+- [Prometheus](https://prometheus.io/) - Metrics monitoring
 
 ---
 
 <div align="center">
 
-**Vigo** - Make Go development simpler and more efficient
+**Made with ❤️ by Vigo Team**
 
-![Stars](https://img.shields.io/github/stars/yourusername/vigo?style=social)
-![Forks](https://img.shields.io/github/forks/yourusername/vigo?style=social)
-
-If this project helps you, please give us a ⭐️ Star!
+![Star](https://img.shields.io/github/stars/yourusername/vigo?style=social)
+![Fork](https://img.shields.io/github/forks/yourusername/vigo?style=social)
+![Watch](https://img.shields.io/github/watchers/yourusername/vigo?style=social)
 
 </div>

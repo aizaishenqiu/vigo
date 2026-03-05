@@ -276,18 +276,18 @@ func NotIn(list []interface{}) Rule {
 
 // SanitizeInput 输入净化
 func SanitizeInput(input string) string {
-	// 移除危险的HTML标签
+	// 移除危险的 HTML 标签
 	re := regexp.MustCompile(`(?i)<(script|iframe|object|embed|form)[^>]*>.*?</\1>`)
 	input = re.ReplaceAllString(input, "")
 
 	// 移除危险的属性
-	re = regexp.MustCompile(`(?i)(on\w+)=["']?([^"'>]*)["']?`)
+	re = regexp.MustCompile(`(?i)(on\w+)\s*=\s*["']?[^"'>]*["']?`)
 	input = re.ReplaceAllString(input, "")
 
-	// 转义HTML特殊字符
+	// 转义 HTML 特殊字符
 	input = html.EscapeString(input)
 
-	// 移除可能的JavaScript伪协议
+	// 移除可能的 JavaScript 伪协议
 	input = strings.Replace(input, "javascript:", "", -1)
 	input = strings.Replace(input, "vbscript:", "", -1)
 	input = strings.Replace(input, "data:", "", -1)
