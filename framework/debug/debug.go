@@ -144,41 +144,132 @@ func (dt *DebugToolbar) generateToolbarHTML(debugData map[string]interface{}) st
 	// 转换为 JSON
 	debugJSON, _ := json.MarshalIndent(debugData, "", "  ")
 
+	perfData := debugData["performance"].(map[string]interface{})
+	responseData := debugData["response"].(map[string]interface{})
+	requestData := debugData["request"].(map[string]interface{})
+
 	return fmt.Sprintf(`
 <!-- Vigo Debug Toolbar -->
-<div id="vigo-debug-toolbar" style="position:fixed;bottom:0;left:0;right:0;z-index:999999;font-family:monospace;background:#1a1a1a;color:#fff;border-top:2px solid #00ff00;">
-	<div style="display:flex;justify-content:space-between;padding:10px;">
-		<div style="display:flex;gap:20px;">
-			<div><strong>⏱️ 耗时:</strong> %v ms</div>
-			<div><strong>💾 内存:</strong> %v KB</div>
-			<div><strong>🔄 Goroutines:</strong> %d</div>
-			<div><strong>📊 状态码:</strong> %d</div>
+<div id="vigo-debug-toolbar" style="position:fixed;bottom:0;left:0;right:0;z-index:999999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%%,#16213e 100%%);color:#e0e0e0;border-top:3px solid #00d9ff;box-shadow:0 -5px 20px rgba(0,217,255,0.3);">
+	<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:rgba(0,0,0,0.3);">
+		<div style="display:flex;gap:25px;align-items:center;">
+			<div style="display:flex;align-items:center;gap:8px;">
+				<span style="font-size:18px;">⏱️</span>
+				<div>
+					<div style="font-size:11px;color:#888;">耗时</div>
+					<div style="font-size:16px;font-weight:bold;color:#00d9ff;">%v ms</div>
+				</div>
+			</div>
+			<div style="display:flex;align-items:center;gap:8px;">
+				<span style="font-size:18px;">💾</span>
+				<div>
+					<div style="font-size:11px;color:#888;">内存</div>
+					<div style="font-size:16px;font-weight:bold;color:#00ff88;">%v KB</div>
+				</div>
+			</div>
+			<div style="display:flex;align-items:center;gap:8px;">
+				<span style="font-size:18px;">🔄</span>
+				<div>
+					<div style="font-size:11px;color:#888;">Goroutines</div>
+					<div style="font-size:16px;font-weight:bold;color:#ff6b9d;">%d</div>
+				</div>
+			</div>
+			<div style="display:flex;align-items:center;gap:8px;">
+				<span style="font-size:18px;">📊</span>
+				<div>
+					<div style="font-size:11px;color:#888;">状态码</div>
+					<div style="font-size:16px;font-weight:bold;color:%s;">%d</div>
+				</div>
+			</div>
+			<div style="display:flex;align-items:center;gap:8px;">
+				<span style="font-size:18px;">🌐</span>
+				<div>
+					<div style="font-size:11px;color:#888;">请求</div>
+					<div style="font-size:14px;font-weight:bold;color:#ffd93d;">%s %s</div>
+				</div>
+			</div>
 		</div>
-		<div>
-			<button onclick="document.getElementById('vigo-debug-panel').style.display='none'" style="background:#ff4444;color:white;border:none;padding:5px 10px;cursor:pointer;">✕ 关闭</button>
+		<div style="display:flex;gap:10px;align-items:center;">
+			<button onclick="vigoDebugToggle()" style="background:#4a4a6a;color:white;border:none;padding:8px 16px;cursor:pointer;border-radius:5px;font-size:13px;transition:all 0.3s;" onmouseover="this.style.background='#5a5a7a'" onmouseout="this.style.background='#4a4a6a'">📋 查看详情</button>
+			<button onclick="vigoDebugClose()" style="background:#ff4757;color:white;border:none;padding:8px 16px;cursor:pointer;border-radius:5px;font-size:13px;transition:all 0.3s;" onmouseover="this.style.background='#ff6b7a'" onmouseout="this.style.background='#ff4757'">✕ 关闭</button>
 		</div>
 	</div>
-	<div id="vigo-debug-panel" style="padding:10px;background:#2a2a2a;max-height:400px;overflow-y:auto;">
-		<pre id="vigo-debug-data" style="color:#00ff00;font-size:12px;">%s</pre>
+	<div id="vigo-debug-panel" style="display:none;padding:20px;background:rgba(0,0,0,0.5);max-height:500px;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.1);">
+		<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+			<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border-left:3px solid #00d9ff;">
+				<h4 style="margin:0 0 10px 0;color:#00d9ff;font-size:14px;">📝 请求信息</h4>
+				<div style="font-size:12px;line-height:1.8;">
+					<div><strong style="color:#888;">方法:</strong> <span style="color:#00ff88;">%s</span></div>
+					<div><strong style="color:#888;">URL:</strong> <span style="color:#ffd93d;">%s</span></div>
+					<div><strong style="color:#888;">Content-Type:</strong> <span style="color:#ff6b9d;">%s</span></div>
+				</div>
+			</div>
+			<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border-left:3px solid #00ff88;">
+				<h4 style="margin:0 0 10px 0;color:#00ff88;font-size:14px;">📤 响应信息</h4>
+				<div style="font-size:12px;line-height:1.8;">
+					<div><strong style="color:#888;">状态码:</strong> <span style="color:#00d9ff;">%d</span></div>
+					<div><strong style="color:#888;">大小:</strong> <span style="color:#ffd93d;">%d bytes</span></div>
+					<div><strong style="color:#888;">Content-Type:</strong> <span style="color:#ff6b9d;">%s</span></div>
+				</div>
+			</div>
+			<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border-left:3px solid #ff6b9d;">
+				<h4 style="margin:0 0 10px 0;color:#ff6b9d;font-size:14px;">⚡ 性能指标</h4>
+				<div style="font-size:12px;line-height:1.8;">
+					<div><strong style="color:#888;">耗时:</strong> <span style="color:#00d9ff;">%v ms (%v μs)</span></div>
+					<div><strong style="color:#888;">内存使用:</strong> <span style="color:#00ff88;">%v KB</span></div>
+					<div><strong style="color:#888;">Goroutines:</strong> <span style="color:#ff6b9d;">%d</span></div>
+				</div>
+			</div>
+		</div>
+		<div style="margin-top:20px;background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border-left:3px solid #ffd93d;">
+			<h4 style="margin:0 0 10px 0;color:#ffd93d;font-size:14px;">📋 完整调试数据</h4>
+			<pre style="background:rgba(0,0,0,0.5);padding:15px;border-radius:5px;overflow-x:auto;font-size:11px;color:#a0a0a0;max-height:300px;">%s</pre>
+		</div>
 	</div>
 </div>
 <script>
-	// 支持折叠/展开
-	document.getElementById('vigo-debug-toolbar').addEventListener('click', function(e) {
-		if(e.target === this) {
-			var panel = document.getElementById('vigo-debug-panel');
-			panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-		}
-	});
+	function vigoDebugToggle() {
+		var panel = document.getElementById('vigo-debug-panel');
+		panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+	}
+	function vigoDebugClose() {
+		document.getElementById('vigo-debug-toolbar').style.display = 'none';
+	}
 </script>
 <!-- End Vigo Debug Toolbar -->
 `,
-		debugData["performance"].(map[string]interface{})["duration_ms"],
-		debugData["performance"].(map[string]interface{})["memory_used"],
-		debugData["performance"].(map[string]interface{})["goroutines"],
-		debugData["response"].(map[string]interface{})["status"],
+		perfData["duration_ms"],
+		perfData["memory_used"],
+		perfData["goroutines"],
+		getStatusColor(responseData["status"].(int)),
+		responseData["status"],
+		requestData["method"],
+		requestData["url"],
+		requestData["method"],
+		requestData["url"],
+		requestData["content_type"],
+		responseData["status"],
+		responseData["size"],
+		responseData["content_type"],
+		perfData["duration_ms"],
+		perfData["duration_us"],
+		perfData["memory_used"],
+		perfData["goroutines"],
 		string(debugJSON),
 	)
+}
+
+// getStatusColor 根据状态码返回颜色
+func getStatusColor(status int) string {
+	if status >= 200 && status < 300 {
+		return "#00ff88"
+	} else if status >= 300 && status < 400 {
+		return "#ffd93d"
+	} else if status >= 400 && status < 500 {
+		return "#ff6b9d"
+	} else {
+		return "#ff4757"
+	}
 }
 
 // logDebugData 记录调试信息

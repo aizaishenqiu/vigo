@@ -12,7 +12,7 @@ type IndexController struct {
 	BaseController
 }
 
-// Index 框架首页
+// Index 框架首页（后台控制面板）
 func (c *IndexController) Index(ctx *mvc.Context) {
 	ctx.HTML(http.StatusOK, "index/index.html", map[string]interface{}{
 		"title":      config.App.App.Name + " - 控制面板",
@@ -27,6 +27,11 @@ func (c *IndexController) Index(ctx *mvc.Context) {
 		"mqEnabled":  config.App.RabbitMQ.Enabled,
 		"grpcEnabled": config.App.GRPC.Enabled,
 	})
+}
+
+// Website 官网首页
+func (c *IndexController) Website(ctx *mvc.Context) {
+	http.ServeFile(ctx.Writer, ctx.Request, "public/index.html")
 }
 
 // Hello Hello方法

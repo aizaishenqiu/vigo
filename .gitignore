@@ -82,3 +82,5 @@ config.*.local.yaml
 
 # 文档文件
 admin-gui/
+website/
+docsmarkdown/

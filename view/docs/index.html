@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigo 文档中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00cc88;
+            --dark-bg: #0a0a0f;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c0;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 6rem auto 2rem;
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .doc-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .doc-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .doc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .doc-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .doc-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doc-link:hover {
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .docs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Vigo Docs</div>
+        <div>
+            <a href="/" class="btn btn-outline">返回官网</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">📚 Vigo 文档中心</h1>
+        <p class="page-subtitle">全面、详细的框架使用文档，助您快速掌握 Vigo</p>
+
+        <div class="docs-grid">
+            <!-- 入门指南 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/01.入门指南/0.极速上手指南.md'">
+                <div class="doc-icon">🚀</div>
+                <h3 class="doc-title">入门指南</h3>
+                <p class="doc-description">快速了解 Vigo 框架，从安装到第一个应用，手把手教您入门</p>
+                <a href="/docs/view?file=使用文档/01.入门指南/0.极速上手指南.md" class="doc-link">开始学习 →</a>
+            </div>
+
+            <!-- 框架简介 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/00.目录/框架简介.md'">
+                <div class="doc-icon">📋</div>
+                <h3 class="doc-title">框架简介</h3>
+                <p class="doc-description">了解 Vigo 的设计理念、核心特性和技术架构</p>
+                <a href="/docs/view?file=使用文档/00.目录/框架简介.md" class="doc-link">查看详情 →</a>
+            </div>
+
+            <!-- 核心功能 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/02.核心功能/01.路由与控制器.md'">
+                <div class="doc-icon">⚙️</div>
+                <h3 class="doc-title">核心功能</h3>
+                <p class="doc-description">路由、控制器、配置管理、视图模板等核心功能详解</p>
+                <a href="/docs/view?file=使用文档/02.核心功能/01.路由与控制器.md" class="doc-link">开始学习 →</a>
+            </div>
+
+            <!-- 数据库 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/03.数据库/00.数据库文档目录.md'">
+                <div class="doc-icon">🗄️</div>
+                <h3 class="doc-title">数据库 ORM</h3>
+                <p class="doc-description">完整的数据库操作指南，包括 ORM、查询构造器、读写分离等</p>
+                <a href="/docs/view?file=使用文档/03.数据库/00.数据库文档目录.md" class="doc-link">开始学习 →</a>
+            </div>
+
+            <!-- 安全防护 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/04.安全防护/07.安全防护体系总结.md'">
+                <div class="doc-icon">🔒</div>
+                <h3 class="doc-title">安全防护</h3>
+                <p class="doc-description">全方位的安全防护体系，包括 XSS、SQL 注入、CSRF 等防护</p>
+                <a href="/docs/view?file=使用文档/04.安全防护/07.安全防护体系总结.md" class="doc-link">开始学习 →</a>
+            </div>
+
+            <!-- 微服务 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/10.微服务架构/01.微服务架构概述.md'">
+                <div class="doc-icon">🌐</div>
+                <h3 class="doc-title">微服务架构</h3>
+                <p class="doc-description">微服务架构设计、服务发现、配置中心、链路追踪等</p>
+                <a href="/docs/view?file=使用文档/10.微服务架构/01.微服务架构概述.md" class="doc-link">开始学习 →</a>
+            </div>
+
+            <!-- 框架对比 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=Vigo 与 Gin go-zero 对比分析_Doubao-Seed-2.0-Code_2026-03-05.md'">
+                <div class="doc-icon">📊</div>
+                <h3 class="doc-title">框架对比</h3>
+                <p class="doc-description">Vigo 与 Gin、go-zero 的详细对比分析，帮助您选择合适的框架</p>
+                <a href="/docs/view?file=Vigo 与 Gin go-zero 对比分析_Doubao-Seed-2.0-Code_2026-03-05.md" class="doc-link">查看对比 →</a>
+            </div>
+
+            <!-- 部署运维 -->
+            <div class="doc-card" onclick="location.href='/docs/view?file=使用文档/08.部署运维/01.压力测试指南.md'">
+                <div class="doc-icon">🚀</div>
+                <h3 class="doc-title">部署运维</h3>
+                <p class="doc-description">压力测试、Docker 部署、性能优化等运维相关文档</p>
+                <a href="/docs/view?file=使用文档/08.部署运维/01.压力测试指南.md" class="doc-link">开始学习 →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

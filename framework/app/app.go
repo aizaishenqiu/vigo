@@ -17,6 +17,7 @@ import (
 	"vigo/framework/admin"
 	"vigo/framework/container"
 	"vigo/framework/db"
+	"vigo/framework/debug"
 	frameworkGrpc "vigo/framework/grpc"
 	"vigo/framework/log"
 	"vigo/framework/logger"
@@ -465,6 +466,14 @@ func (app *App) initMiddlewares() {
 	if config.App.Security.EnableCSRFProtection {
 		middleware.Use(middleware.CSRF())
 		log.Log.Info("[Middleware] CSRF 保护中间件已启用")
+	}
+
+	// 6. 调试工具栏中间件（仅开发环境且启用调试时）
+	isDev := config.App.App.Mode == "dev" || config.App.App.Debug
+	if isDev && config.App.App.DebugToolbar {
+		debugToolbar := debug.NewDebugToolbar()
+		middleware.Use(debugToolbar.Middleware())
+		log.Log.Info("[Middleware] 调试工具栏已启用")
 	}
 
 	log.Log.Info(fmt.Sprintf("[Middleware] 共注册 %d 个全局中间件", len(middleware.GetMiddlewares())))

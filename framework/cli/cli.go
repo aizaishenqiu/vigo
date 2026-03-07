@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -9,7 +9,281 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"vigo/framework/db"
 )
+
+// MigrateCommand 数据迁移命令
+type MigrateCommand struct{}
+
+// Run 运行迁移命令
+func (cmd *MigrateCommand) Run(args []string) {
+	if len(args) == 0 {
+		cmd.showHelp()
+		return
+	}
+
+	subCmd := args[0]
+	switch subCmd {
+	case "migrate":
+		cmd.runMigrate()
+	case "rollback":
+		steps := 1
+		if len(args) > 1 {
+			fmt.Sscanf(args[1], "%d", &steps)
+		}
+		cmd.runRollback(steps)
+	case "reset":
+		cmd.runReset()
+	case "status":
+		cmd.runStatus()
+	case "create":
+		if len(args) < 2 {
+			fmt.Println("错误：请指定迁移名称")
+			fmt.Println("示例：vigo migrate create create_users_table")
+			return
+		}
+		cmd.runCreate(args[1])
+	default:
+		fmt.Printf("未知命令：%s\n", subCmd)
+		cmd.showHelp()
+	}
+}
+
+// showHelp 显示帮助信息
+func (cmd *MigrateCommand) showHelp() {
+	fmt.Println("Vigo Framework Migration Tool")
+	fmt.Println("")
+	fmt.Println("用法:")
+	fmt.Println("  vigo migrate <command> [options]")
+	fmt.Println("")
+	fmt.Println("可用命令:")
+	fmt.Println("  migrate              执行所有未应用的迁移")
+	fmt.Println("  rollback [steps]     回滚迁移（默认 1 步）")
+	fmt.Println("  reset                重置所有迁移")
+	fmt.Println("  status               查看迁移状态")
+	fmt.Println("  create <name>        创建新的迁移文件")
+	fmt.Println("")
+	fmt.Println("示例:")
+	fmt.Println("  vigo migrate migrate")
+	fmt.Println("  vigo migrate rollback")
+	fmt.Println("  vigo migrate rollback 3")
+	fmt.Println("  vigo migrate reset")
+	fmt.Println("  vigo migrate status")
+	fmt.Println("  vigo migrate create create_users_table")
+}
+
+// runMigrate 执行迁移
+func (cmd *MigrateCommand) runMigrate() {
+	fmt.Println("执行迁移...")
+
+	// 初始化数据库连接（从配置文件读取）
+	err := db.Init("mysql", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local", 100, 10, 3600, 300)
+	if err != nil {
+		fmt.Printf("数据库连接失败：%v\n", err)
+		return
+	}
+	defer db.GlobalDB.Close()
+
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err = migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		fmt.Printf("加载迁移失败：%v\n", err)
+		return
+	}
+
+	// 执行迁移
+	err = migrator.Migrate()
+	if err != nil {
+		fmt.Printf("执行迁移失败：%v\n", err)
+		return
+	}
+
+	fmt.Println("迁移执行成功！")
+}
+
+// runRollback 回滚迁移
+func (cmd *MigrateCommand) runRollback(steps int) {
+	fmt.Printf("回滚 %d 步迁移...\n", steps)
+
+	// 初始化数据库连接
+	err := db.Init("mysql", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local", 100, 10, 3600, 300)
+	if err != nil {
+		fmt.Printf("数据库连接失败：%v\n", err)
+		return
+	}
+	defer db.GlobalDB.Close()
+
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err = migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		fmt.Printf("加载迁移失败：%v\n", err)
+		return
+	}
+
+	// 回滚迁移
+	err = migrator.Rollback(steps)
+	if err != nil {
+		fmt.Printf("回滚迁移失败：%v\n", err)
+		return
+	}
+
+	fmt.Printf("成功回滚 %d 步迁移！\n", steps)
+}
+
+// runReset 重置所有迁移
+func (cmd *MigrateCommand) runReset() {
+	fmt.Println("重置所有迁移...")
+
+	// 初始化数据库连接
+	err := db.Init("mysql", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local", 100, 10, 3600, 300)
+	if err != nil {
+		fmt.Printf("数据库连接失败：%v\n", err)
+		return
+	}
+	defer db.GlobalDB.Close()
+
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err = migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		fmt.Printf("加载迁移失败：%v\n", err)
+		return
+	}
+
+	// 重置迁移
+	err = migrator.Reset()
+	if err != nil {
+		fmt.Printf("重置迁移失败：%v\n", err)
+		return
+	}
+
+	fmt.Println("所有迁移已重置！")
+}
+
+// runStatus 查看迁移状态
+func (cmd *MigrateCommand) runStatus() {
+	fmt.Println("查看迁移状态...")
+
+	// 初始化数据库连接
+	err := db.Init("mysql", "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local", 100, 10, 3600, 300)
+	if err != nil {
+		fmt.Printf("数据库连接失败：%v\n", err)
+		return
+	}
+	defer db.GlobalDB.Close()
+
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err = migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		fmt.Printf("加载迁移失败：%v\n", err)
+		return
+	}
+
+	// 获取状态
+	applied, pending, err := migrator.Status()
+	if err != nil {
+		fmt.Printf("获取迁移状态失败：%v\n", err)
+		return
+	}
+
+	currentVersion, _ := migrator.GetCurrentVersion()
+
+	fmt.Printf("\n当前版本：%d\n", currentVersion)
+	fmt.Printf("已应用：%d\n", len(applied))
+	fmt.Printf("未应用：%d\n\n", len(pending))
+
+	if len(applied) > 0 {
+		fmt.Println("已应用的迁移:")
+		for _, m := range applied {
+			fmt.Printf("  ✓ %d: %s\n", m.Version, m.Name)
+		}
+		fmt.Println()
+	}
+
+	if len(pending) > 0 {
+		fmt.Println("未应用的迁移:")
+		for _, m := range pending {
+			fmt.Printf("  - %d: %s\n", m.Version, m.Name)
+		}
+		fmt.Println()
+	}
+}
+
+// runCreate 创建迁移文件
+func (cmd *MigrateCommand) runCreate(name string) {
+	// 生成版本号（时间戳）
+	version := time.Now().Format("20060102150405")
+	filename := fmt.Sprintf("%s_%s.go", version, name)
+
+	// 确保迁移目录存在
+	dir := "database/migrations"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		fmt.Printf("创建迁移目录失败：%v\n", err)
+		return
+	}
+
+	// 检查文件是否已存在
+	fullPath := filepath.Join(dir, filename)
+	if _, err := os.Stat(fullPath); err == nil {
+		fmt.Printf("错误：迁移文件已存在：%s\n", filename)
+		return
+	}
+
+	// 生成迁移文件内容
+	content := generateMigrationContent(version, name)
+
+	// 写入文件
+	if err := os.WriteFile(fullPath, []byte(content), 0644); err != nil {
+		fmt.Printf("创建文件失败：%v\n", err)
+		return
+	}
+
+	fmt.Printf("迁移文件创建成功：%s\n", fullPath)
+}
+
+// generateMigrationContent 生成迁移文件内容
+func generateMigrationContent(version, name string) string {
+	funcName := strings.Title(name)
+
+	return fmt.Sprintf(`package migrations
+
+import (
+	"database/sql"
+	"log"
+)
+
+// Up %s
+func Up_%s_%s(db *sql.DB) error {
+	log.Println("Executing up migration: %s")
+	
+	// TODO: 实现向上迁移逻辑
+	// _, err := db.Exec("CREATE TABLE ...")
+	// return err
+	
+	log.Println("Migration applied: %s")
+	return nil
+}
+
+// Down %s
+func Down_%s_%s(db *sql.DB) error {
+	log.Println("Executing down migration: %s")
+	
+	// TODO: 实现向下迁移逻辑
+	// _, err := db.Exec("DROP TABLE ...")
+	// return err
+	
+	log.Println("Migration rolled back: %s")
+	return nil
+}
+`, funcName, version, name, name, name, funcName, version, name, name, name)
+}
 
 // OptimizeCommand 优化命令（类似 TP 8.1.4 的 optimize 命令）
 type OptimizeCommand struct{}

@@ -10,17 +10,9 @@ import (
 )
 
 // 嵌入视图模板文件（打包进二进制，解决 Linux 部署找不到文件的问题）
-// 注意：embed 不支持 `**` 递归通配符，需要列出所有子目录
+// 使用通配符嵌入 view 目录下所有文件
 //
-//go:embed app/view/index/index.html
-//go:embed app/view/home/index.html
-//go:embed app/view/benchmark/index.html
-//go:embed app/view/monitor/index.html
-//go:embed app/view/performance/index.html
-//go:embed app/view/nacos/index.html
-//go:embed app/view/nacos/admin.html
-//go:embed app/view/rabbitmq/index.html
-//go:embed app/view/rabbitmq/admin.html
+//go:embed view/*
 var viewFS embed.FS
 
 // @title Vigo API

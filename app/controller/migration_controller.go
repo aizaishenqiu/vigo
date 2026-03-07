@@ -1,0 +1,215 @@
+package controller
+
+import (
+	"fmt"
+	"log"
+	"vigo/framework/db"
+	"vigo/framework/mvc"
+)
+
+// MigrationController 数据迁移控制器
+type MigrationController struct {
+	BaseController
+}
+
+// Index 迁移管理页面
+func (c *MigrationController) Index(ctx *mvc.Context) {
+	ctx.HTML(200, "migration/index.html", map[string]interface{}{
+		"title": "数据迁移管理",
+	})
+}
+
+// Status 查看迁移状态
+// @Summary 查看迁移状态
+// @Tags 数据迁移
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/migration/status [get]
+func (c *MigrationController) Status(ctx *mvc.Context) {
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err := migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))
+		return
+	}
+
+	// 获取状态
+	applied, pending, err := migrator.Status()
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("获取迁移状态失败：%v", err))
+		return
+	}
+
+	// 获取当前版本
+	currentVersion, _ := migrator.GetCurrentVersion()
+
+	ctx.Success(map[string]interface{}{
+		"current_version": currentVersion,
+		"total":           len(applied) + len(pending),
+		"applied":         formatMigrations(applied),
+		"pending":         formatMigrations(pending),
+	})
+}
+
+// Migrate 执行迁移
+// @Summary 执行数据迁移
+// @Tags 数据迁移
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/migration/migrate [post]
+func (c *MigrationController) Migrate(ctx *mvc.Context) {
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err := migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))
+		return
+	}
+
+	// 执行迁移
+	err = migrator.Migrate()
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("执行迁移失败：%v", err))
+		return
+	}
+
+	ctx.Success(map[string]interface{}{
+		"message": "迁移执行成功",
+	})
+}
+
+// Rollback 回滚迁移
+// @Summary 回滚数据迁移
+// @Tags 数据迁移
+// @Param steps query int false "回滚步数" default(1)
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/migration/rollback [post]
+func (c *MigrationController) Rollback(ctx *mvc.Context) {
+	steps := ctx.Input("steps")
+	if steps == "" {
+		steps = "1"
+	}
+
+	var stepCount int
+	fmt.Sscanf(steps, "%d", &stepCount)
+	if stepCount <= 0 {
+		stepCount = 1
+	}
+
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err := migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))
+		return
+	}
+
+	// 回滚迁移
+	err = migrator.Rollback(stepCount)
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("回滚迁移失败：%v", err))
+		return
+	}
+
+	ctx.Success(map[string]interface{}{
+		"message": fmt.Sprintf("成功回滚 %d 步迁移", stepCount),
+	})
+}
+
+// Reset 重置所有迁移
+// @Summary 重置所有数据迁移（危险操作）
+// @Tags 数据迁移
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /api/migration/reset [post]
+func (c *MigrationController) Reset(ctx *mvc.Context) {
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err := migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))
+		return
+	}
+
+	// 重置迁移
+	err = migrator.Reset()
+	if err != nil {
+		ctx.Error(500, fmt.Sprintf("重置迁移失败：%v", err))
+		return
+	}
+
+	ctx.Success(map[string]interface{}{
+		"message": "所有迁移已重置",
+	})
+}
+
+// formatMigrations 格式化迁移列表
+func formatMigrations(migrations []*db.Migration) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0, len(migrations))
+	for _, m := range migrations {
+		result = append(result, map[string]interface{}{
+			"version":    m.Version,
+			"name":       m.Name,
+			"applied_at": m.AppliedAt,
+		})
+	}
+	return result
+}
+
+// RunMigration 命令行运行迁移（供 CLI 使用）
+func RunMigration(action string, args ...string) error {
+	migrator := db.NewMigrator(db.GlobalDB, "migrations")
+
+	// 从目录加载迁移
+	err := migrator.LoadMigrationsFromDir("database/migrations")
+	if err != nil {
+		return fmt.Errorf("加载迁移失败：%v", err)
+	}
+
+	switch action {
+	case "migrate":
+		log.Println("Running migrations...")
+		return migrator.Migrate()
+
+	case "rollback":
+		steps := 1
+		if len(args) > 0 {
+			fmt.Sscanf(args[0], "%d", &steps)
+		}
+		log.Printf("Rolling back %d migration(s)...", steps)
+		return migrator.Rollback(steps)
+
+	case "reset":
+		log.Println("Resetting all migrations...")
+		return migrator.Reset()
+
+	case "status":
+		applied, pending, err := migrator.Status()
+		if err != nil {
+			return err
+		}
+
+		currentVersion, _ := migrator.GetCurrentVersion()
+		fmt.Printf("Current version: %d\n", currentVersion)
+		fmt.Printf("Applied migrations: %d\n", len(applied))
+		fmt.Printf("Pending migrations: %d\n", len(pending))
+
+		if len(pending) > 0 {
+			fmt.Println("\nPending migrations:")
+			for _, m := range pending {
+				fmt.Printf("  - %d: %s\n", m.Version, m.Name)
+			}
+		}
+
+		return nil
+
+	default:
+		return fmt.Errorf("unknown action: %s", action)
+	}
+}

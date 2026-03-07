@@ -44,7 +44,8 @@ func Init(r *mvc.Router) {
 
 	// 首页路由
 	index := &controller.IndexController{}
-	r.GET("/", index.Index)
+	r.GET("/", index.Website)        // 官网首页
+	r.GET("/dashboard", index.Index) // 后台控制面板首页
 	r.GET("/hello", index.Hello)
 
 	// 视图测试页面
@@ -62,10 +63,24 @@ func Init(r *mvc.Router) {
 	r.GET("/monitor", mon.Index)
 	r.GET("/monitor/data", mon.Data)
 
-	// Swagger 文档
-	r.Handle("/docs/", httpSwagger.WrapHandler)
-	r.GET("/docs", func(c *mvc.Context) {
-		http.Redirect(c.Writer, c.Request, "/docs/index.html", http.StatusMovedPermanently)
+	// 数据迁移管理
+	migrationCtrl := &controller.MigrationController{}
+	r.GET("/migration", migrationCtrl.Index)
+	r.GET("/api/migration/status", migrationCtrl.Status)
+	r.POST("/api/migration/migrate", migrationCtrl.Migrate)
+	r.POST("/api/migration/rollback", migrationCtrl.Rollback)
+	r.POST("/api/migration/reset", migrationCtrl.Reset)
+
+	// 文档中心（仅用于 Swagger 文档展示）
+	// 注意：实际文档前端由 Node.js Express 服务器提供（website/server.js）
+	docsCtrl := &controller.DocsController{}
+	r.GET("/docs", docsCtrl.Show)      // 文档首页（Vue 应用）
+	r.GET("/docs/view", docsCtrl.Show) // 兼容旧路由
+
+	// Swagger 文档（必须放在 /docs 路由之后）
+	r.Handle("/docs/swagger/", httpSwagger.WrapHandler)
+	r.GET("/swagger", func(c *mvc.Context) {
+		http.Redirect(c.Writer, c.Request, "/docs/swagger/", http.StatusMovedPermanently)
 	})
 
 	// 静态资源

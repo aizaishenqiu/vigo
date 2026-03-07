@@ -58,6 +58,7 @@ type BaseConfig struct {
 	Mode         string `yaml:"mode"`           // 运行模式：dev | test | prod
 	ShowConsole  bool   `yaml:"console"`        // 是否显示控制台输出
 	AutoKillPort bool   `yaml:"auto_kill_port"` // 启动时是否自动杀掉占用端口的进程
+	DebugToolbar bool   `yaml:"debug_toolbar"`  // 是否启用调试工具栏（仅开发环境）
 }
 
 // AdminConfig 管理界面通用配置
@@ -320,7 +321,7 @@ func applyDefaults() {
 
 	// 视图配置默认值
 	if App.View.Path == "" {
-		App.View.Path = "app/view"
+		App.View.Path = "view"
 	}
 	if App.View.Suffix == "" {
 		App.View.Suffix = ".html"

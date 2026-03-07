@@ -57,12 +57,12 @@ func (c *Context) Reset(w http.ResponseWriter, r *http.Request) {
 	c.Params = make(map[string]string) // 新建 map，旧 map 交由 GC 回收
 	// ViewEngine 由 Router 注入全局共享实例
 	if c.ViewEngine == nil {
-		c.ViewEngine = view.NewTemplateEngine("app/view")
+		c.ViewEngine = view.NewTemplateEngine("view")
 	}
 }
 
 // NewContext 创建上下文（保留兼容）
-// 参数：
+// 参数：		
 //   - w: HTTP 响应写入器
 //   - r: HTTP 请求对象
 //
@@ -74,7 +74,7 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 		Writer:     NewStatusWriter(w),
 		Params:     make(map[string]string),
 		index:      -1,
-		ViewEngine: view.NewTemplateEngine("app/view"),
+		ViewEngine: view.NewTemplateEngine("view"),
 	}
 }
 

@@ -8,7 +8,7 @@
 # ==============================================
 app:
   # 应用名称
-  name: vago-12
+  name: vago-1
   # 应用版本：version: 2.0.1
   # HTTP 服务监听端口
   port: 8080
@@ -20,6 +20,8 @@ app:
   console: true
   # 启动时是否自动杀掉占用端口的进程
   auto_kill_port: true
+  # 是否启用调试工具栏（仅开发环境有效）
+  debug_toolbar: true
 
 # ==============================================
 # 安全防护配置
@@ -143,8 +145,8 @@ database:
   driver: mysql
   # 主库主机地址（写库）
   host: 127.0.0.1
-  # 主库端口 默认：3306
-  port: "3306"
+  # 主库端口
+  port: 3306
   # 数据库名称
   name: "vago"
   # 数据库用户名
@@ -305,16 +307,16 @@ databases: {}
 # Nacos 配置中心 & 服务发现
 # ==============================================
 nacos:
-  # Nacos 服务地址 默认：127.0.0.1
-  host: "默认：127.0.0.1"
-  # Nacos 服务端口 默认：8848
-  port: "默认：8848"
+  # Nacos 服务地址
+  host: 127.0.0.1
+  # Nacos 服务端口
+  port: 8848
   # Nacos 命名空间 ID（留空使用 public）
-  namespace: "默认：public"
+  namespace: ""
   # 配置数据 ID
-  data_id: "默认：vigo-config"
+  data_id: vigo-config
   # 配置分组
-  group: "默认：DEFAULT_GROUP"
+  group: DEFAULT_GROUP
   # Nacos 安装路径（用于自动启动 Nacos 服务）
   install_path: ${NACOS_INSTALL_PATH:}
 
@@ -325,7 +327,7 @@ nacos:
     # 是否启用服务发现
     enabled: false
     # 注册到 Nacos 的服务名称
-    service_name: "默认：vigo-service"
+    service_name: vigo-service
     # 是否自动注册服务
     auto_register: true
     # 心跳间隔（秒）
@@ -338,11 +340,11 @@ nacos:
     # 是否启用管理界面（启用后启动时显示访问地址和密码）
     enabled: false
     # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
-    username: "默认：nacos"
+    username: nacos
     # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
-    password: "默认：nacos"
+    password: nacos
     # 管理界面端口
-    port: "默认：8848"
+    port: 8848
 
 # ==============================================
 # Benchmark 压力测试配置
@@ -360,16 +362,16 @@ benchmark:
 rabbitmq:
   # 是否启用 RabbitMQ（10 万并发场景强烈建议启用）
   enabled: false
-  # RabbitMQ 主机地址 默认：127.0.0.1
-  host: "默认：127.0.0.1"
-  # RabbitMQ 端口 默认：5672
-  port: "默认：5672"
-  # RabbitMQ 用户名 默认：guest
-  user: "默认：guest"
-  # RabbitMQ 密码 默认：guest
-  pass: "默认：guest"
-  # 虚拟主机 默认：/
-  vhost: "默认：/"
+  # RabbitMQ 主机地址
+  host: 127.0.0.1
+  # RabbitMQ 端口
+  port: 5672
+  # RabbitMQ 用户名
+  user: guest
+  # RabbitMQ 密码
+  pass: guest
+  # 虚拟主机
+  vhost: /
   # 连接超时时间（秒）
   conn_timeout: 5
   # 心跳间隔（秒）
@@ -386,24 +388,24 @@ rabbitmq:
     # 是否启用管理界面
     enabled: false
     # 管理界面用户名（不设置则留空，需通过环境变量或手动配置）
-    username: "默认：guest"
+    username: guest
     # 管理界面密码（不设置则留空，需通过环境变量或手动配置）
-    password: "默认：guest"
-    # 管理界面端口 默认：15672
-    port: "默认：15672"
+    password: guest
+    # 管理界面端口
+    port: 15672
 
 # ==============================================
 # Redis 缓存配置（高并发优化版）
 # ==============================================
 redis:
-  # Redis 主机地址（单实例模式）默认：127.0.0.1
-  host: "默认：127.0.0.1"
-  # Redis 端口 默认：6379
-  port: "默认：6379"
-  # Redis 密码 默认：""
+  # Redis 主机地址（单实例模式）
+  host: 127.0.0.1
+  # Redis 端口
+  port: 6379
+  # Redis 密码
   password: "123456"
   # Redis 数据库编号（0-15）
-  db: "默认：0"
+  db: 0
 
   # ==============================================
   # 连接池配置（10 万并发优化）
