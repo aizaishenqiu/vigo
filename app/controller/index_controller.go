@@ -2,9 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"runtime"
 	"vigo/config"
 	"vigo/framework/mvc"
-	"runtime"
 )
 
 // IndexController 首页控制器
@@ -12,19 +12,19 @@ type IndexController struct {
 	BaseController
 }
 
-// Index 框架首页（后台控制面板）
+// Index 框架首页（统一控制面板，集成所有功能）
 func (c *IndexController) Index(ctx *mvc.Context) {
 	ctx.HTML(http.StatusOK, "index/index.html", map[string]interface{}{
-		"title":      config.App.App.Name + " - 控制面板",
-		"appName":    config.App.App.Name,
-		"version":    config.App.App.Version,
-		"mode":       config.App.App.Mode,
-		"goVersion":  runtime.Version(),
-		"port":       config.App.App.Port,
-		"dbDriver":   config.App.Database.Driver,
-		"dbHost":     config.App.Database.Host,
-		"redisHost":  config.App.Redis.Host,
-		"mqEnabled":  config.App.RabbitMQ.Enabled,
+		"title":       config.App.App.Name + " - 统一控制台",
+		"appName":     config.App.App.Name,
+		"version":     config.App.App.Version,
+		"mode":        config.App.App.Mode,
+		"goVersion":   runtime.Version(),
+		"port":        config.App.App.Port,
+		"dbDriver":    config.App.Database.Driver,
+		"dbHost":      config.App.Database.Host,
+		"redisHost":   config.App.Redis.Host,
+		"mqEnabled":   config.App.RabbitMQ.Enabled,
 		"grpcEnabled": config.App.GRPC.Enabled,
 	})
 }
@@ -34,7 +34,7 @@ func (c *IndexController) Website(ctx *mvc.Context) {
 	http.ServeFile(ctx.Writer, ctx.Request, "public/index.html")
 }
 
-// Hello Hello方法
+// Hello Hello 方法
 // @Summary 打招呼接口
 // @Tags 基础
 // @Param name query string false "用户名"

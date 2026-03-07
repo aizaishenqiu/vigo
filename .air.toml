@@ -15,9 +15,9 @@ full_bin = "tmp/main.exe"
 # Watch these filename extensions.
 include_ext = ["go", "tpl", "tmpl", "html", "yaml", "yml"]
 # Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", "admin-gui", "website", "dist", "build", ".git", ".idea", ".vscode"]
 # Watch these directories if you specified.
-include_dir = []
+include_dir = ["app", "route", "middleware", "model", "controller", "view", "config"]
 # Exclude files.
 exclude_file = []
 # It's not necessary to trigger build each time file changes if it's too frequent.

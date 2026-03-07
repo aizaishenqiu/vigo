@@ -175,7 +175,7 @@ func CSRF() mvc.HandlerFunc {
 				MaxAge:   3600,
 				HttpOnly: false,
 				Secure:   secureCookie,
-				SameSite: http.SameSiteStrictMode,
+				SameSite: http.SameSiteLaxMode,
 			})
 		} else {
 			csrfToken = cookie.Value

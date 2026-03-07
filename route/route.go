@@ -48,6 +48,10 @@ func Init(r *mvc.Router) {
 	r.GET("/dashboard", index.Index) // 后台控制面板首页
 	r.GET("/hello", index.Hello)
 
+	// 管理后台
+	admin := &controller.AdminController{}
+	r.GET("/admin", admin.Index)
+
 	// 视图测试页面
 	home := &controller.HomeController{}
 	r.GET("/home", home.Index)
@@ -70,6 +74,7 @@ func Init(r *mvc.Router) {
 	r.POST("/api/migration/migrate", migrationCtrl.Migrate)
 	r.POST("/api/migration/rollback", migrationCtrl.Rollback)
 	r.POST("/api/migration/reset", migrationCtrl.Reset)
+	r.POST("/api/migration/upload", migrationCtrl.Upload)
 
 	// 文档中心（仅用于 Swagger 文档展示）
 	// 注意：实际文档前端由 Node.js Express 服务器提供（website/server.js）
@@ -129,6 +134,26 @@ func Init(r *mvc.Router) {
 	r.GET("/nacos/services", nacosCtrl.Services)
 	r.GET("/nacos/instances", nacosCtrl.Instances)
 	r.POST("/nacos/service/register", nacosCtrl.RegisterService)
+
+	// 系统设置
+	settingsCtrl := &controller.SettingsController{}
+	r.GET("/settings", settingsCtrl.Index)
+	r.GET("/api/settings/get", settingsCtrl.Get)
+	r.POST("/api/settings/save", settingsCtrl.Save)
+	r.POST("/api/settings/app", settingsCtrl.SaveApp)
+	r.POST("/api/settings/database", settingsCtrl.SaveDatabase)
+	r.POST("/api/settings/database/add", settingsCtrl.AddDatabase)
+	r.POST("/api/settings/database/remove", settingsCtrl.RemoveDatabase)
+	r.POST("/api/settings/databases/save", settingsCtrl.SaveMultiDatabase)
+	r.GET("/api/settings/databases", settingsCtrl.ListDatabases)
+	r.POST("/api/settings/redis", settingsCtrl.SaveRedis)
+	r.POST("/api/settings/rabbitmq", settingsCtrl.SaveRabbitMQ)
+	r.POST("/api/settings/nacos", settingsCtrl.SaveNacos)
+	r.POST("/api/settings/grpc", settingsCtrl.SaveGRPC)
+	r.POST("/api/settings/security", settingsCtrl.SaveSecurity)
+	r.POST("/api/settings/payment", settingsCtrl.SavePayment)
+	r.POST("/api/settings/oauth", settingsCtrl.SaveOAuth)
+	r.POST("/api/settings/benchmark", settingsCtrl.SaveBenchmark)
 
 	// 健康检查接口（供微服务探活）
 	// /health - 轻量级健康检查，无 IO 操作，适合高并发压测

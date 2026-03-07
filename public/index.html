@@ -516,10 +516,10 @@
             <p class="hero-slogan">"大道至简，开发由我"</p>
             
             <div class="hero-buttons">
-                <a href="/benchmark" class="btn btn-primary">⚡ 性能测试</a>
+                <a href="/dashboard" class="btn btn-primary">🎯 控制面板</a>
+                <a href="/benchmark" class="btn btn-outline">⚡ 性能测试</a>
                 <a href="/docs/view?file=使用文档/01.入门指南/1.快速开始.md" class="btn btn-outline">🚀 快速开始</a>
                 <a href="/docs/view?file=使用文档/00.目录/目录.md" class="btn btn-outline">📖 查看文档</a>
-                <a href="/docs/view?file=Vigo 与 Gin go-zero 对比分析_Doubao-Seed-2.0-Code_2026-03-05.md" class="btn btn-outline">📊 框架对比</a>
             </div>
 
             <div class="hero-stats">
@@ -540,6 +540,107 @@
                     <div class="stat-label">内存占用</div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- 功能模块区域 -->
+    <section class="features" style="padding: 4rem 2rem; background: var(--card-bg);">
+        <div class="section-header">
+            <h2 class="section-title" style="font-size: 2.5rem;">功能模块</h2>
+            <p class="section-subtitle">快速访问所有功能页面，一站式开发体验</p>
+        </div>
+
+        <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 1200px; margin: 0 auto;">
+            <!-- 测试中心 -->
+            <a href="/dashboard" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">控制面板</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">统一控制台，集成所有功能模块</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 102, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--primary-color);">首页</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 102, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--primary-color);">导航</span>
+                </div>
+            </a>
+
+            <a href="/benchmark" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">压力测试</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">QPS、Redis、MySQL、MQ 压测</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 107, 107, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--accent-color);">WebSocket</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 107, 107, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--accent-color);">实时</span>
+                </div>
+            </a>
+
+            <a href="/performance" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">性能测试</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">数据库基准测试、SQL 诊断</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 136, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--secondary-color);">Benchmark</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 136, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--secondary-color);">SQL</span>
+                </div>
+            </a>
+
+            <a href="/monitor" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">🖥️</div>
+                <h3 class="feature-title">系统监控</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">CPU、内存、磁盘、网络实时监控</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: #00cccc;">监控</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: #00cccc;">大屏</span>
+                </div>
+            </a>
+
+            <a href="/migration" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">数据迁移</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">数据库版本控制、迁移管理</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">Migration</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">版本</span>
+                </div>
+            </a>
+
+            <a href="/rabbitmq" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📨</div>
+                <h3 class="feature-title">RabbitMQ</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">队列管理、交换机、消息发布</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 167, 38, 0.2); border-radius: 4px; font-size: 0.85rem; color: #ffa726;">MQ</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 167, 38, 0.2); border-radius: 4px; font-size: 0.85rem; color: #ffa726;">队列</span>
+                </div>
+            </a>
+
+            <a href="/nacos" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">☁️</div>
+                <h3 class="feature-title">Nacos</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">配置中心、服务注册与发现</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">配置</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">服务</span>
+                </div>
+            </a>
+
+            <a href="/docs" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📄</div>
+                <h3 class="feature-title">API 文档</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Swagger UI、在线调试接口</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">Swagger</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">文档</span>
+                </div>
+            </a>
+
+            <a href="/health" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">✅</div>
+                <h3 class="feature-title">健康检查</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">轻量级/完整健康检查接口</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">Health</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">监控</span>
+                </div>
+            </a>
         </div>
     </section>
 

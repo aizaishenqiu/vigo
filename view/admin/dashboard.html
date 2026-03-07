@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - Vigo 管理后台</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #409EFF;
+            --primary-light: #ecf5ff;
+            --success: #67C23A;
+            --warning: #E6A23C;
+            --danger: #F56C6C;
+            --info: #909399;
+            --bg-color: #f5f7fa;
+            --sidebar-bg: #001529;
+            --sidebar-dark: #002140;
+            --header-height: 60px;
+            --sidebar-width: 220px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .logo {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--sidebar-dark);
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .menu-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .menu-link.active {
+            color: #fff;
+            background: var(--primary);
+        }
+
+        .menu-link i {
+            width: 24px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        .menu-link .label {
+            flex: 1;
+        }
+
+        .menu-link .badge {
+            background: var(--danger);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .submenu {
+            list-style: none;
+            background: #000c17;
+            display: none;
+        }
+
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu .menu-link {
+            padding-left: 52px;
+        }
+
+        /* 主内容区 */
+        .main-container {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        /* 顶部导航 */
+        .header {
+            height: var(--header-height);
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,21,41,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        /* 内容区 */
+        .content {
+            padding: 20px;
+        }
+
+        .page-header {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .page-desc {
+            color: var(--info);
+            font-size: 14px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #ebeef5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .stat-icon.primary { background: var(--primary); }
+        .stat-icon.success { background: var(--success); }
+        .stat-icon.warning { background: var(--warning); }
+        .stat-icon.danger { background: var(--danger); }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--info);
+            font-size: 14px;
+        }
+
+        /* 表单 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #606266;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ebeef5;
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            color: #606266;
+            transition: all 0.3s;
+        }
+
+        .tab-item:hover {
+            color: var(--primary);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 提示框 */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #f0f9eb;
+            color: #67c23a;
+            border: 1px solid #e1f3d8;
+        }
+
+        .alert-error {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #fde2e2;
+        }
+
+        .alert-warning {
+            background: #fdf6ec;
+            color: #e6a23c;
+            border: 1px solid #faecd8;
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>Vigo Admin</span>
+        </div>
+        <ul class="menu">
+            <li class="menu-item">
+                <a class="menu-link active" onclick="showPage('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span class="label">控制台</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="toggleSubmenu('system-menu')">
+                    <i class="fas fa-cog"></i>
+                    <span class="label">系统设置</span>
+                    <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+                </a>
+                <ul class="submenu" id="system-menu">
+                    <li><a class="menu-link" onclick="showPage('app-settings')"><span class="label">应用配置</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('database-settings')"><span class="label">数据库配置</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('redis-settings')"><span class="label">Redis 配置</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('security-settings')"><span class="label">安全配置</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="toggleSubmenu('service-menu')">
+                    <i class="fas fa-cloud"></i>
+                    <span class="label">服务配置</span>
+                    <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+                </a>
+                <ul class="submenu" id="service-menu">
+                    <li><a class="menu-link" onclick="showPage('rabbitmq-settings')"><span class="label">RabbitMQ</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('nacos-settings')"><span class="label">Nacos</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('grpc-settings')"><span class="label">gRPC</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="toggleSubmenu('payment-menu')">
+                    <i class="fas fa-yen-sign"></i>
+                    <span class="label">支付配置</span>
+                    <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+                </a>
+                <ul class="submenu" id="payment-menu">
+                    <li><a class="menu-link" onclick="showPage('alipay-settings')"><span class="label">支付宝</span></a></li>
+                    <li><a class="menu-link" onclick="showPage('wechat-settings')"><span class="label">微信支付</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showPage('benchmark-settings')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="label">压测配置</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showPage('tools')">
+                    <i class="fas fa-tools"></i>
+                    <span class="label">工具</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-left">
+                <h3 style="color: #333;">Vigo 管理后台</h3>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span>管理员</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <!-- 控制台页面 -->
+            <div id="page-dashboard" class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">控制台</h1>
+                    <p class="page-desc">欢迎使用 Vigo 管理后台</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-db-count">1</div>
+                            <div class="stat-label">数据库连接</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-status">正常</div>
+                            <div class="stat-label">系统状态</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-uptime">-</div>
+                            <div class="stat-label">运行时间</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-errors">0</div>
+                            <div class="stat-label">错误数量</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">快速操作</h3>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="showPage('app-settings')">
+                            <i class="fas fa-cog"></i> 系统设置
+                        </button>
+                        <button class="btn btn-success" onclick="showPage('database-settings')">
+                            <i class="fas fa-database"></i> 数据库管理
+                        </button>
+                        <button class="btn btn-warning" onclick="showPage('benchmark-settings')">
+                            <i class="fas fa-tachometer-alt"></i> 性能测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 应用配置页面 -->
+            <div id="page-app-settings" class="page-content hidden">
+                <div class="page-header">
+                    <h1 class="page-title">应用配置</h1>
+                    <p class="page-desc">配置应用基本信息</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">基础配置</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">应用名称</label>
+                            <input type="text" class="form-input" id="app-name" placeholder="Vigo" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">服务端口</label>
+                            <input type="number" class="form-input" id="app-port" placeholder="8080" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">运行模式</label>
+                            <select class="form-input" id="app-mode">
+                                <option value="dev">开发模式</option>
+                                <option value="prod">生产模式</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveAppSettings()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据库配置页面 -->
+            <div id="page-database-settings" class="page-content hidden">
+                <div class="page-header">
+                    <h1 class="page-title">数据库配置</h1>
+                    <p class="page-desc">配置数据库连接信息</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">主数据库</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">数据库驱动</label>
+                            <select class="form-input" id="db-driver">
+                                <option value="mysql">MySQL</option>
+                                <option value="postgres">PostgreSQL</option>
+                                <option value="sqlite">SQLite</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">主机地址</label>
+                            <input type="text" class="form-input" id="db-host" placeholder="127.0.0.1" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">端口</label>
+                            <input type="number" class="form-input" id="db-port" placeholder="3306" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">数据库名</label>
+                            <input type="text" class="form-input" id="db-name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">用户名</label>
+                            <input type="text" class="form-input" id="db-user" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-input" id="db-password" />
+                        </div>
+                        <button class="btn btn-primary" onclick="saveDatabaseSettings()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redis 配置页面 -->
+            <div id="page-redis-settings" class="page-content hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Redis 配置</h1>
+                    <p class="page-desc">配置 Redis 缓存服务</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Redis 连接</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">主机地址</label>
+                            <input type="text" class="form-input" id="redis-host" placeholder="127.0.0.1" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">端口</label>
+                            <input type="number" class="form-input" id="redis-port" placeholder="6379" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-input" id="redis-password" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">数据库</label>
+                            <input type="number" class="form-input" id="redis-db" placeholder="0" />
+                        </div>
+                        <button class="btn btn-primary" onclick="saveRedisSettings()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 安全配置页面 -->
+            <div id="page-security-settings" class="page-content hidden">
+                <div class="page-header">
+                    <h1 class="page-title">安全配置</h1>
+                    <p class="page-desc">配置系统安全策略</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">安全策略</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="security-enabled" /> 启用安全中间件
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="csrf-enabled" /> 启用 CSRF 保护
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="rate-limit-enabled" /> 启用速率限制
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 压测配置页面 -->
+            <div id="page-benchmark-settings" class="page-content hidden">
+                <div class="page-header">
+                    <h1 class="page-title">压测配置</h1>
+                    <p class="page-desc">配置性能测试参数</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">资源限制</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">内存限制百分比</label>
+                            <input type="number" class="form-input" id="bench-mem" value="85" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CPU 限制百分比</label>
+                            <input type="number" class="form-input" id="bench-cpu" value="85" />
+                        </div>
+                        <button class="btn btn-primary" onclick="saveBenchmarkSettings()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            // 显示目标页面
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            
+            // 更新菜单激活状态
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.menu-link').classList.add('active');
+        }
+
+        // 子菜单切换
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId);
+            submenu.classList.toggle('show');
+        }
+
+        // 保存应用配置
+        function saveAppSettings() {
+            const config = {
+                name: document.getElementById('app-name').value,
+                port: parseInt(document.getElementById('app-port').value),
+                mode: document.getElementById('app-mode').value
+            };
+
+            fetch('/api/settings/app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0) {
+                    alert('保存成功');
+                } else {
+                    alert('保存失败：' + result.msg);
+                }
+            })
+            .catch(err => alert('请求失败：' + err.message));
+        }
+
+        // 保存数据库配置
+        function saveDatabaseSettings() {
+            const config = {
+                driver: document.getElementById('db-driver').value,
+                host: document.getElementById('db-host').value,
+                port: parseInt(document.getElementById('db-port').value),
+                name: document.getElementById('db-name').value,
+                user: document.getElementById('db-user').value,
+                password: document.getElementById('db-password').value
+            };
+
+            fetch('/api/settings/database', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0) {
+                    alert('保存成功');
+                } else {
+                    alert('保存失败：' + result.msg);
+                }
+            })
+            .catch(err => alert('请求失败：' + err.message));
+        }
+
+        // 保存 Redis 配置
+        function saveRedisSettings() {
+            const config = {
+                host: document.getElementById('redis-host').value,
+                port: parseInt(document.getElementById('redis-port').value),
+                password: document.getElementById('redis-password').value,
+                db: parseInt(document.getElementById('redis-db').value)
+            };
+
+            fetch('/api/settings/redis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0) {
+                    alert('保存成功');
+                } else {
+                    alert('保存失败：' + result.msg);
+                }
+            })
+            .catch(err => alert('请求失败：' + err.message));
+        }
+
+        // 保存安全配置
+        function saveSecuritySettings() {
+            const config = {
+                enable_security_middleware: document.getElementById('security-enabled').checked,
+                enable_csrf: document.getElementById('csrf-enabled').checked,
+                enable_rate_limit: document.getElementById('rate-limit-enabled').checked
+            };
+
+            fetch('/api/settings/security', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0) {
+                    alert('保存成功');
+                } else {
+                    alert('保存失败：' + result.msg);
+                }
+            })
+            .catch(err => alert('请求失败：' + err.message));
+        }
+
+        // 保存压测配置
+        function saveBenchmarkSettings() {
+            const config = {
+                mem_limit_percent: parseInt(document.getElementById('bench-mem').value),
+                cpu_limit_percent: parseInt(document.getElementById('bench-cpu').value)
+            };
+
+            fetch('/api/settings/benchmark', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ config })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0) {
+                    alert('保存成功');
+                } else {
+                    alert('保存失败：' + result.msg);
+                }
+            })
+            .catch(err => alert('请求失败：' + err.message));
+        }
+
+        // 加载配置
+        function loadConfig() {
+            fetch('/api/settings/all')
+            .then(res => res.json())
+            .then(result => {
+                if (result.code === 0 && result.data) {
+                    const cfg = result.data;
+                    
+                    // 填充应用配置
+                    if (cfg.app) {
+                        document.getElementById('app-name').value = cfg.app.name || '';
+                        document.getElementById('app-port').value = cfg.app.port || 8080;
+                        document.getElementById('app-mode').value = cfg.app.mode || 'prod';
+                    }
+                    
+                    // 填充数据库配置
+                    if (cfg.database) {
+                        document.getElementById('db-driver').value = cfg.database.driver || 'mysql';
+                        document.getElementById('db-host').value = cfg.database.host || '127.0.0.1';
+                        document.getElementById('db-port').value = cfg.database.port || 3306;
+                        document.getElementById('db-name').value = cfg.database.name || '';
+                        document.getElementById('db-user').value = cfg.database.user || '';
+                        document.getElementById('db-password').value = cfg.database.pass || '';
+                    }
+                    
+                    // 填充 Redis 配置
+                    if (cfg.redis) {
+                        document.getElementById('redis-host').value = cfg.redis.host || '127.0.0.1';
+                        document.getElementById('redis-port').value = cfg.redis.port || 6379;
+                        document.getElementById('redis-password').value = cfg.redis.password || '';
+                        document.getElementById('redis-db').value = cfg.redis.db || 0;
+                    }
+                    
+                    // 填充安全配置
+                    if (cfg.security) {
+                        document.getElementById('security-enabled').checked = cfg.security.enable_security_middleware !== false;
+                        document.getElementById('csrf-enabled').checked = cfg.security.enable_csrf_protection || false;
+                        document.getElementById('rate-limit-enabled').checked = cfg.security.enable_rate_limit || false;
+                    }
+                    
+                    // 填充压测配置
+                    if (cfg.benchmark) {
+                        document.getElementById('bench-mem').value = cfg.benchmark.mem_limit_percent || 85;
+                        document.getElementById('bench-cpu').value = cfg.benchmark.cpu_limit_percent || 85;
+                    }
+                }
+            })
+            .catch(err => console.error('加载配置失败:', err));
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            loadConfig();
+        };
+    </script>
+</body>
+</html>

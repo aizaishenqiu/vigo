@@ -212,6 +212,88 @@
         border-left: 4px solid #f56565;
         color: #742a2a;
       }
+
+      /* 上传区域样式 */
+      .upload-section {
+        margin-bottom: 20px;
+      }
+
+      .upload-area {
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f7fafc;
+      }
+
+      .upload-area:hover {
+        border-color: #5a67d8;
+        background: #edf2f7;
+      }
+
+      .upload-area.dragover {
+        border-color: #48bb78;
+        background: #f0fff4;
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+
+      .upload-text {
+        font-size: 16px;
+        color: #2d3748;
+        margin-bottom: 8px;
+      }
+
+      .upload-hint {
+        font-size: 14px;
+        color: #718096;
+      }
+
+      .file-list {
+        margin-top: 15px;
+      }
+
+      .file-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .file-name {
+        font-size: 14px;
+        color: #2d3748;
+        flex: 1;
+      }
+
+      .file-size {
+        font-size: 12px;
+        color: #718096;
+        margin-left: 10px;
+      }
+
+      .file-remove {
+        background: #f56565;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .file-remove:hover {
+        background: #e53e3e;
+      }
     </style>
   </head>
   <body>
@@ -219,6 +301,22 @@
       <div class="header">
         <h1>🔄 数据迁移管理</h1>
         <p>管理数据库 Schema 版本控制和迁移</p>
+      </div>
+
+      <div class="card">
+        <h2>📁 上传迁移文件</h2>
+        <div class="upload-section">
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="migrationFile" accept=".sql,.go" multiple style="display: none;" />
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">点击选择或拖拽迁移文件到此处</div>
+            <div class="upload-hint">支持 .sql 或 .go 格式</div>
+          </div>
+          <div id="fileList" class="file-list"></div>
+          <button class="btn btn-primary" onclick="uploadMigrations()" style="margin-top: 15px;">
+            ⬆️ 上传并执行
+          </button>
+        </div>
       </div>
 
       <div class="card">
@@ -261,6 +359,123 @@
     </div>
 
     <script>
+      // 文件上传相关
+      let selectedFiles = [];
+
+      // 初始化上传区域
+      function initUpload() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('migrationFile');
+
+        // 点击上传区域
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+          handleFiles(e.target.files);
+        });
+
+        // 拖拽事件
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+          uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files);
+        });
+      }
+
+      // 处理文件
+      function handleFiles(files) {
+        const validTypes = ['.sql', '.go'];
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const ext = '.' + file.name.split('.').pop().toLowerCase();
+          
+          if (validTypes.includes(ext)) {
+            selectedFiles.push(file);
+          } else {
+            showAlert(`文件 ${file.name} 格式不支持`, 'error');
+          }
+        }
+        
+        updateFileList();
+      }
+
+      // 更新文件列表
+      function updateFileList() {
+        const fileList = document.getElementById('fileList');
+        
+        if (selectedFiles.length === 0) {
+          fileList.innerHTML = '';
+          return;
+        }
+
+        fileList.innerHTML = selectedFiles.map((file, index) => `
+          <div class="file-item">
+            <span class="file-name">📄 ${file.name}</span>
+            <span class="file-size">${formatFileSize(file.size)}</span>
+            <button class="file-remove" onclick="removeFile(${index})">✕</button>
+          </div>
+        `).join('');
+      }
+
+      // 移除文件
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+      }
+
+      // 格式化文件大小
+      function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+      }
+
+      // 上传并执行迁移
+      async function uploadMigrations() {
+        if (selectedFiles.length === 0) {
+          showAlert('请先选择文件', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+          formData.append('files', file);
+        });
+
+        try {
+          const response = await fetch('/api/migration/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.code === 0) {
+            showAlert('上传成功，开始执行迁移...', 'success');
+            // 上传成功后自动执行迁移
+            setTimeout(runMigrate, 1000);
+            selectedFiles = [];
+            updateFileList();
+            document.getElementById('migrationFile').value = '';
+          } else {
+            showAlert('上传失败：' + result.msg, 'error');
+          }
+        } catch (error) {
+          showAlert('请求失败：' + error.message, 'error');
+        }
+      }
+
       // 加载迁移状态
       async function loadStatus() {
         try {
@@ -440,7 +655,10 @@
       }
 
       // 页面加载时自动加载状态
-      window.onload = loadStatus;
+      window.onload = function() {
+        initUpload();
+        loadStatus();
+      };
     </script>
   </body>
 </html>
