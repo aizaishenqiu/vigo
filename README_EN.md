@@ -23,12 +23,12 @@
 
 ### 🎯 Core Advantages
 
-| Advantage      | Description                                      | Benefit                    |
-| -------------- | ------------------------------------------------ | -------------------------- |
-| **Ultimate Performance** | Go compiled + goroutine concurrency + connection pool optimization | QPS increased by **18-30x** |
-| **Comprehensive Features** | ORM/Queue/Cache/Monitoring/Payment/GraphQL coverage | Development efficiency improved by **60%+** |
-| **Easy to Use** | Clear architecture + code generation + comprehensive docs | Learning cost reduced by **50%** |
-| **Production Ready** | Monitoring/alerting + Docker deployment + security protection | System stability improved by **90%+** |
+| Advantage                  | Description                                                        | Benefit                                     |
+| -------------------------- | ------------------------------------------------------------------ | ------------------------------------------- |
+| **Ultimate Performance**   | Go compiled + goroutine concurrency + connection pool optimization | QPS increased by **18-30x**                 |
+| **Comprehensive Features** | ORM/Queue/Cache/Monitoring/Payment/GraphQL coverage                | Development efficiency improved by **60%+** |
+| **Easy to Use**            | Clear architecture + code generation + comprehensive docs          | Learning cost reduced by **50%**            |
+| **Production Ready**       | Monitoring/alerting + Docker deployment + security protection      | System stability improved by **90%+**       |
 
 ---
 
@@ -112,22 +112,37 @@
 
 ### Installation
 
+**Option 1: Clone from Gitee (Recommended for users in China)**
+
 ```bash
-# Clone the repository
-git clone https://gitee.com/yourusername/vigo.git
+git clone https://gitee.com/yjk100_admin/vigo.git
 cd vigo
+```
+
+**Option 2: Clone from GitHub**
+
+```bash
+git clone https://github.com/aizaishenqiu/vigo.git
+cd vigo
+```
 
 # Install dependencies
+
 go mod download
 
 # Configure database
+
 # Edit config.yaml, modify database connection settings
 
 # Run the application
+
 go run main.go
+
 # Or use air for hot reloading
+
 air
-```
+
+````
 
 ### Hello World
 
@@ -142,7 +157,7 @@ import (
 func main() {
     // Create application
     a := app.NewApp()
-    
+
     // Register route
     mvc.GET("/hello", func(ctx *mvc.Context) {
         ctx.JSON(200, map[string]interface{}{
@@ -153,11 +168,11 @@ func main() {
             },
         })
     })
-    
+
     // Start application
     a.Run(":8080")
 }
-```
+````
 
 ---
 
@@ -330,7 +345,7 @@ services:
 - 📖 **Official Docs**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
 - 🌐 **Website**: [Website](https://doc.foucui.cn)
 - 📧 **Contact Us**: yjk150@qq.com
-- 🐙 **Repository**: [Gitee](https://gitee.com/yourusername/vigo) | [GitHub](https://github.com/yourusername/vigo)
+- 🐙 **Repository**: [Gitee](https://gitee.com/yjk100_admin/vigo) | [GitHub](https://github.com/aizaishenqiu/vigo)
 
 ---
 
@@ -357,10 +372,10 @@ Thanks to the following open source projects:
 
 **Made with ❤️ by Vigo Team**
 
-![Star](https://img.shields.io/github/stars/yourusername/vigo?style=social)
-![Fork](https://img.shields.io/github/forks/yourusername/vigo?style=social)
-![Watch](https://img.shields.io/github/watchers/yourusername/vigo?style=social)
+![Star](https://img.shields.io/github/stars/aizaishenqiu/vigo?style=social)
+![Fork](https://img.shields.io/github/forks/aizaishenqiu/vigo?style=social)
+![Watch](https://img.shields.io/github/watchers/aizaishenqiu/vigo?style=social)
 
-[🌟 Star on GitHub](https://github.com/yourusername/vigo) | [🌟 Star on Gitee](https://gitee.com/yourusername/vigo)
+[🌟 Star on GitHub](https://github.com/aizaishenqiu/vigo) | [🌟 Star on Gitee](https://gitee.com/yjk100_admin/vigo)
 
 </div>
