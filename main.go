@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"vigo/config"
+	_ "vigo/database/migrations" // 导入迁移注册包
 	_ "vigo/docs"
 	"vigo/framework/app"
 	"vigo/framework/view"

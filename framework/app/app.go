@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"vigo/app/service/benchmark"
+	"vigo/bootstrap"
 	"vigo/config"
 	"vigo/framework/admin"
 	"vigo/framework/container"
@@ -659,4 +660,15 @@ func buildDSN(driver string, cfg config.DatabaseConfig) string {
 	default:
 		return ""
 	}
+}
+
+// importAndRegisterMigrations 注册所有数据库迁移
+// 此函数导入 migrations 包并注册所有迁移函数
+func importAndRegisterMigrations(migrator *db.Migrator) {
+	log.Log.Info("[Migration] 开始注册数据库迁移...")
+
+	// 调用 bootstrap 包中的注册函数
+	bootstrap.RegisterMigrations(migrator)
+
+	log.Log.Info("[Migration] 数据库迁移注册完成")
 }

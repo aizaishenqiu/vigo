@@ -538,6 +538,7 @@ services:
 - 📖 **官方文档**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
 - 🌐 **官网文档**: [官网文档](https://doc.foucui.cn)
 - 📧 **联系我们**: yjk150@qq.com
+- 🐙 **代码仓库**: [Gitee](https://gitee.com/yourusername/vigo) | [GitHub](https://github.com/yourusername/vigo)
 
 ---
 
@@ -567,5 +568,7 @@ Vigo 框架采用 [MIT](LICENSE) 开源协议。
 ![Star](https://img.shields.io/github/stars/yourusername/vigo?style=social)
 ![Fork](https://img.shields.io/github/forks/yourusername/vigo?style=social)
 ![Watch](https://img.shields.io/github/watchers/yourusername/vigo?style=social)
+
+[🌟 Star on GitHub](https://github.com/yourusername/vigo) | [🌟 Star on Gitee](https://gitee.com/yourusername/vigo)
 
 </div>

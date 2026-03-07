@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"vigo/bootstrap"
 	"vigo/framework/db"
 	"vigo/framework/mvc"
 )
@@ -50,7 +51,10 @@ func (c *MigrationController) Status(ctx *mvc.Context) {
 
 	migrator := db.NewMigrator(db.GlobalDB, "migrations")
 
-	// 从目录加载迁移
+	// 注册迁移
+	bootstrap.RegisterMigrations(migrator)
+
+	// 从目录加载迁移（验证文件存在性）
 	err := migrator.LoadMigrationsFromDir("database/migrations")
 	if err != nil {
 		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))
@@ -84,7 +88,10 @@ func (c *MigrationController) Status(ctx *mvc.Context) {
 func (c *MigrationController) Migrate(ctx *mvc.Context) {
 	migrator := db.NewMigrator(db.GlobalDB, "migrations")
 
-	// 从目录加载迁移
+	// 注册迁移
+	bootstrap.RegisterMigrations(migrator)
+
+	// 从目录加载迁移（验证文件存在性）
 	err := migrator.LoadMigrationsFromDir("database/migrations")
 	if err != nil {
 		ctx.Error(500, fmt.Sprintf("加载迁移失败：%v", err))

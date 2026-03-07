@@ -8,7 +8,7 @@ import (
 // Up 创建文章表
 func Up_20260307120100_create_articles_table(db *sql.DB) error {
 	log.Println("Creating articles table...")
-	
+
 	query := `
 		CREATE TABLE IF NOT EXISTS articles (
 			id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -34,12 +34,12 @@ func Up_20260307120100_create_articles_table(db *sql.DB) error {
 			FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	`
-	
+
 	_, err := db.Exec(query)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("Articles table created successfully")
 	return nil
 }
@@ -47,12 +47,12 @@ func Up_20260307120100_create_articles_table(db *sql.DB) error {
 // Down 删除文章表
 func Down_20260307120100_create_articles_table(db *sql.DB) error {
 	log.Println("Dropping articles table...")
-	
+
 	_, err := db.Exec("DROP TABLE IF EXISTS articles")
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("Articles table dropped successfully")
 	return nil
 }

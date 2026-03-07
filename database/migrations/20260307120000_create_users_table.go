@@ -8,7 +8,7 @@ import (
 // Up 创建用户表
 func Up_20260307120000_create_users_table(db *sql.DB) error {
 	log.Println("Creating users table...")
-	
+
 	query := `
 		CREATE TABLE IF NOT EXISTS users (
 			id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -25,12 +25,12 @@ func Up_20260307120000_create_users_table(db *sql.DB) error {
 			INDEX idx_status (status)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	`
-	
+
 	_, err := db.Exec(query)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("Users table created successfully")
 	return nil
 }
@@ -38,12 +38,12 @@ func Up_20260307120000_create_users_table(db *sql.DB) error {
 // Down 删除用户表
 func Down_20260307120000_create_users_table(db *sql.DB) error {
 	log.Println("Dropping users table...")
-	
+
 	_, err := db.Exec("DROP TABLE IF EXISTS users")
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("Users table dropped successfully")
 	return nil
 }
