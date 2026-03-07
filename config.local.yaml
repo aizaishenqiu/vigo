@@ -1,0 +1,101 @@
+# 本地开发配置 - 不提交到 git
+app:
+  name: vigo
+  version: 3.0.0
+  port: 8080
+  debug: true
+  mode: dev
+  console: true
+  auto_kill_port: true
+
+database:
+  driver: mysql
+  host: 127.0.0.1
+  port: 3306
+  name: jw_platform_db
+  user: root
+  pass: shine20
+  charset: utf8mb4
+  max_open_conns: 50
+  max_idle_conns: 25
+  conn_max_lifetime: 3600
+  rw_split: false
+  reads: []
+
+nacos:
+  host: 127.0.0.1
+  port: 8848
+  namespace: ""
+  data_id: vigo-config
+  group: DEFAULT_GROUP
+  install_path: ""  # Nacos安装路径，用于自动启动Nacos服务
+  discovery:
+    enabled: false
+    service_name: vigo
+    auto_register: true
+    heartbeat: 5
+  admin:
+    enabled: true
+    username: ""
+    password: ""
+    port: 8848
+
+rabbitmq:
+  enabled: false
+  host: 127.0.0.1
+  port: 5672
+  user: guest
+  pass: guest
+  vhost: /
+  conn_timeout: 5
+  heartbeat: 10
+  reconnect_delay: 3
+  max_retries: 3
+  admin:
+    enabled: true
+    username: ""
+    password: ""
+    port: 15672
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: "123456"
+  db: 0
+  pool_size: 50
+
+grpc:
+  enabled: false
+  port: 9090
+  service_name: vigo
+  enable_recovery: true
+  enable_logger: true
+  max_recv_msg_size: 4
+  max_send_msg_size: 4
+
+security:
+  jwt:
+    secret: dev-jwt-secret-key-for-development-only-32chars
+    expire: 86400
+    issuer: vigo
+  session:
+    lifetime: 120
+    secure: false
+    httponly: true
+    samesite: lax
+  password:
+    min_length: 6
+    require_uppercase: false
+    require_lowercase: true
+    require_number: true
+    require_special: false
+  cors:
+    allow_origins: ["*"]
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
+    max_age: 86400
+  dos:
+    enable: false
+    limit: 500
+    window: 60
+    black_ip: []
