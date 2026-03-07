@@ -94,8 +94,9 @@ func Init(r *mvc.Router) {
 	// 压力测试面板
 	benchmarkCtrl := &controller.BenchmarkController{Hub: wsHub}
 	r.GET("/benchmark", benchmarkCtrl.Index)
-	r.GET("/benchmark/ws", benchmarkCtrl.WebSocket) // WebSocket 端点
-	r.GET("/benchmark/stats", benchmarkCtrl.Stats)  // 保留 HTTP 降级接口
+	r.GET("/benchmark/ws", benchmarkCtrl.WebSocket)      // WebSocket 端点
+	r.GET("/benchmark/stats", benchmarkCtrl.Stats)       // 保留 HTTP 降级接口
+	r.GET("/benchmark/services", benchmarkCtrl.Services) // 服务状态
 	r.POST("/benchmark/start", benchmarkCtrl.Start)
 	r.POST("/benchmark/start-http", benchmarkCtrl.StartHTTP)
 	r.POST("/benchmark/stop", benchmarkCtrl.Stop)

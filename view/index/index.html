@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}}</title>
     <style>
-        /* 深色主题 */
         :root { 
             --bg:#020617; 
             --card:#111827; 
@@ -22,7 +21,6 @@
             --sidebar:#020617;
         }
         
-        /* 浅色主题 */
         [data-theme="light"] {
             --bg:#f8fafc; 
             --card:#ffffff; 
@@ -40,764 +38,471 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter',system-ui,-apple-system,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Inter',system-ui,-apple-system,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; }
         .layout { display: flex; min-height: 100vh; }
 
-        /* 侧边栏 */
-        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 24px 0; display: flex; flex-direction: column; transition: background-color 0.3s; }
-        .sidebar-brand { padding: 0 24px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-brand-left { flex: 1; }
-        .sidebar-brand h1 { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--blue), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sidebar-brand .ver { font-size: 11px; color: var(--sub); margin-top: 4px; }
-        .theme-toggle { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; }
-        .theme-toggle:hover { background: rgba(59,130,246,.1); border-color: var(--blue); }
-        .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
-        .nav-section { margin-bottom: 20px; }
-        .nav-section-title { font-size: 11px; text-transform: uppercase; color: var(--sub); letter-spacing: 1px; padding: 0 12px 8px; font-weight: 600; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--sub); text-decoration: none; font-size: 13px; transition: all .2s; margin-bottom: 2px; }
-        .nav-item:hover { background: rgba(59,130,246,.1); color: var(--text); }
-        .nav-item.active { background: rgba(59,130,246,.15); color: var(--blue); font-weight: 500; }
-        .nav-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-
-        /* 主内容 */
-        .main { flex: 1; padding: 24px 32px; overflow-y: auto; }
-        .main-header { margin-bottom: 24px; }
+        .sidebar { display: flex; width: auto; background: var(--sidebar); border-right: 1px solid var(--border); transition: background-color 0.3s; flex-shrink: 0; }
+        
+        .icon-nav { width: 80px; background: var(--card); border-right: 1px solid var(--border); padding: 20px 8px; display: flex; flex-direction: column; align-items: center; gap: 12px; overflow-y: auto; flex-shrink: 0; }
+        
+        .icon-nav-item { width: 56px; height: 56px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; color: var(--sub); background: transparent; border: none; padding: 8px 4px; }
+        .icon-nav-item:hover { background: rgba(59,130,246,.08); color: var(--text); transform: translateY(-2px); }
+        .icon-nav-item.active { background: linear-gradient(135deg, rgba(59,130,246,.2) 0%, rgba(59,130,246,.1) 100%); color: var(--blue); box-shadow: 0 4px 12px rgba(59,130,246,.2); }
+        .icon-nav-item .nav-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 6px; transition: transform 0.3s; }
+        .icon-nav-item:hover .nav-icon { transform: scale(1.1); }
+        .icon-nav-item span { font-size: 11px; text-align: center; line-height: 1.2; }
+        
+        .icon-nav::-webkit-scrollbar { width: 4px; }
+        .icon-nav::-webkit-scrollbar-track { background: transparent; }
+        .icon-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        
+        .menu-panel { width: 240px; background: var(--sidebar); padding: 16px 0; overflow-y: auto; flex-shrink: 0; display: none; opacity: 0; transform: translateX(-10px); transition: opacity 0.3s ease, transform 0.3s ease; }
+        
+        .menu-panel.active { display: block; opacity: 1; transform: translateX(0); animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .menu-panel-header { padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .menu-panel-header h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .menu-panel-header p { font-size: 12px; color: var(--sub); }
+        
+        .menu-panel::-webkit-scrollbar { width: 4px; }
+        .menu-panel::-webkit-scrollbar-track { background: transparent; }
+        .menu-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .menu-panel::-webkit-scrollbar-thumb:hover { background: var(--sub); }
+        
+        .sidebar-nav { padding: 0 12px; }
+        .nav-section { margin-bottom: 16px; }
+        .nav-section-title { font-size: 11px; text-transform: uppercase; color: var(--sub); letter-spacing: 0.8px; padding: 12px 16px 8px; font-weight: 600; margin-bottom: 4px; }
+        
+        .menu-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            border-radius: 8px;
+            color: var(--sub);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2px;
+            border-left: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-group::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(59,130,246,.08) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .menu-group:hover {
+            background: rgba(59,130,246,.06);
+            color: var(--text);
+            transform: translateX(3px);
+        }
+        
+        .menu-group:hover::before {
+            opacity: 1;
+        }
+        
+        .menu-group.active {
+            background: linear-gradient(90deg, rgba(59,130,246,.12) 0%, rgba(59,130,246,.04) 100%);
+            color: var(--blue);
+            border-left-color: var(--blue);
+            box-shadow: 0 2px 8px rgba(59,130,246,.12);
+        }
+        
+        .menu-group .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .menu-group i.arrow {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 9px;
+            color: var(--sub);
+            position: relative;
+            z-index: 1;
+            font-style: normal;
+        }
+        
+        .menu-group.active i.arrow {
+            transform: rotate(90deg);
+            color: var(--blue);
+        }
+        
+        .menu-group i.arrow::before {
+            content: '▶';
+        }
+        
+        .menu-group.active i.arrow::before {
+            content: '▼';
+        }
+        
+        .submenu {
+            list-style: none;
+            overflow: hidden;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .submenu li {
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .submenu.show li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .submenu.show li:nth-child(1) { transition-delay: 0.05s; }
+        .submenu.show li:nth-child(2) { transition-delay: 0.1s; }
+        .submenu.show li:nth-child(3) { transition-delay: 0.15s; }
+        .submenu.show li:nth-child(4) { transition-delay: 0.2s; }
+        .submenu.show li:nth-child(5) { transition-delay: 0.25s; }
+        .submenu.show li:nth-child(6) { transition-delay: 0.3s; }
+        
+        .submenu li a {
+            padding: 10px 12px 10px 48px;
+            display: block;
+            color: var(--sub);
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+            border-radius: 6px;
+            margin: 3px 0;
+            position: relative;
+            line-height: 1.4;
+        }
+        
+        .submenu li a::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--sub);
+            opacity: 0;
+            transition: all 0.25s;
+        }
+        
+        .submenu li a:hover::before {
+            opacity: 1;
+            background: var(--blue);
+        }
+        
+        .submenu li a:hover {
+            background: rgba(59,130,246,.08);
+            color: var(--text);
+            padding-left: 52px;
+        }
+        
+        .submenu li a.active {
+            background: linear-gradient(90deg, rgba(59,130,246,.15) 0%, rgba(59,130,246,.08) 100%);
+            color: var(--blue);
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(59,130,246,.1);
+        }
+        
+        .submenu li a.active::before {
+            opacity: 1;
+            background: var(--blue);
+            width: 6px;
+            height: 6px;
+        }
+        
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main-header { padding: 24px 32px; border-bottom: 1px solid var(--border); background: var(--card); flex-shrink: 0; }
         .main-header h2 { font-size: 22px; font-weight: 700; }
         .main-header p { color: var(--sub); font-size: 14px; margin-top: 4px; }
-
-        /* 概览卡片 */
-        .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .ov-card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); transition: transform .2s, background-color 0.3s, border-color 0.3s; }
-        .ov-card:hover { transform: translateY(-2px); }
-        .ov-card .ov-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
-        .ov-card .ov-label { font-size: 12px; color: var(--sub); margin-bottom: 4px; }
-        .ov-card .ov-value { font-size: 20px; font-weight: 700; }
-        .ov-card .ov-sub { font-size: 11px; color: var(--sub); margin-top: 4px; }
-
-        /* 模块网格 */
-        .modules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
-        .mod-card { background: var(--card); border-radius: 12px; padding: 24px; border: 1px solid var(--border); cursor: pointer; transition: all .3s; text-decoration: none; color: inherit; display: block; }
-        .mod-card:hover { border-color: var(--blue); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(59,130,246,.15); }
-        .mod-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .mod-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .mod-title { font-size: 15px; font-weight: 600; }
-        .mod-desc { font-size: 13px; color: var(--sub); line-height: 1.6; }
-        .mod-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
-        .mod-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; background: rgba(59,130,246,.1); color: var(--blue); }
-
-        /* 文档区 */
-        .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .doc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-        .doc-card { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); cursor: pointer; transition: all .2s; text-decoration: none; color: inherit; }
-        .doc-card:hover { border-color: var(--green); background: rgba(16,185,129,.05); }
-        .doc-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .doc-card p { font-size: 11px; color: var(--sub); }
-
-        /* 状态指示 */
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .status-dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
-        .status-dot.off { background: var(--red); }
-
-        /* 服务状态面板 */
-        .services { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .svc-card { background: var(--card); border-radius: 10px; padding: 16px 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s, border-color 0.3s; }
-        .svc-info { display: flex; align-items: center; gap: 12px; }
-        .svc-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .svc-name { font-size: 14px; font-weight: 500; }
-        .svc-detail { font-size: 11px; color: var(--sub); margin-top: 2px; }
-        .svc-status { text-align: right; }
-        .svc-status .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
-        .badge-on { background: rgba(16,185,129,.15); color: var(--green); }
-        .badge-off { background: rgba(239,68,68,.15); color: var(--red); }
-        .badge-na { background: rgba(148,163,184,.1); color: var(--sub); }
-
-        @media (max-width: 1200px) {
-            .overview { grid-template-columns: repeat(2, 1fr); }
-            .modules { grid-template-columns: repeat(2, 1fr); }
-            .doc-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+        
+        .iframe-container { flex: 1; overflow: hidden; position: relative; }
+        .iframe-container iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
     </style>
 </head>
 <body>
 <div class="layout">
-    <!-- 侧边栏 -->
     <aside class="sidebar">
-        <div class="sidebar-brand">
-            <div class="sidebar-brand-left">
-                <h1>Vigo</h1>
-                <div class="ver">Framework v{{.version}}</div>
-            </div>
-            <button class="theme-toggle" id="theme-toggle" title="切换主题">🌙</button>
+        <div class="icon-nav">
+            <button class="icon-nav-item active" onclick="showPanel('panel-dashboard', this)" title="控制台">
+                <div class="nav-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">📊</div>
+                <span>控制台</span>
+            </button>
+            <button class="icon-nav-item" onclick="showPanel('panel-test', this)" title="测试中心">
+                <div class="nav-icon" style="background:rgba(239,68,68,.15);color:var(--red)">⚡</div>
+                <span>测试</span>
+            </button>
+            <button class="icon-nav-item" onclick="showPanel('panel-monitor', this)" title="监控与管理">
+                <div class="nav-icon" style="background:rgba(6,182,212,.15);color:var(--cyan)">📈</div>
+                <span>监控</span>
+            </button>
+            <button class="icon-nav-item" onclick="showPanel('panel-service', this)" title="服务管理">
+                <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">📬</div>
+                <span>服务</span>
+            </button>
+            <button class="icon-nav-item" onclick="showPanel('panel-config', this)" title="系统配置">
+                <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">⚙️</div>
+                <span>配置</span>
+            </button>
+            <button class="icon-nav-item" onclick="showPanel('panel-tools', this)" title="开发工具">
+                <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">🛠️</div>
+                <span>工具</span>
+            </button>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">控制台</div>
-                <a href="/dashboard" class="nav-item active">
-                    <div class="nav-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#9776;</div>
-                    控制面板
-                </a>
-                <a href="/" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#127968;</div>
-                    官网首页
-                </a>
+
+        <div id="panel-dashboard" class="menu-panel active">
+            <div class="menu-panel-header">
+                <h3>控制台</h3>
+                <p>系统管理和导航</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">测试中心</div>
-                <a href="/benchmark" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(239,68,68,.15);color:var(--red)">&#9889;</div>
-                    压力测试
-                </a>
-                <a href="/performance" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9881;</div>
-                    性能测试
-                </a>
-                <a href="/performance/run" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9658;</div>
-                    性能测试运行
-                </a>
-                <a href="/performance/results" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128202;</div>
-                    性能测试结果
-                </a>
-                <a href="/performance/system" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128187;</div>
-                    系统信息
-                </a>
-                <a href="/performance/database" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128451;</div>
-                    数据库测试
-                </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">快捷入口</div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/', '官网首页', this)" class="active">官网首页</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div id="panel-test" class="menu-panel">
+            <div class="menu-panel-header">
+                <h3>测试中心</h3>
+                <p>性能和压力测试</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">监控与管理</div>
-                <a href="/monitor" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(6,182,212,.15);color:var(--cyan)">&#9673;</div>
-                    系统监控大屏
-                </a>
-                <a href="/migration" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128190;</div>
-                    数据迁移管理
-                </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">测试工具</div>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(239,68,68,.15);color:var(--red)">⚡</div>
+                            <span>压力测试</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/benchmark', '压力测试', this)">压力测试</a></li>
+                    </ul>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">⚙️</div>
+                            <span>性能测试</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/performance', '性能测试', this)">性能测试</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div id="panel-monitor" class="menu-panel">
+            <div class="menu-panel-header">
+                <h3>监控与管理</h3>
+                <p>系统监控和数据管理</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">服务管理</div>
-                <a href="/rabbitmq" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9993;</div>
-                    RabbitMQ 管理
-                </a>
-                <a href="/rabbitmq/queues" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128231;</div>
-                    队列管理
-                </a>
-                <a href="/rabbitmq/exchanges" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128256;</div>
-                    交换机管理
-                </a>
-                <a href="/nacos" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9741;</div>
-                    Nacos 服务管理
-                </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">监控工具</div>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(6,182,212,.15);color:var(--cyan)">📈</div>
+                            <span>系统监控</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/monitor', '系统监控大屏', this)">系统监控大屏</a></li>
+                        <li><a href="javascript:void(0)" onclick="loadPage('/migration', '数据迁移管理', this)">数据迁移管理</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div id="panel-service" class="menu-panel">
+            <div class="menu-panel-header">
+                <h3>服务管理</h3>
+                <p>消息队列和服务发现</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">系统配置</div>
-                <a href="/settings" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#9881;</div>
-                    系统设置
-                </a>
-                <a href="/docs" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(6,182,212,.15);color:var(--cyan)">&#128218;</div>
-                    文档中心
-                </a>
-                <a href="/nacos/config" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9881;</div>
-                    配置管理
-                </a>
-                <a href="/nacos/services" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128225;</div>
-                    服务注册
-                </a>
-                <a href="/nacos/instances" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128187;</div>
-                    实例管理
-                </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">消息队列</div>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">📬</div>
+                            <span>RabbitMQ</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/rabbitmq', 'RabbitMQ 管理', this)">RabbitMQ 管理</a></li>
+                    </ul>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">🌐</div>
+                            <span>Nacos</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/nacos', 'Nacos 服务管理', this)">Nacos 服务管理</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div id="panel-config" class="menu-panel">
+            <div class="menu-panel-header">
+                <h3>系统配置</h3>
+                <p>系统设置和文档</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">开发工具</div>
-                <a href="/docs" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128196;</div>
-                    API 文档
-                </a>
-                <a href="/docs/view" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128214;</div>
-                    文档查看
-                </a>
-                <a href="/docs/swagger/" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128218;</div>
-                    Swagger UI
-                </a>
-                <a href="/swagger" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128221;</div>
-                    Swagger 重定向
-                </a>
-                <a href="/health" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#10003;</div>
-                    健康检查
-                </a>
-                <a href="/health/full" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128200;</div>
-                    完整健康检查
-                </a>
-                <a href="/home" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#127968;</div>
-                    首页测试
-                </a>
-                <a href="/hello" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#128075;</div>
-                    Hello 接口
-                </a>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">配置管理</div>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">⚙️</div>
+                            <span>系统设置</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/settings', '系统设置', this)">系统设置</a></li>
+                        <li><a href="javascript:void(0)" onclick="loadPage('/docs', '文档中心', this)">文档中心</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <div id="panel-tools" class="menu-panel">
+            <div class="menu-panel-header">
+                <h3>开发工具</h3>
+                <p>开发和调试工具</p>
             </div>
-            <div class="nav-section">
-                <div class="nav-section-title">认证</div>
-                <a href="/api/login" class="nav-item">
-                    <div class="nav-icon" style="background:rgba(236,72,153,.15);color:var(--pink)">&#128273;</div>
-                    登录接口
-                </a>
-            </div>
-        </nav>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">开发辅助</div>
+                    <div class="menu-group" onclick="toggleMenu(this)">
+                        <div class="left">
+                            <div class="nav-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">📄</div>
+                            <span>文档工具</span>
+                        </div>
+                        <i class="arrow">▶</i>
+                    </div>
+                    <ul class="submenu show">
+                        <li><a href="javascript:void(0)" onclick="loadPage('/docs', 'API 文档', this)">API 文档</a></li>
+                        <li><a href="javascript:void(0)" onclick="loadPage('/docs/swagger/', 'Swagger UI', this)">Swagger UI</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
     </aside>
 
-    <!-- 主内容 -->
     <div class="main">
         <div class="main-header">
-            <h2>控制面板</h2>
-            <p>{{.appName}} v{{.version}} | 运行模式: {{.mode}} | Go {{.goVersion}}</p>
+            <h2 id="page-title">官网首页</h2>
+            <p id="page-desc">{{.appName}} v{{.version}} | 运行模式：{{.mode}} | Go {{.goVersion}}</p>
         </div>
-
-        <!-- 概览 -->
-        <div class="overview">
-            <div class="ov-card">
-                <div class="ov-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#9741;</div>
-                <div class="ov-label">HTTP 端口</div>
-                <div class="ov-value">:{{.port}}</div>
-                <div class="ov-sub">主服务运行中</div>
-            </div>
-            <div class="ov-card">
-                <div class="ov-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9783;</div>
-                <div class="ov-label">数据库驱动</div>
-                <div class="ov-value" style="font-size:16px">{{.dbDriver}}</div>
-                <div class="ov-sub">{{.dbHost}}</div>
-            </div>
-            <div class="ov-card">
-                <div class="ov-icon" style="background:rgba(239,68,68,.15);color:var(--red)">&#9889;</div>
-                <div class="ov-label">Redis</div>
-                <div class="ov-value" style="font-size:16px">{{.redisHost}}</div>
-                <div class="ov-sub" id="redis-status">检测中...</div>
-            </div>
-            <div class="ov-card">
-                <div class="ov-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#9014;</div>
-                <div class="ov-label">运行环境</div>
-                <div class="ov-value" style="font-size:16px">{{.goVersion}}</div>
-                <div class="ov-sub">{{.mode}} 模式</div>
-            </div>
-        </div>
-
-        <!-- 服务状态 -->
-        <div class="section-title">服务状态</div>
-        <div class="services" style="margin-bottom:24px">
-            <div class="svc-card">
-                <div class="svc-info">
-                    <div class="svc-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#9783;</div>
-                    <div>
-                        <div class="svc-name">主数据库 ({{.dbDriver}})</div>
-                        <div class="svc-detail">{{.dbHost}}</div>
-                    </div>
-                </div>
-                <div class="svc-status"><span class="badge" id="db-badge">检测中</span></div>
-            </div>
-            <div class="svc-card">
-                <div class="svc-info">
-                    <div class="svc-icon" style="background:rgba(239,68,68,.15);color:var(--red)">&#9889;</div>
-                    <div>
-                        <div class="svc-name">Redis 缓存</div>
-                        <div class="svc-detail">{{.redisHost}}</div>
-                    </div>
-                </div>
-                <div class="svc-status"><span class="badge" id="redis-badge">检测中</span></div>
-            </div>
-            <div class="svc-card">
-                <div class="svc-info">
-                    <div class="svc-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9993;</div>
-                    <div>
-                        <div class="svc-name">RabbitMQ 消息队列</div>
-                        <div class="svc-detail" id="mq-detail">-</div>
-                    </div>
-                </div>
-                <div class="svc-status"><span class="badge" id="mq-badge">检测中</span></div>
-            </div>
-            <div class="svc-card">
-                <div class="svc-info">
-                    <div class="svc-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9741;</div>
-                    <div>
-                        <div class="svc-name">Nacos 服务注册</div>
-                        <div class="svc-detail" id="nacos-detail">-</div>
-                    </div>
-                </div>
-                <div class="svc-status"><span class="badge" id="nacos-badge">检测中</span></div>
-            </div>
-        </div>
-
-        <!-- 功能模块 -->
-        <div class="section-title">测试中心</div>
-        <div class="modules">
-            <a class="mod-card" href="/benchmark">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(239,68,68,.15);color:var(--red)">&#9889;</div>
-                    <div class="mod-title">压力测试中心</div>
-                </div>
-                <div class="mod-desc">全模块压力测试，支持 QPS、Redis、MySQL、MQ 压测，实时 WebSocket 推送监控数据</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">WebSocket</span>
-                    <span class="mod-tag">ECharts</span>
-                    <span class="mod-tag">HTTP 压测</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/performance">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9881;</div>
-                    <div class="mod-title">性能测试中心</div>
-                </div>
-                <div class="mod-desc">系统性能分析，数据库基准测试，SQL 执行效率诊断，连接池监控</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Database</span>
-                    <span class="mod-tag">Benchmark</span>
-                    <span class="mod-tag">SQL</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/performance/run">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9658;</div>
-                    <div class="mod-title">运行性能测试</div>
-                </div>
-                <div class="mod-desc">执行性能测试任务，实时查看测试进度和结果数据</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Run</span>
-                    <span class="mod-tag">Real-time</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/performance/results">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128202;</div>
-                    <div class="mod-title">性能测试结果</div>
-                </div>
-                <div class="mod-desc">查看所有历史性能测试结果，支持数据对比和趋势分析</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Results</span>
-                    <span class="mod-tag">Analysis</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/performance/system">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128187;</div>
-                    <div class="mod-title">系统信息</div>
-                </div>
-                <div class="mod-desc">查看系统硬件配置、Go 运行时信息、操作系统详情</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">System</span>
-                    <span class="mod-tag">Info</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/performance/database">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128451;</div>
-                    <div class="mod-title">数据库性能测试</div>
-                </div>
-                <div class="mod-desc">数据库基准测试，SQL 执行效率诊断，连接池性能分析</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Database</span>
-                    <span class="mod-tag">SQL</span>
-                </div>
-            </a>
-        </div>
-
-        <!-- 监控与管理 -->
-        <div class="section-title">监控与管理</div>
-        <div class="modules">
-            <a class="mod-card" href="/monitor">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(6,182,212,.15);color:var(--cyan)">&#9673;</div>
-                    <div class="mod-title">系统监控大屏</div>
-                </div>
-                <div class="mod-desc">实时监控 CPU、内存、磁盘、网络等系统资源使用情况，可视化数据大屏</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">CPU</span>
-                    <span class="mod-tag">Memory</span>
-                    <span class="mod-tag">Network</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/migration">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128190;</div>
-                    <div class="mod-title">数据迁移管理</div>
-                </div>
-                <div class="mod-desc">数据库版本控制，迁移文件创建、执行、回滚，Web 管理界面</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Migration</span>
-                    <span class="mod-tag">Database</span>
-                    <span class="mod-tag">Version</span>
-                </div>
-            </a>
-        </div>
-
-        <!-- 服务管理 -->
-        <div class="section-title">服务管理</div>
-        <div class="modules">
-            <a class="mod-card" href="/rabbitmq">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#9993;</div>
-                    <div class="mod-title">RabbitMQ 管理</div>
-                </div>
-                <div class="mod-desc">队列和交换机管理，消息发布测试，连接状态监控，Management API 集成</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Queue</span>
-                    <span class="mod-tag">Exchange</span>
-                    <span class="mod-tag">Publish</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/rabbitmq/queues">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128231;</div>
-                    <div class="mod-title">队列管理</div>
-                </div>
-                <div class="mod-desc">查看和管理所有队列，支持创建、删除、清空队列操作</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Queue</span>
-                    <span class="mod-tag">Manage</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/rabbitmq/exchanges">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(245,158,11,.15);color:var(--orange)">&#128256;</div>
-                    <div class="mod-title">交换机管理</div>
-                </div>
-                <div class="mod-desc">查看和管理交换机，支持创建、删除交换机，绑定队列</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Exchange</span>
-                    <span class="mod-tag">Bind</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/nacos">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9741;</div>
-                    <div class="mod-title">Nacos 服务管理</div>
-                </div>
-                <div class="mod-desc">配置中心管理，服务注册与发现，命名空间管理，实例健康检查</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Config</span>
-                    <span class="mod-tag">Discovery</span>
-                    <span class="mod-tag">Registry</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/nacos/config">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#9881;</div>
-                    <div class="mod-title">配置管理</div>
-                </div>
-                <div class="mod-desc">查看和编辑 Nacos 配置，支持发布、删除配置操作</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Config</span>
-                    <span class="mod-tag">Edit</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/nacos/services">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128225;</div>
-                    <div class="mod-title">服务注册</div>
-                </div>
-                <div class="mod-desc">查看已注册的服务列表，支持服务注册操作</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Service</span>
-                    <span class="mod-tag">Register</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/nacos/instances">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128187;</div>
-                    <div class="mod-title">实例管理</div>
-                </div>
-                <div class="mod-desc">查看服务实例详情，健康检查，实例上下线管理</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Instance</span>
-                    <span class="mod-tag">Health</span>
-                </div>
-            </a>
-        </div>
-
-        <!-- 开发工具 -->
-        <div class="section-title">开发工具</div>
-        <div class="modules">
-            <a class="mod-card" href="/docs">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128196;</div>
-                    <div class="mod-title">API 文档</div>
-                </div>
-                <div class="mod-desc">框架 API 文档查看，支持 Markdown 格式，分类浏览</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Docs</span>
-                    <span class="mod-tag">Markdown</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/docs/view">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128214;</div>
-                    <div class="mod-title">文档查看器</div>
-                </div>
-                <div class="mod-desc">文档在线查看器，支持目录导航，代码高亮</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Viewer</span>
-                    <span class="mod-tag">Navigate</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/docs/swagger/">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(139,92,246,.15);color:var(--purple)">&#128218;</div>
-                    <div class="mod-title">Swagger UI</div>
-                </div>
-                <div class="mod-desc">Swagger UI 交互式文档，支持在线测试 API 接口</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Swagger</span>
-                    <span class="mod-tag">OpenAPI</span>
-                    <span class="mod-tag">Test</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/health">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#10003;</div>
-                    <div class="mod-title">健康检查</div>
-                </div>
-                <div class="mod-desc">轻量级健康检查接口，无 IO 操作，适合高并发探活</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Health</span>
-                    <span class="mod-tag">Lightweight</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/health/full">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(16,185,129,.15);color:var(--green)">&#128200;</div>
-                    <div class="mod-title">完整健康检查</div>
-                </div>
-                <div class="mod-desc">完整健康检查，包含数据库和 Redis 连接状态，带 3 秒缓存</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Full</span>
-                    <span class="mod-tag">Database</span>
-                    <span class="mod-tag">Redis</span>
-                </div>
-            </a>
-            <a class="mod-card" href="/home">
-                <div class="mod-header">
-                    <div class="mod-icon" style="background:rgba(59,130,246,.15);color:var(--blue)">&#127968;</div>
-                    <div class="mod-title">首页测试</div>
-                </div>
-                <div class="mod-desc">首页测试页面，用于验证热重载功能是否正常工作</div>
-                <div class="mod-tags">
-                    <span class="mod-tag">Test</span>
-                    <span class="mod-tag">Hot Reload</span>
-                </div>
-            </a>
-        </div>
-
-        <!-- 热重载测试 -->
-        <div class="section-title">🔥 热重载测试</div>
-        <div class="test-box" style="background:var(--card);border-radius:12px;padding:24px;border:1px solid var(--border);margin-bottom:24px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,.15);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;">⚡</div>
-                <div>
-                    <h3 style="font-size:16px;font-weight:600;">Air 热重载状态</h3>
-                    <p style="font-size:13px;color:var(--sub);margin-top:2px;">修改此文件后，如果自动刷新页面，说明热重载已生效</p>
-                </div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
-                <div style="background:rgba(59,130,246,.05);border-radius:8px;padding:16px;border:1px solid rgba(59,130,246,.2);">
-                    <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">当前时间</div>
-                    <div id="current-time" style="font-size:18px;font-weight:700;color:var(--blue);font-family:monospace;">--:--:--</div>
-                </div>
-                <div style="background:rgba(16,185,129,.05);border-radius:8px;padding:16px;border:1px solid rgba(16,185,129,.2);">
-                    <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">热重载状态</div>
-                    <div id="hot-reload-status" style="font-size:18px;font-weight:700;color:var(--green);">✓ 已激活</div>
-                </div>
-            </div>
-            <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,.05);border-radius:8px;border:1px solid rgba(245,158,11,.2);">
-                <p style="font-size:13px;color:var(--orange);margin:0;">
-                    💡 提示：修改 <code style="background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px;">view/index/index.html</code> 文件并保存，页面应自动刷新
-                </p>
-            </div>
-        </div>
-
-        <!-- 框架特性 -->
-        <div class="section-title">框架核心能力</div>
-        <div class="doc-grid">
-            <div class="doc-card">
-                <h4>MVC 架构</h4>
-                <p>Router / Controller / Model / View 完整 MVC 分层</p>
-            </div>
-            <div class="doc-card">
-                <h4>ThinkPHP/Laravel ORM</h4>
-                <p>链式查询、模型事件、软删除、获取器/修改器、分页</p>
-            </div>
-            <div class="doc-card">
-                <h4>多数据库支持</h4>
-                <p>MySQL / PostgreSQL / SQLite / SQL Server + 读写分离</p>
-            </div>
-            <div class="doc-card">
-                <h4>安全中间件</h4>
-                <p>XSS / SQL 注入 / CSRF / 速率限制 / 异常恢复</p>
-            </div>
-            <div class="doc-card">
-                <h4>WebSocket 实时通讯</h4>
-                <p>频道订阅、指令路由、心跳保活、自动重连</p>
-            </div>
-            <div class="doc-card">
-                <h4>gRPC 微服务</h4>
-                <p>健康检查、拦截器、优雅停机，支持单体/微服务切换</p>
-            </div>
-            <div class="doc-card">
-                <h4>容器 & 门面</h4>
-                <p>依赖注入容器、Facade 门面模式简化服务访问</p>
-            </div>
-            <div class="doc-card">
-                <h4>数据迁移</h4>
-                <p>数据库版本控制、迁移文件管理、Web 界面操作</p>
-            </div>
-            <div class="doc-card">
-                <h4>RabbitMQ 消息队列</h4>
-                <p>队列管理、交换机、消息发布、Management API</p>
-            </div>
-            <div class="doc-card">
-                <h4>Nacos 服务发现</h4>
-                <p>配置中心、服务注册、实例管理、命名空间</p>
-            </div>
-            <div class="doc-card">
-                <h4>系统监控</h4>
-                <p>CPU、内存、磁盘、网络实时监控大屏</p>
-            </div>
-            <div class="doc-card">
-                <h4>性能测试</h4>
-                <p>数据库基准测试、SQL 诊断、连接池监控</p>
-            </div>
+        <div class="iframe-container">
+            <iframe id="content-frame" src="/" style="width:100%;height:100%;border:none;"></iframe>
         </div>
     </div>
 </div>
 
 <script>
+function loadPage(url, title, element) {
+    document.getElementById('content-frame').src = url;
+    document.getElementById('page-title').textContent = title;
+    
+    document.querySelectorAll('.submenu li a').forEach(link => {
+        link.classList.remove('active');
+    });
+    if (element) {
+        element.classList.add('active');
+    }
+}
+
+function toggleMenu(element) {
+    element.classList.toggle('active');
+    const submenu = element.nextElementSibling;
+    if (submenu && submenu.classList.contains('submenu')) {
+        submenu.classList.toggle('show');
+    }
+}
+
+function showPanel(panelId, btnElement) {
+    document.querySelectorAll('.menu-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    
+    document.getElementById(panelId).classList.add('active');
+    
+    document.querySelectorAll('.icon-nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    btnElement.classList.add('active');
+}
+
 function getAutoTheme() {
-    // 根据时间自动判断主题：晚上 18:00 - 早上 6:00 使用黑夜模式
     const hour = new Date().getHours();
-    return (hour >= 18 || hour < 6) ? 'dark' : 'light';
+    return (hour >= 6 && hour < 18) ? 'light' : 'dark';
 }
 
 function initTheme() {
     const savedTheme = localStorage.getItem('vigo-theme');
+    const autoTheme = getAutoTheme();
     const html = document.documentElement;
-    const toggleBtn = document.getElementById('theme-toggle');
     
     if (savedTheme) {
-        // 使用用户保存的主题
         html.setAttribute('data-theme', savedTheme);
-        toggleBtn.textContent = savedTheme === 'light' ? '🌙' : '☀️';
     } else {
-        // 没有保存的主题，根据时间自动设置
-        const autoTheme = getAutoTheme();
         html.setAttribute('data-theme', autoTheme);
-        toggleBtn.textContent = autoTheme === 'light' ? '🌙' : '☀️';
     }
 }
 
 function toggleTheme() {
     const html = document.documentElement;
-    const toggleBtn = document.getElementById('theme-toggle');
-    const currentTheme = html.getAttribute('data-theme') || 'dark';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    const current = html.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
     
-    html.setAttribute('data-theme', newTheme);
-    toggleBtn.textContent = newTheme === 'light' ? '🌙' : '☀️';
-    localStorage.setItem('vigo-theme', newTheme);
-}
-
-function updateTime() {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
-    const dateStr = now.toLocaleDateString('zh-CN');
-    document.getElementById('current-time').textContent = `${dateStr} ${timeStr}`;
-}
-
-async function checkServices() {
-    // 检测数据库 & Redis
-    try {
-        const r = await fetch('/benchmark/stats').then(r => r.json());
-        setBadge('db-badge', r.data?.write_db_status || r.data?.db_status);
-        setBadge('redis-badge', r.data?.redis_status);
-        document.getElementById('redis-status').textContent = r.data?.redis_status ? '已连接' : '未连接';
-    } catch(e) {
-        setBadge('db-badge', false);
-        setBadge('redis-badge', false);
-    }
-
-    // 检测 RabbitMQ
-    try {
-        const r = await fetch('/rabbitmq/status').then(r => r.json());
-        setBadge('mq-badge', r.data?.connected);
-        document.getElementById('mq-detail').textContent = r.data?.connected
-            ? (r.data.config?.host + ':' + r.data.config?.port + ' v' + (r.data.version || '-'))
-            : '未连接';
-    } catch(e) { setBadge('mq-badge', false); }
-
-    // 检测 Nacos
-    try {
-        const r = await fetch('/nacos/status').then(r => r.json());
-        setBadge('nacos-badge', r.data?.connected);
-        document.getElementById('nacos-detail').textContent = r.data?.connected
-            ? (r.data.config?.host + ':' + r.data.config?.port)
-            : '未连接 (' + (r.data?.config?.host || '-') + ':' + (r.data?.config?.port || '-') + ')';
-    } catch(e) { setBadge('nacos-badge', false); }
-}
-
-function setBadge(id, ok) {
-    const el = document.getElementById(id);
-    if (ok) { el.textContent = '已连接'; el.className = 'badge badge-on'; }
-    else { el.textContent = '未连接'; el.className = 'badge badge-off'; }
-}
-
-// 自动切换主题（如果用户没有手动设置）
-function autoSwitchTheme() {
-    const savedTheme = localStorage.getItem('vigo-theme');
-    if (!savedTheme) {
-        // 用户没有手动设置过，根据时间自动切换
-        const autoTheme = getAutoTheme();
-        const html = document.documentElement;
-        const toggleBtn = document.getElementById('theme-toggle');
-        
-        const currentTheme = html.getAttribute('data-theme') || 'dark';
-        if (autoTheme !== currentTheme) {
-            html.setAttribute('data-theme', autoTheme);
-            toggleBtn.textContent = autoTheme === 'light' ? '🌙' : '☀️';
-        }
-    }
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('vigo-theme', next);
 }
 
 initTheme();
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-updateTime();
-setInterval(updateTime, 1000);
-checkServices();
-setInterval(checkServices, 15000);
-
-// 每小时检查一次是否需要自动切换主题
-setInterval(autoSwitchTheme, 3600000);
-// 页面可见时检查（从后台切换回前台）
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-        autoSwitchTheme();
-    }
-});
 </script>
 </body>
 </html>

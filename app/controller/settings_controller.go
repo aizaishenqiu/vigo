@@ -25,8 +25,16 @@ func (c *SettingsController) Index(ctx *mvc.Context) {
 
 // Get 获取所有配置
 func (c *SettingsController) Get(ctx *mvc.Context) {
+	// 尝试读取配置文件，如果不存在则返回空配置
 	configData, err := os.ReadFile("config.yaml")
 	if err != nil {
+		// 如果文件不存在，返回空配置而不是错误
+		if os.IsNotExist(err) {
+			ctx.Success(map[string]interface{}{
+				"config": map[string]interface{}{},
+			})
+			return
+		}
 		ctx.Error(500, fmt.Sprintf("读取配置文件失败：%v", err))
 		return
 	}

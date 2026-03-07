@@ -2,9 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 	"vigo/framework/facade"
 	"vigo/framework/mvc"
-	"strconv"
 )
 
 type RabbitMQController struct {
@@ -57,7 +57,13 @@ func (r *RabbitMQController) Status(c *mvc.Context) {
 func (r *RabbitMQController) Queues(c *mvc.Context) {
 	mq := facade.RabbitMQ()
 	if mq == nil || !mq.IsConnected() {
-		c.Error(http.StatusServiceUnavailable, "RabbitMQ 未连接")
+		// 返回友好的错误信息
+		c.Success(map[string]interface{}{
+			"connected":   false,
+			"queues":      []map[string]interface{}{},
+			"message":     "RabbitMQ 未连接，请检查配置文件中的 RabbitMQ 设置并启动 RabbitMQ 服务",
+			"config_hint": "请在 config.yaml 中配置 rabbitmq.host, rabbitmq.port, rabbitmq.user, rabbitmq.password",
+		})
 		return
 	}
 
@@ -141,7 +147,13 @@ func (r *RabbitMQController) PurgeQueue(c *mvc.Context) {
 func (r *RabbitMQController) Exchanges(c *mvc.Context) {
 	mq := facade.RabbitMQ()
 	if mq == nil || !mq.IsConnected() {
-		c.Error(http.StatusServiceUnavailable, "RabbitMQ 未连接")
+		// 返回友好的错误信息
+		c.Success(map[string]interface{}{
+			"connected":   false,
+			"exchanges":   []map[string]interface{}{},
+			"message":     "RabbitMQ 未连接，请检查配置文件中的 RabbitMQ 设置并启动 RabbitMQ 服务",
+			"config_hint": "请在 config.yaml 中配置 rabbitmq.host, rabbitmq.port, rabbitmq.user, rabbitmq.password",
+		})
 		return
 	}
 

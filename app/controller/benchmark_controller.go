@@ -2,11 +2,11 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
+	"time"
 	"vigo/app/service/benchmark"
 	"vigo/framework/mvc"
 	"vigo/framework/websocket"
-	"strconv"
-	"time"
 )
 
 type BenchmarkController struct {
@@ -117,4 +117,15 @@ func (b *BenchmarkController) Stats(c *mvc.Context) {
 // QPS 兼容旧接口
 func (b *BenchmarkController) QPS(c *mvc.Context) {
 	b.Stats(c)
+}
+
+// Services 获取服务连接状态
+func (b *BenchmarkController) Services(c *mvc.Context) {
+	svc := benchmark.GetService()
+	stats := svc.GetStats()
+	c.Success(map[string]interface{}{
+		"mysql": stats.MySQLOps >= 0,
+		"redis": stats.RedisOps >= 0,
+		"mq":    stats.MQThroughput >= 0,
+	})
 }

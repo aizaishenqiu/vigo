@@ -15,10 +15,9 @@
             --info: #909399;
             --bg-color: #f5f7fa;
             --sidebar-bg: #001529;
-            --sidebar-dark: #002140;
             --sidebar-hover: #1890ff;
             --header-height: 60px;
-            --sidebar-width: 240px;
+            --sidebar-width: 220px;
         }
 
         * {
@@ -33,7 +32,7 @@
             min-height: 100vh;
         }
 
-        /* 侧边栏 - 手风琴样式 */
+        /* 侧边栏 */
         .sidebar {
             position: fixed;
             left: 0;
@@ -43,9 +42,7 @@
             background: var(--sidebar-bg);
             color: #fff;
             z-index: 1000;
-            transition: all 0.3s;
             overflow-y: auto;
-            overflow-x: hidden;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -62,14 +59,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--sidebar-dark);
+            background: #002140;
             font-size: 20px;
             font-weight: bold;
             color: #fff;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         .logo i {
@@ -80,7 +74,8 @@
 
         .menu {
             list-style: none;
-            padding: 10px 0;
+            padding: 0;
+            margin: 0;
         }
 
         .menu-item {
@@ -142,7 +137,7 @@
             max-height: 500px;
         }
 
-        .submenu .menu-item a {
+        .submenu li a {
             padding: 12px 20px 12px 52px;
             display: block;
             color: rgba(255,255,255,0.5);
@@ -151,12 +146,12 @@
             font-size: 14px;
         }
 
-        .submenu .menu-item a:hover {
+        .submenu li a:hover {
             color: #fff;
             background: rgba(255,255,255,0.05);
         }
 
-        .submenu .menu-item a.active {
+        .submenu li a.active {
             color: var(--primary);
             background: rgba(64,158,255,0.1);
         }
@@ -371,7 +366,7 @@
             font-weight: 500;
         }
 
-        .form-input, .form-select, .form-textarea {
+        .form-input, .form-select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #dcdfe6;
@@ -381,16 +376,10 @@
             background: #fff;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
+        .form-input:focus, .form-select:focus {
             border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-            font-family: monospace;
         }
 
         .form-grid {
@@ -431,94 +420,10 @@
             background: #85ce61;
         }
 
-        .btn-danger {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            background: #f78989;
-        }
-
         .btn-group {
             display: flex;
             gap: 10px;
             margin-top: 20px;
-        }
-
-        /* 标签页 */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #ebeef5;
-            margin-bottom: 20px;
-            background: #fff;
-            padding: 0 20px;
-            border-radius: 4px 4px 0 0;
-        }
-
-        .tab-item {
-            padding: 14px 20px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            color: #606266;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .tab-item:hover {
-            color: var(--primary);
-        }
-
-        .tab-item.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-            background: #fff;
-            padding: 20px;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 提示框 */
-        .alert {
-            padding: 12px 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-success {
-            background: #f0f9eb;
-            color: #67c23a;
-            border: 1px solid #e1f3d8;
-        }
-
-        .alert-error {
-            background: #fef0f0;
-            color: #f56c6c;
-            border: 1px solid #fde2e2;
-        }
-
-        .alert-warning {
-            background: #fdf6ec;
-            color: #e6a23c;
-            border: 1px solid #faecd8;
-        }
-
-        .alert-info {
-            background: #ecf5ff;
-            color: #409eff;
-            border: 1px solid #d9ecff;
         }
 
         /* 隐藏类 */
@@ -531,6 +436,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 15px;
         }
 
         .toggle-switch {
@@ -614,7 +520,6 @@
                 <ul class="submenu">
                     <li><a href="javascript:void(0)" onclick="showPage('app-settings', this)">应用配置</a></li>
                     <li><a href="javascript:void(0)" onclick="showPage('database-settings', this)">数据库配置</a></li>
-                    <li><a href="javascript:void(0)" onclick="showPage('multi-db-settings', this)">多数据库管理</a></li>
                     <li><a href="javascript:void(0)" onclick="showPage('redis-settings', this)">Redis 配置</a></li>
                     <li><a href="javascript:void(0)" onclick="showPage('security-settings', this)">安全配置</a></li>
                 </ul>
@@ -679,7 +584,6 @@
                 <ul class="submenu">
                     <li><a href="javascript:void(0)" onclick="showPage('migration-tool', this)">数据迁移</a></li>
                     <li><a href="javascript:void(0)" onclick="showPage('monitor-tool', this)">监控大屏</a></li>
-                    <li><a href="javascript:void(0)" onclick="showPage('websocket-tool', this)">WebSocket</a></li>
                 </ul>
             </li>
         </ul>
@@ -712,7 +616,7 @@
             <div id="page-dashboard" class="page-content">
                 <div class="page-header">
                     <h1 class="page-title">控制台</h1>
-                    <p class="page-desc">欢迎使用 Vigo 管理后台 - 全功能后端管理系统</p>
+                    <p class="page-desc">欢迎使用 Vigo 管理后台</p>
                 </div>
 
                 <div class="stats-grid">
@@ -735,52 +639,12 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="uptime">-</div>
-                            <div class="stat-label">运行时间</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
                         <div class="stat-icon info">
                             <i class="fas fa-microchip"></i>
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="go-version">-</div>
                             <div class="stat-label">Go 版本</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon danger">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">0</div>
-                            <div class="stat-label">错误数量</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">快速操作</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="showPageByElement(document.querySelectorAll('.submenu a')[0])">
-                                <i class="fas fa-cog"></i> 系统设置
-                            </button>
-                            <button class="btn btn-success" onclick="showPageByElement(document.querySelectorAll('.submenu a')[1])">
-                                <i class="fas fa-database"></i> 数据库管理
-                            </button>
-                            <button class="btn btn-warning" onclick="showPage('migration-tool')">
-                                <i class="fas fa-exchange-alt"></i> 数据迁移
-                            </button>
-                            <button class="btn btn-primary" onclick="showPage('monitor-tool')">
-                                <i class="fas fa-chart-line"></i> 监控大屏
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -791,24 +655,11 @@
                     </div>
                     <div class="card-body">
                         <div class="form-grid">
-                            <div>
-                                <strong>框架版本:</strong> <span id="sys-version">-</span>
-                            </div>
-                            <div>
-                                <strong>运行模式:</strong> <span id="sys-mode">-</span>
-                            </div>
-                            <div>
-                                <strong>服务端口:</strong> <span id="sys-port">-</span>
-                            </div>
-                            <div>
-                                <strong>数据库:</strong> <span id="sys-db">-</span>
-                            </div>
-                            <div>
-                                <strong>Redis:</strong> <span id="sys-redis">-</span>
-                            </div>
-                            <div>
-                                <strong>RabbitMQ:</strong> <span id="sys-mq">-</span>
-                            </div>
+                            <div><strong>框架版本:</strong> <span id="sys-version">-</span></div>
+                            <div><strong>运行模式:</strong> <span id="sys-mode">-</span></div>
+                            <div><strong>服务端口:</strong> <span id="sys-port">-</span></div>
+                            <div><strong>数据库:</strong> <span id="sys-db">-</span></div>
+                            <div><strong>Redis:</strong> <span id="sys-redis">-</span></div>
                         </div>
                     </div>
                 </div>
@@ -825,11 +676,11 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">应用名称</label>
-                                <input type="text" class="form-input" id="app-name" placeholder="Vigo" />
+                                <input type="text" class="form-input" id="app-name" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">服务端口</label>
-                                <input type="number" class="form-input" id="app-port" placeholder="8080" />
+                                <input type="number" class="form-input" id="app-port" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">运行模式</label>
@@ -840,17 +691,8 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">应用版本</label>
-                                <input type="text" class="form-input" id="app-version" placeholder="1.0.0" />
+                                <input type="text" class="form-input" id="app-version" />
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="app-debug" />
-                                    <span class="slider"></span>
-                                </label>
-                                <span style="margin-left: 10px;">调试模式</span>
-                            </label>
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-primary" onclick="saveAppSettings()">
@@ -876,16 +718,15 @@
                                     <option value="mysql">MySQL</option>
                                     <option value="postgres">PostgreSQL</option>
                                     <option value="sqlite">SQLite</option>
-                                    <option value="mssql">SQL Server</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">主机地址</label>
-                                <input type="text" class="form-input" id="db-host" placeholder="127.0.0.1" />
+                                <input type="text" class="form-input" id="db-host" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">端口</label>
-                                <input type="number" class="form-input" id="db-port" placeholder="3306" />
+                                <input type="number" class="form-input" id="db-port" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">数据库名</label>
@@ -913,35 +754,6 @@
                 </div>
             </div>
 
-            <!-- 多数据库管理页面 -->
-            <div id="page-multi-db-settings" class="page-content hidden">
-                <div class="page-header">
-                    <h1 class="page-title">多数据库管理</h1>
-                    <p class="page-desc">管理多个业务数据库连接</p>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <strong>使用说明：</strong>
-                                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                                    <li>多数据库功能用于支持不同业务使用独立的数据库（如：用户库、订单库、日志库等）</li>
-                                    <li>每个业务库可以独立配置读写分离和连接池</li>
-                                    <li>代码中使用 <code>db.Use("user_db")</code> 来切换到指定的数据库</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div id="databaseList"></div>
-                        <div class="btn-group">
-                            <button class="btn btn-success" onclick="showAddDatabaseForm()">
-                                <i class="fas fa-plus"></i> 添加数据库
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Redis 配置页面 -->
             <div id="page-redis-settings" class="page-content hidden">
                 <div class="page-header">
@@ -953,11 +765,11 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">主机地址</label>
-                                <input type="text" class="form-input" id="redis-host" placeholder="127.0.0.1" />
+                                <input type="text" class="form-input" id="redis-host" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">端口</label>
-                                <input type="number" class="form-input" id="redis-port" placeholder="6379" />
+                                <input type="number" class="form-input" id="redis-port" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">密码</label>
@@ -965,7 +777,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">数据库</label>
-                                <input type="number" class="form-input" id="redis-db" placeholder="0" min="0" max="15" />
+                                <input type="number" class="form-input" id="redis-db" value="0" />
                             </div>
                         </div>
                         <div class="btn-group">
@@ -985,32 +797,26 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <div class="form-group">
-                            <label class="toggle-wrapper">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="security-enabled" checked />
-                                    <span class="slider"></span>
-                                </label>
-                                <span>启用安全中间件（拦截 SQL 注入、XSS、命令注入等攻击）</span>
+                        <div class="toggle-wrapper">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="security-enabled" checked />
+                                <span class="slider"></span>
                             </label>
+                            <span>启用安全中间件（拦截 SQL 注入、XSS、命令注入等攻击）</span>
                         </div>
-                        <div class="form-group">
-                            <label class="toggle-wrapper">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="csrf-enabled" />
-                                    <span class="slider"></span>
-                                </label>
-                                <span>启用 CSRF 保护</span>
+                        <div class="toggle-wrapper">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="csrf-enabled" />
+                                <span class="slider"></span>
                             </label>
+                            <span>启用 CSRF 保护</span>
                         </div>
-                        <div class="form-group">
-                            <label class="toggle-wrapper">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="rate-limit-enabled" />
-                                    <span class="slider"></span>
-                                </label>
-                                <span>启用速率限制</span>
+                        <div class="toggle-wrapper">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="rate-limit-enabled" />
+                                <span class="slider"></span>
                             </label>
+                            <span>启用速率限制</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label">速率限制（每秒请求数）</label>
@@ -1037,12 +843,10 @@
                             <div class="form-group">
                                 <label class="form-label">内存限制百分比</label>
                                 <input type="number" class="form-input" id="bench-mem" value="85" />
-                                <small>超过该限制会停止压测</small>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">CPU 限制百分比</label>
                                 <input type="number" class="form-input" id="bench-cpu" value="85" />
-                                <small>压测工具本身会消耗大量 CPU，建议设置为 95 或更高</small>
                             </div>
                         </div>
                         <div class="btn-group">
@@ -1087,38 +891,21 @@
                     </div>
                 </div>
             </div>
-
-            <!-- WebSocket 页面 -->
-            <div id="page-websocket-tool" class="page-content hidden">
-                <div class="page-header">
-                    <h1 class="page-title">WebSocket 测试</h1>
-                    <p class="page-desc">WebSocket 连接测试工具</p>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <p>WebSocket 功能开发中...</p>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
     <script>
         // 页面切换
         function showPage(pageId, element) {
-            // 隐藏所有页面
             document.querySelectorAll('.page-content').forEach(page => {
                 page.classList.add('hidden');
             });
-            // 显示目标页面
             document.getElementById('page-' + pageId).classList.remove('hidden');
             
-            // 更新面包屑
             const pageNames = {
                 'dashboard': '控制台',
                 'app-settings': '应用配置',
                 'database-settings': '数据库配置',
-                'multi-db-settings': '多数据库管理',
                 'redis-settings': 'Redis 配置',
                 'security-settings': '安全配置',
                 'rabbitmq-settings': 'RabbitMQ',
@@ -1129,12 +916,10 @@
                 'oauth-settings': '第三方登录',
                 'benchmark-settings': '压测配置',
                 'migration-tool': '数据迁移',
-                'monitor-tool': '监控大屏',
-                'websocket-tool': 'WebSocket'
+                'monitor-tool': '监控大屏'
             };
             document.getElementById('current-page').textContent = pageNames[pageId] || pageId;
 
-            // 更新菜单激活状态
             if (element) {
                 document.querySelectorAll('.menu-group, .submenu a').forEach(link => {
                     link.classList.remove('active');
@@ -1143,28 +928,21 @@
             }
         }
 
-        function showPageByElement(element) {
-            const pageId = element.getAttribute('onclick').match(/showPage\('([^']+)'/)[1];
-            showPage(pageId, element);
-        }
-
         // 子菜单切换（手风琴效果）
         function toggleSubmenu(element) {
-            // 关闭其他打开的菜单
             document.querySelectorAll('.menu-group.active').forEach(group => {
                 if (group !== element) {
                     group.classList.remove('active');
-                    const submenu = group.nextElementSibling;
-                    if (submenu && submenu.classList.contains('submenu')) {
+                    const submenu = group.parentElement.querySelector('.submenu');
+                    if (submenu) {
                         submenu.classList.remove('show');
                     }
                 }
             });
 
-            // 切换当前菜单
             element.classList.toggle('active');
-            const submenu = element.nextElementSibling;
-            if (submenu && submenu.classList.contains('submenu')) {
+            const submenu = element.parentElement.querySelector('.submenu');
+            if (submenu) {
                 submenu.classList.toggle('show');
             }
         }
@@ -1175,8 +953,7 @@
                 name: document.getElementById('app-name').value,
                 port: parseInt(document.getElementById('app-port').value),
                 mode: document.getElementById('app-mode').value,
-                version: document.getElementById('app-version').value,
-                debug: document.getElementById('app-debug').checked
+                version: document.getElementById('app-version').value
             };
 
             fetch('/api/settings/app', {
@@ -1296,10 +1073,6 @@
             .catch(err => alert('请求失败：' + err.message));
         }
 
-        function showAddDatabaseForm() {
-            alert('添加数据库功能开发中...');
-        }
-
         // 加载系统信息
         function loadSystemInfo() {
             fetch('/api/settings/all')
@@ -1308,7 +1081,6 @@
                 if (result.code === 0 && result.data) {
                     const cfg = result.data;
                     
-                    // 填充系统信息
                     if (cfg.app) {
                         document.getElementById('sys-version').textContent = cfg.app.version || '-';
                         document.getElementById('sys-mode').textContent = cfg.app.mode || '-';
@@ -1318,7 +1090,6 @@
                         document.getElementById('app-port').value = cfg.app.port || 8080;
                         document.getElementById('app-mode').value = cfg.app.mode || 'prod';
                         document.getElementById('app-version').value = cfg.app.version || '';
-                        document.getElementById('app-debug').checked = cfg.app.debug || false;
                     }
                     
                     if (cfg.database) {
@@ -1339,17 +1110,12 @@
                         document.getElementById('redis-db').value = cfg.redis.db || 0;
                     }
                     
-                    if (cfg.rabbitmq) {
-                        document.getElementById('sys-mq').textContent = cfg.rabbitmq.enabled ? '已启用' : '未启用';
-                    }
-                    
-                    document.getElementById('go-version').textContent = navigator.userAgent.match(/Go\/([\d.]+)/)?.[1] || '-';
+                    document.getElementById('go-version').textContent = 'Go 1.21';
                 }
             })
             .catch(err => console.error('加载配置失败:', err));
         }
 
-        // 页面加载时初始化
         window.onload = function() {
             loadSystemInfo();
         };

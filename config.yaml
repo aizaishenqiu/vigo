@@ -8,20 +8,20 @@
 # ==============================================
 app:
   # 应用名称
-name: vago-1
+  name: vago-service-saas
   # 应用版本：version: 2.0.1
   # HTTP 服务监听端口
-port: 8080
+  port: 8080
   # 是否开启调试模式（生产环境建议关闭）
-debug: false
+  debug: false
   # 运行模式：dev | test | prod
-mode: prod
+  mode: prod
   # 是否显示控制台输出
-console: true
+  console: true
   # 启动时是否自动杀掉占用端口的进程
-auto_kill_port: true
+  auto_kill_port: true
   # 是否启用调试工具栏（仅开发环境有效）
-debug_toolbar: true
+  debug_toolbar: true
 
 # ==============================================
 # 安全防护配置
@@ -148,7 +148,7 @@ database:
   # 主库端口
   port: 3306
   # 数据库名称
-  name: "vago"
+  name: vago-service
   # 数据库用户名
   user: "root"
   # 数据库密码

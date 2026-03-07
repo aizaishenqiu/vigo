@@ -1151,29 +1151,29 @@
 
         // 页面加载时初始化
         window.addEventListener('DOMContentLoaded', function() {
-            // 预加载 CSRF Token
-            fetch('/api/settings/get', { credentials: 'include' })
-                .then(() => {
-                    console.log('CSRF Token 已初始化');
-                })
-                .catch(err => console.error('CSRF Token 初始化失败', err));
-            
-            // 加载配置
+            // 加载配置（GET 请求不需要 CSRF Token）
             loadConfig();
         });
 
         // 加载配置
         async function loadConfig() {
             try {
-                const response = await fetchWithCSRF('/api/settings/get');
+                const response = await fetch('/api/settings/get', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
                 const result = await response.json();
                 
                 if (result.code === 0) {
                     globalConfig = result.data.config;
                     fillConfigForms(globalConfig);
+                } else {
+                    console.error('加载配置失败:', result.msg);
+                    showAlert('加载配置失败：' + (result.msg || '未知错误'), 'error');
                 }
             } catch (error) {
                 console.error('加载配置失败', error);
+                showAlert('网络请求失败：' + error.message, 'error');
             }
         }
 

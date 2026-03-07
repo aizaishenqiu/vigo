@@ -29,6 +29,25 @@ func (c *MigrationController) Index(ctx *mvc.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /api/migration/status [get]
 func (c *MigrationController) Status(ctx *mvc.Context) {
+	// 检查数据库连接
+	if db.GlobalDB == nil {
+		ctx.Error(500, "数据库未连接，请检查数据库配置")
+		return
+	}
+
+	// 检查 migrations 目录是否存在
+	if _, err := os.Stat("database/migrations"); os.IsNotExist(err) {
+		// 目录不存在，返回空状态而不是错误
+		ctx.Success(map[string]interface{}{
+			"current_version": "0",
+			"total":           0,
+			"applied":         []map[string]interface{}{},
+			"pending":         []map[string]interface{}{},
+			"message":         "migrations 目录不存在，暂无迁移记录",
+		})
+		return
+	}
+
 	migrator := db.NewMigrator(db.GlobalDB, "migrations")
 
 	// 从目录加载迁移
