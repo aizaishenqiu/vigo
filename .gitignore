@@ -1,0 +1,86 @@
+# ==============================================
+# Vigo 项目 Git 忽略文件
+# ==============================================
+
+# 编译产物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+vigo
+vigo-linux-amd64
+vigo-darwin-amd64
+vigo-windows-amd64.exe
+
+# 测试文件
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# Go 工作区文件
+go.work
+go.work.sum
+
+# IDE 配置文件
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 依赖目录
+vendor/
+
+# 打包目录
+dist/
+
+# 运行时目录
+runtime/
+logs/
+*.log
+*.pid
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 环境配置文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 敏感配置文件（如果使用本地配置）
+config.local.yaml
+config.*.local.yaml
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# SSL 证书文件
+*.pem
+*.key
+*.crt
+*.p12
+
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 压缩文件
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# 文档文件
+admin-gui/
+website/
+docsmarkdown/

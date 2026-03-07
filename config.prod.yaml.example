@@ -1,0 +1,256 @@
+# Vigo 生产环境配置示例
+# 复制此文件为 config.yaml 或 config.local.yaml 使用
+# 注意：敏感配置建议使用环境变量覆盖
+
+app:
+  name: vigo
+  version: 1.0.1
+  port: 8080
+  debug: false
+  mode: prod
+  console: false
+  auto_kill_port: true
+
+# ==============================================
+# 数据库配置（主库 - 默认数据库）
+# ==============================================
+database:
+  driver: mysql
+  host: ${DB_HOST:127.0.0.1}
+  port: ${DB_PORT:3306}
+  name: ${DB_NAME:vigo}
+  user: ${DB_USER:root}
+  pass: ${DB_PASSWORD:your-password}
+  charset: utf8mb4
+  max_open_conns: 1000
+  max_idle_conns: 500
+  conn_max_lifetime: 1800
+  conn_max_idletime: 300
+  
+  # 读写分离开关
+  rw_split: true
+  
+  # 多主库配置（写入负载均衡）
+  # 可选：配置多个主库实现写入负载均衡
+  writes:
+    - host: 192.168.1.10
+      port: 3306
+      user: writer1
+      pass: write-pass-1
+      charset: utf8mb4
+    - host: 192.168.1.11
+      port: 3306
+      user: writer2
+      pass: write-pass-2
+      charset: utf8mb4
+  
+  # 只读从库配置（读取负载均衡）
+  reads:
+    - host: 192.168.1.20
+      port: 3306
+      user: reader1
+      pass: read-pass-1
+      charset: utf8mb4
+    - host: 192.168.1.21
+      port: 3306
+      user: reader2
+      pass: read-pass-2
+      charset: utf8mb4
+    - host: 192.168.1.22
+      port: 3306
+      user: reader3
+      pass: read-pass-3
+      charset: utf8mb4
+
+# ==============================================
+# 多数据库配置（不同业务独立数据库）
+# ==============================================
+databases:
+  # 用户中心数据库
+  user_center:
+    driver: mysql
+    host: 192.168.2.10
+    port: 3306
+    name: user_center
+    user: user_admin
+    pass: user-pass
+    charset: utf8mb4
+    max_open_conns: 500
+    max_idle_conns: 100
+    conn_max_lifetime: 1800
+    conn_max_idletime: 300
+    rw_split: true
+    reads:
+      - host: 192.168.2.20
+        port: 3306
+        user: user_reader
+        pass: user-read-pass
+        charset: utf8mb4
+  
+  # 订单数据库
+  order_db:
+    driver: mysql
+    host: 192.168.3.10
+    port: 3306
+    name: order_db
+    user: order_admin
+    pass: order-pass
+    charset: utf8mb4
+    max_open_conns: 800
+    max_idle_conns: 200
+    conn_max_lifetime: 1800
+    conn_max_idletime: 300
+    rw_split: true
+    writes:
+      - host: 192.168.3.11
+        port: 3306
+        user: order_writer
+        pass: order-write-pass
+        charset: utf8mb4
+    reads:
+      - host: 192.168.3.20
+        port: 3306
+        user: order_reader
+        pass: order-read-pass
+        charset: utf8mb4
+      - host: 192.168.3.21
+        port: 3306
+        user: order_reader
+        pass: order-read-pass
+        charset: utf8mb4
+  
+  # 日志数据库（使用 PostgreSQL）
+  log_db:
+    driver: postgres
+    host: 192.168.4.10
+    port: 5432
+    name: log_db
+    user: log_admin
+    pass: log-pass
+    charset: utf8
+    max_open_conns: 200
+    max_idle_conns: 50
+    conn_max_lifetime: 3600
+    conn_max_idletime: 600
+    rw_split: false
+    reads: []
+  
+  # 配置数据库（使用 SQLite）
+  config_db:
+    driver: sqlite3
+    name: ./data/config.db
+    max_open_conns: 10
+    max_idle_conns: 5
+    conn_max_lifetime: 3600
+    conn_max_idletime: 600
+    rw_split: false
+    reads: []
+
+# ==============================================
+# Nacos 配置中心
+# ==============================================
+nacos:
+  host: ${NACOS_HOST:127.0.0.1}
+  port: 8848
+  namespace: ""
+  data_id: vigo-config
+  group: DEFAULT_GROUP
+  admin:
+    enabled: false
+    username: ""
+    password: ""
+    port: 8848
+  discovery:
+    enabled: false
+    service_name: vigo
+    auto_register: false
+    heartbeat: 5
+
+# ==============================================
+# RabbitMQ 消息队列
+# ==============================================
+rabbitmq:
+  enabled: false
+  host: ${RABBITMQ_HOST:127.0.0.1}
+  port: 5672
+  user: ${RABBITMQ_USER:guest}
+  pass: ${RABBITMQ_PASSWORD:guest}
+  vhost: /
+  conn_timeout: 5
+  heartbeat: 10
+  reconnect_delay: 3
+  max_retries: 3
+  admin:
+    enabled: false
+    username: ""
+    password: ""
+    port: 15672
+
+# ==============================================
+# Redis 缓存配置
+# ==============================================
+redis:
+  host: ${REDIS_HOST:127.0.0.1}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  db: 0
+  pool_size: 2000
+  min_idle_conns: 200
+  max_idle_conns: 1000
+  
+  # Redis 集群配置
+  cluster:
+    enabled: false
+    addrs:
+      - 127.0.0.1:7000
+      - 127.0.0.1:7001
+      - 127.0.0.1:7002
+
+# ==============================================
+# gRPC 微服务配置
+# ==============================================
+grpc:
+  enabled: false
+  port: 9090
+  service_name: vigo
+  enable_recovery: true
+  enable_logger: true
+  max_recv_msg_size: 4
+  max_send_msg_size: 4
+
+# ==============================================
+# 安全配置
+# ==============================================
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-jwt-secret-key-at-least-32-characters}
+    expire: 7200
+    issuer: vigo
+  session:
+    lifetime: 120
+    secure: true
+    httponly: true
+    samesite: lax
+  password:
+    min_length: 8
+    require_uppercase: true
+    require_lowercase: true
+    require_number: true
+    require_special: true
+  cors:
+    allow_origins: ["https://your-domain.com"]
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
+    max_age: 86400
+  dos:
+    enable: true
+    limit: 1000
+    window: 60
+    black_ip: []
+
+# ==============================================
+# 压力测试配置
+# ==============================================
+benchmark:
+  mem_limit_percent: 90
+  cpu_limit_percent: 90
