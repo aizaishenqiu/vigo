@@ -47,6 +47,7 @@ type AppConfig struct {
 	OAuth     OAuthConfig         `yaml:"oauth"`     // 第三方登录配置
 	View      ViewConfig          `yaml:"view"`      // 视图配置
 	Admin     AdminConfig         `yaml:"admin"`     // 管理界面配置
+	Benchmark BenchmarkConfig     `yaml:"benchmark"` // 压力测试配置
 }
 
 // BaseConfig 应用基础配置

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +51,7 @@
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
         }
 
@@ -63,7 +64,7 @@
             font-size: 20px;
             font-weight: bold;
             color: #fff;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .logo i {
@@ -87,7 +88,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 14px 20px;
-            color: rgba(255,255,255,0.65);
+            color: rgba(255, 255, 255, 0.65);
             cursor: pointer;
             transition: all 0.3s;
             border-left: 3px solid transparent;
@@ -95,7 +96,7 @@
 
         .menu-group:hover {
             color: #fff;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .menu-group.active {
@@ -140,7 +141,7 @@
         .submenu li a {
             padding: 12px 20px 12px 52px;
             display: block;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-decoration: none;
             transition: all 0.3s;
             font-size: 14px;
@@ -148,12 +149,12 @@
 
         .submenu li a:hover {
             color: #fff;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .submenu li a.active {
             color: var(--primary);
-            background: rgba(64,158,255,0.1);
+            background: rgba(64, 158, 255, 0.1);
         }
 
         .badge {
@@ -176,7 +177,7 @@
         .header {
             height: var(--header-height);
             background: #fff;
-            box-shadow: 0 1px 4px rgba(0,21,41,0.08);
+            box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -255,7 +256,7 @@
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .page-title {
@@ -274,7 +275,7 @@
         .card {
             background: #fff;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
 
@@ -311,13 +312,13 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .stat-icon {
@@ -331,11 +332,25 @@
             color: #fff;
         }
 
-        .stat-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .stat-icon.success { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
-        .stat-icon.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .stat-icon.danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .stat-icon.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .stat-icon.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
 
         .stat-info {
             flex: 1;
@@ -366,7 +381,8 @@
             font-weight: 500;
         }
 
-        .form-input, .form-select {
+        .form-input,
+        .form-select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #dcdfe6;
@@ -376,10 +392,11 @@
             background: #fff;
         }
 
-        .form-input:focus, .form-select:focus {
+        .form-input:focus,
+        .form-select:focus {
             border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
+            box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
         }
 
         .form-grid {
@@ -408,7 +425,7 @@
         .btn-primary:hover {
             background: #66b1ff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(64,158,255,0.4);
+            box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
         }
 
         .btn-success {
@@ -476,11 +493,11 @@
             border-radius: 50%;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: var(--primary);
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(22px);
         }
 
@@ -492,6 +509,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- 侧边栏 -->
     <div class="sidebar">
@@ -508,7 +526,7 @@
                     </div>
                 </div>
             </li>
-            
+
             <li class="menu-item">
                 <div class="menu-group" onclick="toggleSubmenu(this)">
                     <div class="left">
@@ -563,29 +581,7 @@
                 </div>
             </li>
 
-            <li class="menu-item">
-                <div class="menu-group" onclick="showPage('benchmark-settings', this)">
-                    <div class="left">
-                        <i class="fas fa-tachometer-alt icon"></i>
-                        <span>压测配置</span>
-                    </div>
-                    <span class="badge">NEW</span>
-                </div>
-            </li>
 
-            <li class="menu-item">
-                <div class="menu-group" onclick="toggleSubmenu(this)">
-                    <div class="left">
-                        <i class="fas fa-tools icon"></i>
-                        <span>工具</span>
-                    </div>
-                    <i class="fas fa-chevron-right arrow"></i>
-                </div>
-                <ul class="submenu">
-                    <li><a href="javascript:void(0)" onclick="showPage('migration-tool', this)">数据迁移</a></li>
-                    <li><a href="javascript:void(0)" onclick="showPage('monitor-tool', this)">监控大屏</a></li>
-                </ul>
-            </li>
         </ul>
     </div>
 
@@ -612,21 +608,21 @@
 
         <!-- 内容区 -->
         <div class="content">
-            <!-- 控制台页面 -->
+            <!-- 工作台页面 -->
             <div id="page-dashboard" class="page-content">
                 <div class="page-header">
-                    <h1 class="page-title">控制台</h1>
-                    <p class="page-desc">欢迎使用 Vigo 管理后台</p>
+                    <h1 class="page-title">工作台</h1>
+                    <p class="page-desc">欢迎使用 Vigo - 现代化企业级 SaaS 开发框架</p>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon primary">
-                            <i class="fas fa-database"></i>
+                            <i class="fas fa-bolt"></i>
                         </div>
                         <div class="stat-info">
-                            <div class="stat-value">1</div>
-                            <div class="stat-label">数据库连接</div>
+                            <div class="stat-value">高性能</div>
+                            <div class="stat-label">Go 编译型 + 协程并发</div>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -634,32 +630,93 @@
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="stat-info">
-                            <div class="stat-value">正常</div>
-                            <div class="stat-label">系统状态</div>
+                            <div class="stat-value">功能完整</div>
+                            <div class="stat-label">ORM/队列/缓存/监控</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">企业级</div>
+                            <div class="stat-label">SaaS/微服务/安全</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon info">
-                            <i class="fas fa-microchip"></i>
+                            <i class="fas fa-rocket"></i>
                         </div>
                         <div class="stat-info">
-                            <div class="stat-value" id="go-version">-</div>
-                            <div class="stat-label">Go 版本</div>
+                            <div class="stat-value">v2.0.12</div>
+                            <div class="stat-label">稳定版本</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">系统信息</h3>
+                        <h3 class="card-title">框架特性</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-grid">
-                            <div><strong>框架版本:</strong> <span id="sys-version">-</span></div>
-                            <div><strong>运行模式:</strong> <span id="sys-mode">-</span></div>
-                            <div><strong>服务端口:</strong> <span id="sys-port">-</span></div>
-                            <div><strong>数据库:</strong> <span id="sys-db">-</span></div>
-                            <div><strong>Redis:</strong> <span id="sys-redis">-</span></div>
+                            <div>
+                                <strong><i class="fas fa-database"></i> ORM 数据库操作</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">完整查询构造器、链式操作、模型关联、JSON
+                                    查询</p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-cog"></i> CLI 代码生成</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">一键生成
+                                    Controller/Model/Service/Middleware</p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-cloud"></i> 微服务支持</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">gRPC + Nacos + RabbitMQ
+                                    + 服务发现</p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-shield-alt"></i> 安全防护</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">CSRF/XSS 防护、JWT 认证、限流熔断
+                                </p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-chart-line"></i> 监控运维</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">系统指标、请求监控、多渠道告警</p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-rocket"></i> 高性能</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">QPS 10万+、内存 15-25MB、启动
+                                    <10ms< /p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">快速开始</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div>
+                                <strong>1. 安装依赖</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">go mod tidy</p>
+                            </div>
+                            <div>
+                                <strong>2. 配置环境</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">cp config.yaml
+                                    config.local.yaml</p>
+                            </div>
+                            <div>
+                                <strong>3. 启动服务</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">go run main.go</p>
+                            </div>
+                            <div>
+                                <strong>4. 访问管理后台</strong>
+                                <p style="color: var(--info); font-size: 13px; margin-top: 5px;">
+                                    http://localhost:8080/admin</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -830,67 +887,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 压测配置页面 -->
-            <div id="page-benchmark-settings" class="page-content hidden">
-                <div class="page-header">
-                    <h1 class="page-title">压测配置</h1>
-                    <p class="page-desc">配置性能测试参数</p>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">内存限制百分比</label>
-                                <input type="number" class="form-input" id="bench-mem" value="85" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">CPU 限制百分比</label>
-                                <input type="number" class="form-input" id="bench-cpu" value="85" />
-                            </div>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="saveBenchmarkSettings()">
-                                <i class="fas fa-save"></i> 保存配置
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 数据迁移工具页面 -->
-            <div id="page-migration-tool" class="page-content hidden">
-                <div class="page-header">
-                    <h1 class="page-title">数据迁移</h1>
-                    <p class="page-desc">管理数据库迁移文件</p>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="window.open('/migration', '_blank')">
-                                <i class="fas fa-external-link-alt"></i> 打开迁移管理页面
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 监控大屏页面 -->
-            <div id="page-monitor-tool" class="page-content hidden">
-                <div class="page-header">
-                    <h1 class="page-title">监控大屏</h1>
-                    <p class="page-desc">实时系统监控</p>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="window.open('/monitor', '_blank')">
-                                <i class="fas fa-external-link-alt"></i> 打开监控大屏
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -901,9 +897,9 @@
                 page.classList.add('hidden');
             });
             document.getElementById('page-' + pageId).classList.remove('hidden');
-            
+
             const pageNames = {
-                'dashboard': '控制台',
+                'dashboard': '工作台',
                 'app-settings': '应用配置',
                 'database-settings': '数据库配置',
                 'redis-settings': 'Redis 配置',
@@ -913,10 +909,7 @@
                 'grpc-settings': 'gRPC',
                 'alipay-settings': '支付宝',
                 'wechat-settings': '微信支付',
-                'oauth-settings': '第三方登录',
-                'benchmark-settings': '压测配置',
-                'migration-tool': '数据迁移',
-                'monitor-tool': '监控大屏'
+                'oauth-settings': '第三方登录'
             };
             document.getElementById('current-page').textContent = pageNames[pageId] || pageId;
 
@@ -961,15 +954,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ config })
             })
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0) {
-                    alert('保存成功');
-                } else {
-                    alert('保存失败：' + result.msg);
-                }
-            })
-            .catch(err => alert('请求失败：' + err.message));
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code === 0) {
+                        alert('保存成功');
+                    } else {
+                        alert('保存失败：' + result.msg);
+                    }
+                })
+                .catch(err => alert('请求失败：' + err.message));
         }
 
         // 保存数据库配置
@@ -989,15 +982,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ config })
             })
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0) {
-                    alert('保存成功');
-                } else {
-                    alert('保存失败：' + result.msg);
-                }
-            })
-            .catch(err => alert('请求失败：' + err.message));
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code === 0) {
+                        alert('保存成功');
+                    } else {
+                        alert('保存失败：' + result.msg);
+                    }
+                })
+                .catch(err => alert('请求失败：' + err.message));
         }
 
         // 保存 Redis 配置
@@ -1014,15 +1007,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ config })
             })
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0) {
-                    alert('保存成功');
-                } else {
-                    alert('保存失败：' + result.msg);
-                }
-            })
-            .catch(err => alert('请求失败：' + err.message));
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code === 0) {
+                        alert('保存成功');
+                    } else {
+                        alert('保存失败：' + result.msg);
+                    }
+                })
+                .catch(err => alert('请求失败：' + err.message));
         }
 
         // 保存安全配置
@@ -1039,86 +1032,65 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ config })
             })
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0) {
-                    alert('保存成功');
-                } else {
-                    alert('保存失败：' + result.msg);
-                }
-            })
-            .catch(err => alert('请求失败：' + err.message));
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code === 0) {
+                        alert('保存成功');
+                    } else {
+                        alert('保存失败：' + result.msg);
+                    }
+                })
+                .catch(err => alert('请求失败：' + err.message));
         }
 
-        // 保存压测配置
-        function saveBenchmarkSettings() {
-            const config = {
-                mem_limit_percent: parseInt(document.getElementById('bench-mem').value),
-                cpu_limit_percent: parseInt(document.getElementById('bench-cpu').value)
-            };
-
-            fetch('/api/settings/benchmark', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ config })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0) {
-                    alert('保存成功');
-                } else {
-                    alert('保存失败：' + result.msg);
-                }
-            })
-            .catch(err => alert('请求失败：' + err.message));
-        }
 
         // 加载系统信息
         function loadSystemInfo() {
             fetch('/api/settings/all')
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 0 && result.data) {
-                    const cfg = result.data;
-                    
-                    if (cfg.app) {
-                        document.getElementById('sys-version').textContent = cfg.app.version || '-';
-                        document.getElementById('sys-mode').textContent = cfg.app.mode || '-';
-                        document.getElementById('sys-port').textContent = cfg.app.port || '-';
-                        
-                        document.getElementById('app-name').value = cfg.app.name || '';
-                        document.getElementById('app-port').value = cfg.app.port || 8080;
-                        document.getElementById('app-mode').value = cfg.app.mode || 'prod';
-                        document.getElementById('app-version').value = cfg.app.version || '';
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code === 0 && result.data) {
+                        const cfg = result.data;
+
+                        if (cfg.app) {
+                            document.getElementById('sys-version').textContent = cfg.app.version || '-';
+                            document.getElementById('sys-mode').textContent = cfg.app.mode || '-';
+                            document.getElementById('sys-port').textContent = cfg.app.port || '-';
+
+                            document.getElementById('app-name').value = cfg.app.name || '';
+                            document.getElementById('app-port').value = cfg.app.port || 8080;
+                            document.getElementById('app-mode').value = cfg.app.mode || 'prod';
+                            document.getElementById('app-version').value = cfg.app.version || '';
+                        }
+
+                        if (cfg.database) {
+                            document.getElementById('sys-db').textContent = cfg.database.driver + ' @ ' + cfg.database.host;
+                            document.getElementById('db-driver').value = cfg.database.driver || 'mysql';
+                            document.getElementById('db-host').value = cfg.database.host || '127.0.0.1';
+                            document.getElementById('db-port').value = cfg.database.port || 3306;
+                            document.getElementById('db-name').value = cfg.database.name || '';
+                            document.getElementById('db-user').value = cfg.database.user || '';
+                            document.getElementById('db-password').value = cfg.database.pass || '';
+                            document.getElementById('db-charset').value = cfg.database.charset || 'utf8mb4';
+                        }
+
+                        if (cfg.redis) {
+                            document.getElementById('sys-redis').textContent = cfg.redis.host + ':' + cfg.redis.port;
+                            document.getElementById('redis-host').value = cfg.redis.host || '127.0.0.1';
+                            document.getElementById('redis-port').value = cfg.redis.port || 6379;
+                            document.getElementById('redis-db').value = cfg.redis.db || 0;
+                        }
+
+                        document.getElementById('go-version').textContent = 'Go 1.21';
                     }
-                    
-                    if (cfg.database) {
-                        document.getElementById('sys-db').textContent = cfg.database.driver + ' @ ' + cfg.database.host;
-                        document.getElementById('db-driver').value = cfg.database.driver || 'mysql';
-                        document.getElementById('db-host').value = cfg.database.host || '127.0.0.1';
-                        document.getElementById('db-port').value = cfg.database.port || 3306;
-                        document.getElementById('db-name').value = cfg.database.name || '';
-                        document.getElementById('db-user').value = cfg.database.user || '';
-                        document.getElementById('db-password').value = cfg.database.pass || '';
-                        document.getElementById('db-charset').value = cfg.database.charset || 'utf8mb4';
-                    }
-                    
-                    if (cfg.redis) {
-                        document.getElementById('sys-redis').textContent = cfg.redis.host + ':' + cfg.redis.port;
-                        document.getElementById('redis-host').value = cfg.redis.host || '127.0.0.1';
-                        document.getElementById('redis-port').value = cfg.redis.port || 6379;
-                        document.getElementById('redis-db').value = cfg.redis.db || 0;
-                    }
-                    
-                    document.getElementById('go-version').textContent = 'Go 1.21';
-                }
-            })
-            .catch(err => console.error('加载配置失败:', err));
+                })
+                .catch(err => console.error('加载配置失败:', err));
         }
 
-        window.onload = function() {
+        window.onload = function () {
             loadSystemInfo();
         };
     </script>
 </body>
+
 </html>

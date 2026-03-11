@@ -134,8 +134,6 @@ func RegisterRoutes(r *mvc.Router) {
 	r.GET(basePath+"/settings", settingsHandler)
 	r.GET(basePath+"/nacos", nacosIndex)
 	r.GET(basePath+"/rabbitmq", rabbitmqIndex)
-	r.GET(basePath+"/stress", stressIndex)
-	r.GET(basePath+"/migration", migrationIndex) // Placeholder
 
 	// API 路由 - 配置管理
 	r.GET(basePath+"/api/settings/get", getSettings)
@@ -151,8 +149,6 @@ func RegisterRoutes(r *mvc.Router) {
 	r.POST(basePath+"/api/settings/security", saveSecuritySettings)
 	r.POST(basePath+"/api/settings/payment", savePaymentSettings)
 	r.POST(basePath+"/api/settings/oauth", saveOAuthSettings)
-	r.POST(basePath+"/api/settings/benchmark", saveBenchmarkSettings)
-	r.GET(basePath+"/api/settings/benchmark", saveBenchmarkSettings)
 
 	// API 路由 - 系统监控
 	r.GET(basePath+"/api/monitor/stats", monitorStats)
@@ -174,14 +170,6 @@ func RegisterRoutes(r *mvc.Router) {
 	r.POST(basePath+"/api/rabbitmq/exchange", rabbitmqExchangeCreate)
 	r.DELETE(basePath+"/api/rabbitmq/exchange", rabbitmqExchangeDelete)
 	r.GET(basePath+"/api/rabbitmq/status", rabbitmqStatusStub)
-
-	// API 路由 - 压测
-	r.POST(basePath+"/api/stress/start", stressTestStartStub)
-	r.POST(basePath+"/api/stress/start-http", stressTestStartHttpStub)
-	r.POST(basePath+"/api/stress/stop", stressTestStopStub)
-	r.POST(basePath+"/api/stress/reset", stressTestResetStub)
-	r.GET(basePath+"/api/stress/stats", stressTestStatsStub)
-	r.GET(basePath+"/api/stress/services", stressTestServicesStub)
 
 	fmt.Printf("Admin panel registered at %s\n", basePath)
 }
@@ -216,14 +204,6 @@ func rabbitmqIndex(c *mvc.Context) {
 	renderView(c, "views/rabbitmq.html", map[string]interface{}{"title": "RabbitMQ 管理"})
 }
 
-func stressIndex(c *mvc.Context) {
-	renderView(c, "views/stress.html", map[string]interface{}{"title": "压测中心"})
-}
-
-func migrationIndex(c *mvc.Context) {
-	c.String(200, "Migration tool coming soon")
-}
-
 // 辅助函数
 func renderView(c *mvc.Context, viewPath string, data map[string]interface{}) {
 	tmpl, err := template.ParseFS(adminViews, viewPath)
@@ -241,30 +221,5 @@ func rabbitmqStatusStub(c *mvc.Context) {
 	c.Json(200, map[string]interface{}{
 		"code": 0, "msg": "success",
 		"data": map[string]interface{}{"connected": true, "version": "3.12.0", "erlang_version": "26.0"},
-	})
-}
-
-func stressTestStartStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{"code": 0, "msg": "started (stub)"})
-}
-func stressTestStartHttpStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{"code": 0, "msg": "started (stub)"})
-}
-func stressTestStopStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{"code": 0, "msg": "stopped (stub)"})
-}
-func stressTestResetStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{"code": 0, "msg": "reset (stub)"})
-}
-func stressTestStatsStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{
-		"code": 0, "msg": "success",
-		"data": map[string]interface{}{"qps": 0, "latency": 0, "cpu": 10, "memUsed": 1024 * 1024 * 100, "memTotal": 1024 * 1024 * 1024 * 8},
-	})
-}
-func stressTestServicesStub(c *mvc.Context) {
-	c.Json(200, map[string]interface{}{
-		"code": 0, "msg": "success",
-		"data": map[string]interface{}{"mysql": true, "redis": true, "mq": true},
 	})
 }
