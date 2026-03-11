@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Vigo 管理界面-用户登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+        body {
+            background-color: #2d3a4b;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            width: 350px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            margin: 0;
+            font-weight: 300;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: #fff;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #409eff;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #409eff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #66b1ff;
+        }
+
+        .error-msg {
+            color: #f56c6c;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>管理界面-用户登录</h2>
+        </div>
+        <div class="error-msg" id="errorMsg"></div>
+        <form id="loginForm" onsubmit="return false;">
+            <div class="form-group">
+                <input type="text" name="username" class="form-control" placeholder="请输入用户名" required
+                    autocomplete="off">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" class="form-control" placeholder="请输入密码" required
+                    autocomplete="off">
+            </div>
+            <button type="button" class="btn-login" onclick="doLogin()">登录</button>
+        </form>
+    </div>
+
+    <script>
+        function doLogin() {
+            const form = document.getElementById('loginForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Get CSRF token from cookie
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            }
+
+            fetch('/admin/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCookie('csrf_token')
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.code === 0) {
+                        window.location.href = '/admin';
+                    } else {
+                        const errorEl = document.getElementById('errorMsg');
+                        errorEl.textContent = res.msg || 'Login failed';
+                        errorEl.style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    const errorEl = document.getElementById('errorMsg');
+                    errorEl.textContent = 'Network error';
+                    errorEl.style.display = 'block';
+                });
+        }
+
+        // Support Enter key
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                doLogin();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+# Vigo 开发环境配置示例
+# 复制此文件为 config.local.yaml 用于本地开发
+# 注意：config.local.yaml 不会被 git 跟踪（已在 .gitignore 中）
+
+app:
+  name: vigo
+  version: 2.0.12
+  port: 8080
+  debug: true
+  mode: dev
+  console: true
+  auto_kill_port: true
+
+# ==============================================
+# 数据库配置（主库 - 默认数据库）
+# ==============================================
+database:
+  driver: mysql
+  host: ${DB_HOST:127.0.0.1}
+  port: ${DB_PORT:3306}
+  name: ${DB_NAME:vigo_dev}
+  user: ${DB_USER:root}
+  pass: ${DB_PASSWORD:your-dev-password}
+  charset: utf8mb4
+  max_open_conns: 50
+  max_idle_conns: 25
+  conn_max_lifetime: 3600
+  conn_max_idletime: 600
+  
+  # 读写分离开关（开发环境通常关闭）
+  rw_split: false
+  
+  # 多主库配置（开发环境通常不需要）
+  writes: []
+  
+  # 只读从库配置（开发环境通常不需要）
+  reads: []
+
+# ==============================================
+# 多数据库配置（不同业务独立数据库）
+# 开发环境示例：连接不同的测试数据库
+# ==============================================
+databases:
+  # 用户中心数据库示例
+  # user_center:
+  #   driver: mysql
+  #   host: 127.0.0.1
+  #   port: 3306
+  #   name: user_center_dev
+  #   user: root
+  #   pass: your-password
+  #   charset: utf8mb4
+  #   max_open_conns: 20
+  #   max_idle_conns: 10
+  #   conn_max_lifetime: 3600
+  #   conn_max_idletime: 600
+  #   rw_split: false
+  #   reads: []
+  
+  # 日志数据库示例（PostgreSQL）
+  # log_db:
+  #   driver: postgres
+  #   host: 127.0.0.1
+  #   port: 5432
+  #   name: log_dev
+  #   user: postgres
+  #   pass: postgres
+  #   charset: utf8
+  #   max_open_conns: 20
+  #   max_idle_conns: 10
+  #   conn_max_lifetime: 3600
+  #   conn_max_idletime: 600
+  #   rw_split: false
+  #   reads: []
+  
+  # 本地配置数据库示例（SQLite）
+  # config_db:
+  #   driver: sqlite3
+  #   name: ./data/config.db
+  #   max_open_conns: 5
+  #   max_idle_conns: 2
+  #   conn_max_lifetime: 3600
+  #   conn_max_idletime: 600
+  #   rw_split: false
+  #   reads: []
+
+# ==============================================
+# Nacos 配置中心
+# ==============================================
+nacos:
+  host: 127.0.0.1
+  port: 8848
+  namespace: ""
+  data_id: vigo-config
+  group: DEFAULT_GROUP
+  admin:
+    enabled: false
+    username: ""
+    password: ""
+    port: 8848
+  discovery:
+    enabled: false
+    service_name: vigo
+    auto_register: false
+    heartbeat: 5
+
+# ==============================================
+# RabbitMQ 消息队列
+# ==============================================
+rabbitmq:
+  enabled: false
+  host: 127.0.0.1
+  port: 5672
+  user: guest
+  pass: guest
+  vhost: /
+  conn_timeout: 5
+  heartbeat: 10
+  reconnect_delay: 3
+  max_retries: 3
+  admin:
+    enabled: false
+    username: ""
+    password: ""
+    port: 15672
+
+# ==============================================
+# Redis 缓存配置
+# ==============================================
+redis:
+  host: ${REDIS_HOST:127.0.0.1}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  db: 0
+  pool_size: 50
+  min_idle_conns: 10
+  max_idle_conns: 25
+  
+  # Redis 集群配置（开发环境通常不需要）
+  cluster:
+    enabled: false
+    addrs: []
+
+# ==============================================
+# gRPC 微服务配置
+# ==============================================
+grpc:
+  enabled: false
+  port: 9090
+  service_name: vigo
+  enable_recovery: true
+  enable_logger: true
+  max_recv_msg_size: 4
+  max_send_msg_size: 4
+
+# ==============================================
+# 安全配置
+# ==============================================
+security:
+  jwt:
+    secret: dev-jwt-secret-key-for-development-only-32chars
+    expire: 86400
+    issuer: vigo
+  session:
+    lifetime: 120
+    secure: false
+    httponly: true
+    samesite: lax
+  password:
+    min_length: 6
+    require_uppercase: false
+    require_lowercase: true
+    require_number: true
+    require_special: false
+  cors:
+    allow_origins: ["*"]
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: ["Content-Type", "Authorization", "X-Requested-With"]
+    max_age: 86400
+  dos:
+    enable: false
+    limit: 500
+    window: 60
+    black_ip: []
+
+# ==============================================
+# 压力测试配置
+# ==============================================
+benchmark:
+  mem_limit_percent: 90
+  cpu_limit_percent: 90

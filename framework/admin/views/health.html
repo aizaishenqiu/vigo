@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{.title}} - Vigo 管理中心</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all">
+  <style>
+    .layui-body { padding: 15px; background-color: #f2f2f2; }
+    .panel { background: #fff; padding: 20px; border-radius: 4px; margin-bottom: 15px; }
+    .panel-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; }
+    .status-card { padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+    .status-card.up { background: #f0f9ff; border-left: 4px solid #1890ff; }
+    .status-card.down { background: #fff1f0; border-left: 4px solid #f5222d; }
+    .menu-item { padding: 12px 20px; border-left: 3px solid transparent; cursor: pointer; transition: all 0.3s; color: #fff; }
+    .menu-item:hover { background: #f6f6f6; border-left-color: #667eea; color: #333; }
+    .menu-item.active { background: #e6f7ff; border-left-color: #1890ff; color: #333; }
+    .menu-item i { margin-right: 8px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <div class="layui-logo" style="font-size: 20px; font-weight: bold; color: #fff;">
+        <i class="layui-icon layui-icon-engine"></i> Vigo 管理中心
+      </div>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+          <a href="javascript:;">
+            <i class="layui-icon layui-icon-username"></i> 管理员
+          </a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="showPage('dashboard')"><i class="layui-icon layui-icon-home"></i> 返回首页</a></dd>
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-set"></i> 修改密码</a></dd>
+            <dd><a href="javascript:;"><i class="layui-icon layui-icon-logout"></i> 退出登录</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+      <div class="layui-side-scroll">
+        <div class="menu-item" onclick="showPage('dashboard')">
+          <i class="layui-icon layui-icon-home"></i> 仪表盘
+        </div>
+        <div class="menu-item" onclick="showPage('nacos')">
+          <i class="layui-icon layui-icon-set"></i> Nacos 配置
+        </div>
+        <div class="menu-item" onclick="showPage('rabbitmq')">
+          <i class="layui-icon layui-icon-template"></i> RabbitMQ 监控
+        </div>
+        <div class="menu-item" onclick="showPage('stress')">
+          <i class="layui-icon layui-icon-chart"></i> 压力测试
+        </div>
+        <div class="menu-item active" onclick="showPage('health')">
+          <i class="layui-icon layui-icon-ok-circle"></i> 健康检查
+        </div>
+        <div class="menu-item" onclick="showPage('monitor')">
+          <i class="layui-icon layui-icon-chart-screen"></i> 系统监控
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-body">
+      <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6">
+          <div class="panel">
+            <div class="panel-title">
+              <i class="layui-icon layui-icon-ok-circle"></i> 数据库
+            </div>
+            {{if eq (index .status "database").status "up"}}
+              <p><span class="layui-badge layui-bg-green">正常</span></p>
+            {{else}}
+              <p><span class="layui-badge layui-bg-red">异常</span></p>
+            {{end}}
+            <p>连接延迟：{{(index .status "database").latency}}</p>
+            <p>连接池：{{(index .status "database").pool}}</p>
+          </div>
+        </div>
+        
+        <div class="layui-col-md6">
+          <div class="panel">
+            <div class="panel-title">
+              <i class="layui-icon layui-icon-ok-circle"></i> Redis
+            </div>
+            {{if eq (index .status "redis").status "up"}}
+              <p><span class="layui-badge layui-bg-green">正常</span></p>
+            {{else}}
+              <p><span class="layui-badge layui-bg-red">异常</span></p>
+            {{end}}
+            <p>连接延迟：{{(index .status "redis").latency}}</p>
+            <p>内存使用：{{(index .status "redis").memory}}</p>
+          </div>
+        </div>
+        
+        <div class="layui-col-md6">
+          <div class="panel">
+            <div class="panel-title">
+              <i class="layui-icon layui-icon-ok-circle"></i> 缓存系统
+            </div>
+            {{if eq (index .status "cache").status "up"}}
+              <p><span class="layui-badge layui-bg-green">正常</span></p>
+            {{else}}
+              <p><span class="layui-badge layui-bg-red">异常</span></p>
+            {{end}}
+            <p>命中率：{{(index .status "cache").hit_rate}}</p>
+            <p>缓存条目：{{(index .status "cache").items}}</p>
+          </div>
+        </div>
+        
+        <div class="layui-col-md6">
+          <div class="panel">
+            <div class="panel-title">
+              <i class="layui-icon layui-icon-ok-circle"></i> 消息队列
+            </div>
+            {{if eq (index .status "queue").status "up"}}
+              <p><span class="layui-badge layui-bg-green">正常</span></p>
+            {{else}}
+              <p><span class="layui-badge layui-bg-red">异常</span></p>
+            {{end}}
+            <p>队列数：{{(index .status "queue").queues}}</p>
+            <p>积压消息：{{(index .status "queue").messages}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-footer">
+      © 2026 Vigo Framework
+    </div>
+  </div>
+
+  <script src="/admin/static/layui/layui.js"></script>
+  <script>
+    function showPage(page) {
+      var basePath = '{{.base_path}}';
+      window.location.href = basePath + '/' + page;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>{{.title}}</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all">
+  <style>
+    body {
+      background-color: #f0f2f5;
+      padding: 15px;
+    }
+
+    .layui-card {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      border-radius: 2px;
+    }
+
+    .layui-card-header {
+      font-weight: bold;
+    }
+
+    /* 欢迎 Banner */
+    .welcome-banner {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin-right: 20px;
+    }
+
+    .welcome-text h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .welcome-text p {
+      color: #999;
+    }
+
+    .stats {
+      display: flex;
+      gap: 40px;
+      text-align: right;
+    }
+
+    .stat-item h3 {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .stat-item p {
+      font-size: 24px;
+      color: #333;
+    }
+
+    /* 状态检测卡片 */
+    .status-card {
+      background-color: #fff;
+      border-radius: 2px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+    }
+
+    .status-info h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .status-info p {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .status-icon {
+      font-size: 24px;
+    }
+
+    .status-ok {
+      color: #52c41a;
+    }
+
+    .status-err {
+      color: #ff4d4f;
+    }
+
+    /* 快捷导航 */
+    .shortcut-grid {
+      text-align: center;
+      padding: 15px 0;
+      color: #666;
+    }
+
+    .shortcut-grid i {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .shortcut-grid:hover {
+      background-color: #f6f6f6;
+      cursor: pointer;
+    }
+
+    /* 项目列表 */
+    .project-list .layui-col-md4 {
+      padding: 10px;
+      border: 1px solid #f0f0f0;
+      transition: all .3s;
+    }
+
+    .project-list .layui-col-md4:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+
+    .project-title {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .project-title i {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    .project-desc {
+      color: #999;
+      height: 44px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .project-footer {
+      display: flex;
+      justify-content: space-between;
+      color: #ccc;
+      font-size: 12px;
+    }
+
+    /* 动态列表 */
+    .dynamic-list .layui-timeline-item {
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 顶部欢迎区 -->
+  <div class="welcome-banner layui-card">
+    <div class="user-info">
+      <img src="https://unpkg.com/outeres/demo/avatar/1.jpg" class="avatar" alt="Avatar">
+      <div class="welcome-text">
+        <h2>早安, 管理员, 开始您一天的工作吧！</h2>
+        <p>今日晴，20℃ - 32℃！</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-item">
+        <h3>待办</h3>
+        <p>2/10</p>
+      </div>
+      <div class="stat-item">
+        <h3>项目</h3>
+        <p>8</p>
+      </div>
+      <div class="stat-item">
+        <h3>团队</h3>
+        <p>300</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工具状态检测 -->
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md3">
+      <div class="status-card">
+        <div class="status-info">
+          <h3>MySQL</h3>
+          <p id="mysql-status">检测中...</p>
+        </div>
+        <i class="layui-icon layui-icon-list status-icon" id="mysql-icon"></i>
+      </div>
+    </div>
+    <div class="layui-col-md3">
+      <div class="status-card">
+        <div class="status-info">
+          <h3>Redis</h3>
+          <p id="redis-status">检测中...</p>
+        </div>
+        <i class="layui-icon layui-icon-util status-icon" id="redis-icon"></i>
+      </div>
+    </div>
+    <div class="layui-col-md3">
+      <div class="status-card">
+        <div class="status-info">
+          <h3>Nacos</h3>
+          <p id="nacos-status">检测中...</p>
+        </div>
+        <i class="layui-icon layui-icon-cloud status-icon" id="nacos-icon"></i>
+      </div>
+    </div>
+    <div class="layui-col-md3">
+      <div class="status-card">
+        <div class="status-info">
+          <h3>RabbitMQ</h3>
+          <p id="rabbitmq-status">检测中...</p>
+        </div>
+        <i class="layui-icon layui-icon-dialogue status-icon" id="rabbitmq-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="layui-row layui-col-space15">
+    <!-- 左侧主内容 -->
+    <div class="layui-col-md8">
+      <!-- 框架介绍 -->
+      <div class="layui-card">
+        <div class="layui-card-header">Vigo Framework</div>
+        <div class="layui-card-body">
+          <p style="color: #666; line-height: 1.8;">
+            Vigo 是一个高性能、模块化的 Go 语言 Web 开发框架。它集成了现代微服务架构所需的各种组件，旨在提供极致的开发体验和运行效率。
+            框架内置了强大的路由引擎、中间件机制、ORM、缓存、消息队列支持以及全链路监控能力。
+          </p>
+          <div style="margin-top: 15px;">
+            <span class="layui-badge layui-bg-blue">Golang</span>
+            <span class="layui-badge layui-bg-green">Microservice</span>
+            <span class="layui-badge layui-bg-orange">High Performance</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 项目卡片 -->
+      <div class="layui-card">
+        <div class="layui-card-header">
+          项目
+          <a href="javascript:;" style="float: right; color: #1890ff;">全部项目</a>
+        </div>
+        <div class="layui-card-body project-list layui-row">
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-github" style="color: #333;"></i> Github</div>
+            <div class="project-desc">不要等待机会，而要创造机会。</div>
+            <div class="project-footer"><span>开源组</span> <span>2025-07-01</span></div>
+          </div>
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-website" style="color: #42b983;"></i> Vue</div>
+            <div class="project-desc">现在的你决定将来的你。</div>
+            <div class="project-footer"><span>算法组</span> <span>2025-07-01</span></div>
+          </div>
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-html5" style="color: #e44d26;"></i> HTML5</div>
+            <div class="project-desc">没有什么时候比现在更重要。</div>
+            <div class="project-footer"><span>上班摸鱼</span> <span>2025-07-01</span></div>
+          </div>
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-component" style="color: #dd0031;"></i> Angular
+            </div>
+            <div class="project-desc">希望是一个好东西，也许是最好的。</div>
+            <div class="project-footer"><span>UI组</span> <span>2025-07-01</span></div>
+          </div>
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-engine" style="color: #61dafb;"></i> React</div>
+            <div class="project-desc">健康的身体是实干的本钱。</div>
+            <div class="project-footer"><span>技术牛</span> <span>2025-07-01</span></div>
+          </div>
+          <div class="layui-col-md4">
+            <div class="project-title"><i class="layui-icon layui-icon-code-circle" style="color: #f7df1e;"></i> JS
+            </div>
+            <div class="project-desc">路是走出来的，而不是想出来的。</div>
+            <div class="project-footer"><span>架构组</span> <span>2025-07-01</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最新动态 -->
+      <div class="layui-card">
+        <div class="layui-card-header">最新动态</div>
+        <div class="layui-card-body">
+          <ul class="layui-timeline dynamic-list">
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+              <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">刚刚</h3>
+                <p>威廉 在 <a href="#">开源组</a> 新建了项目 <a href="#">Vigo Admin</a></p>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+              <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">1 小时前</h3>
+                <p>艾文 关注了 <a href="#">威廉</a></p>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+              <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">2 天前</h3>
+                <p>克里斯 发布了 <a href="#">个人动态</a></p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧侧边栏 -->
+    <div class="layui-col-md4">
+      <!-- 快捷导航 -->
+      <div class="layui-card">
+        <div class="layui-card-header">快捷导航</div>
+        <div class="layui-card-body layui-row">
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-console" style="color: #55acee;"></i>
+            <span>控制台</span>
+          </div>
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-chart" style="color: #dd4b39;"></i>
+            <span>仪表盘</span>
+          </div>
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-template-1" style="color: #f4c20d;"></i>
+            <span>组件</span>
+          </div>
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-set" style="color: #3b5998;"></i>
+            <span>系统管理</span>
+          </div>
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-user" style="color: #00a65a;"></i>
+            <span>权限管理</span>
+          </div>
+          <div class="layui-col-xs4 shortcut-grid">
+            <i class="layui-icon layui-icon-chart-screen" style="color: #1890ff;"></i>
+            <span>图表</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 待办事项 -->
+      <div class="layui-card">
+        <div class="layui-card-header">待办事项</div>
+        <div class="layui-card-body">
+          <div style="padding: 10px 0;">
+            <input type="checkbox" name="" title="审查代码提交" lay-skin="primary" checked> 审查代码提交
+            <span style="float: right; color: #ccc;">2025-07-30</span>
+          </div>
+          <div style="padding: 10px 0;">
+            <input type="checkbox" name="" title="系统性能优化" lay-skin="primary"> 系统性能优化
+            <span style="float: right; color: #ccc;">2025-07-30</span>
+          </div>
+          <div style="padding: 10px 0;">
+            <input type="checkbox" name="" title="安全检查" lay-skin="primary"> 安全检查
+            <span style="float: right; color: #ccc;">2025-07-30</span>
+          </div>
+          <div style="padding: 10px 0;">
+            <input type="checkbox" name="" title="更新项目文档" lay-skin="primary"> 更新项目文档
+            <span style="float: right; color: #ccc;">2025-07-30</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 访问来源 -->
+      <div class="layui-card">
+        <div class="layui-card-header">访问来源</div>
+        <div class="layui-card-body">
+          <div id="visitChart" style="height: 260px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/static/layui/layui.js"></script>
+  <script src="/admin/static/echarts/echarts.min.js"></script>
+  <script>
+    layui.use(['element', 'form'], function () {
+      var element = layui.element;
+      var form = layui.form;
+      var $ = layui.$;
+
+      // 检测系统状态
+      function checkSystemStatus() {
+        $.get('/admin/api/monitor/stats', function (res) {
+          if (res.code === 0 && res.data) {
+            // MySQL
+            // 暂时用 redis 状态模拟，实际应从 stats 中获取
+            // 假设 stats 中包含 mysql 状态
+            updateStatus('mysql', true);
+
+            // Redis
+            updateStatus('redis', res.data.redis.status === 'up');
+
+            // Nacos
+            // updateStatus('nacos', res.data.nacos.status === 'up');
+            // 模拟 Nacos 状态
+            updateStatus('nacos', true);
+
+            // RabbitMQ
+            updateStatus('rabbitmq', res.data.rabbitmq.status === 'up');
+          }
+        });
+      }
+
+      function updateStatus(id, isOk) {
+        var el = $('#' + id + '-status');
+        var icon = $('#' + id + '-icon');
+        if (isOk) {
+          el.text('运行正常').addClass('status-ok').removeClass('status-err');
+          icon.addClass('status-ok').removeClass('status-err');
+        } else {
+          el.text('连接失败').addClass('status-err').removeClass('status-ok');
+          icon.addClass('status-err').removeClass('status-ok');
+        }
+      }
+
+      checkSystemStatus();
+
+      // 初始化图表
+      var chart = echarts.init(document.getElementById('visitChart'));
+      chart.setOption({
+        tooltip: { trigger: 'item' },
+        legend: { bottom: '0', left: 'center' },
+        series: [
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+            label: { show: false, position: 'center' },
+            emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
+            labelLine: { show: false },
+            data: [
+              { value: 1048, name: '搜索引擎' },
+              { value: 735, name: '直接访问' },
+              { value: 580, name: '邮件营销' },
+              { value: 484, name: '联盟广告' },
+              { value: 300, name: '视频广告' }
+            ]
+          }
+        ]
+      });
+
+      window.onresize = function () {
+        chart.resize();
+      };
+    });
+  </script>
+</body>
+
+</html>

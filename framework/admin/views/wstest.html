@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>WebSocket 测试</title>
+</head>
+<body>
+  <h1>WebSocket 连接测试</h1>
+  <div id="status">状态：连接中...</div>
+  <div id="messages"></div>
+  
+  <script>
+    var ws = new WebSocket('ws://' + window.location.host + '/admin/ws');
+    var statusDiv = document.getElementById('status');
+    var messagesDiv = document.getElementById('messages');
+    
+    ws.onopen = function() {
+      statusDiv.innerHTML = '状态：已连接 ✓';
+      statusDiv.style.color = 'green';
+      
+      // 订阅系统统计频道
+      ws.send(JSON.stringify({
+        type: 'subscribe',
+        channel: 'system'
+      }));
+      
+      messagesDiv.innerHTML += '<p>已发送订阅消息</p>';
+    };
+    
+    ws.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      messagesDiv.innerHTML += '<p>收到消息：' + JSON.stringify(data) + '</p>';
+    };
+    
+    ws.onclose = function() {
+      statusDiv.innerHTML = '状态：已关闭 ✗';
+      statusDiv.style.color = 'red';
+      messagesDiv.innerHTML += '<p>连接已关闭</p>';
+    };
+    
+    ws.onerror = function(error) {
+      statusDiv.innerHTML = '状态：错误 ✗';
+      statusDiv.style.color = 'red';
+      messagesDiv.innerHTML += '<p>发生错误</p>';
+      console.error('WebSocket 错误:', error);
+    };
+  </script>
+</body>
+</html>

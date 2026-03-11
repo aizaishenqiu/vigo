@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>{{.title}}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+
+        .layui-card {
+            border-radius: 4px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+        }
+
+        .layui-card-header {
+            font-weight: 600;
+        }
+
+        .section-body {
+            background: #fff;
+            padding: 20px 20px 5px;
+        }
+
+        .config-section {
+            display: none;
+        }
+
+        .config-section.active {
+            display: block;
+        }
+
+        .layui-form-item .layui-input-inline {
+            width: 340px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layui-card">
+        <div class="layui-card-header" id="sectionTitle">配置</div>
+        <div class="section-body">
+            <div id="sec-app" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">应用名称</label>
+                        <div class="layui-input-inline"><input id="app-name" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">端口</label>
+                        <div class="layui-input-inline"><input id="app-port" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">运行模式</label>
+                        <div class="layui-input-inline"><select id="app-mode">
+                                <option value="dev">开发环境</option>
+                                <option value="test">测试环境</option>
+                                <option value="prod">生产环境</option>
+                            </select></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">调试模式</label>
+                        <div class="layui-input-inline"><input id="app-debug" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">控制台输出</label>
+                        <div class="layui-input-inline"><input id="app-console" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">自动释放端口</label>
+                        <div class="layui-input-inline"><input id="app-auto-kill-port" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">调试工具栏</label>
+                        <div class="layui-input-inline"><input id="app-debug-toolbar" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-app">保存应用配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-admin" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">原密码</label>
+                        <div class="layui-input-inline"><input id="admin-old-password" type="password"
+                                class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">新密码</label>
+                        <div class="layui-input-inline"><input id="admin-new-password" type="password"
+                                class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">确认密码</label>
+                        <div class="layui-input-inline"><input id="admin-confirm-password" type="password"
+                                class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-admin">修改密码</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-database" class="config-section">
+                <div style="margin-bottom: 12px;">
+                    <button class="layui-btn layui-btn-sm" id="btn-add-db"><i class="layui-icon">&#xe654;</i>
+                        添加数据库</button>
+                </div>
+                <table id="db-table" lay-filter="db-table"></table>
+            </div>
+
+            <div id="sec-redis" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">Host</label>
+                        <div class="layui-input-inline"><input id="redis-host" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Port</label>
+                        <div class="layui-input-inline"><input id="redis-port" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Password</label>
+                        <div class="layui-input-inline"><input id="redis-password" type="password" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">DB</label>
+                        <div class="layui-input-inline"><input id="redis-db" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">PoolSize</label>
+                        <div class="layui-input-inline"><input id="redis-pool-size" type="number" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">MinIdleConns</label>
+                        <div class="layui-input-inline"><input id="redis-min-idle-conns" type="number"
+                                class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">MaxIdleConns</label>
+                        <div class="layui-input-inline"><input id="redis-max-idle-conns" type="number"
+                                class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-redis">保存Redis配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-rabbitmq" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                        <div class="layui-input-inline"><input id="mq-enabled" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Host</label>
+                        <div class="layui-input-inline"><input id="mq-host" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Port</label>
+                        <div class="layui-input-inline"><input id="mq-port" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">User</label>
+                        <div class="layui-input-inline"><input id="mq-user" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Pass</label>
+                        <div class="layui-input-inline"><input id="mq-pass" type="password" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">VHost</label>
+                        <div class="layui-input-inline"><input id="mq-vhost" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">ConnTimeout</label>
+                        <div class="layui-input-inline"><input id="mq-timeout" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Heartbeat</label>
+                        <div class="layui-input-inline"><input id="mq-heartbeat" type="number" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-rabbitmq">保存RabbitMQ配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-nacos" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                        <div class="layui-input-inline"><input id="nacos-enabled" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">IP</label>
+                        <div class="layui-input-inline"><input id="nacos-ip" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Port</label>
+                        <div class="layui-input-inline"><input id="nacos-port" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Namespace</label>
+                        <div class="layui-input-inline"><input id="nacos-namespace" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">DataId</label>
+                        <div class="layui-input-inline"><input id="nacos-data-id" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">Group</label>
+                        <div class="layui-input-inline"><input id="nacos-group" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-nacos">保存Nacos配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-grpc" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                        <div class="layui-input-inline"><input id="grpc-enabled" type="checkbox" lay-skin="switch"
+                                lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">端口</label>
+                        <div class="layui-input-inline"><input id="grpc-port" type="number" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">服务名</label>
+                        <div class="layui-input-inline"><input id="grpc-service-name" class="layui-input"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-grpc">保存gRPC配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-security" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">安全中间件</label>
+                        <div class="layui-input-inline"><input id="sec-enable-security-middleware" type="checkbox"
+                                lay-skin="switch" lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">CSRF保护</label>
+                        <div class="layui-input-inline"><input id="sec-enable-csrf-protection" type="checkbox"
+                                lay-skin="switch" lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">速率限制</label>
+                        <div class="layui-input-inline"><input id="sec-enable-rate-limit" type="checkbox"
+                                lay-skin="switch" lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">每秒限制</label>
+                        <div class="layui-input-inline"><input id="sec-rate-limit" type="number" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">CORS域名校验</label>
+                        <div class="layui-input-inline"><input id="sec-enable-cors-domain-check" type="checkbox"
+                                lay-skin="switch" lay-text="开启|关闭"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-security">保存安全配置</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="sec-payment" class="config-section">
+                <fieldset class="layui-elem-field">
+                    <legend>支付宝</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-enabled" type="checkbox"
+                                    lay-skin="switch" lay-text="开启|关闭"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppID</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-app-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">私钥</label>
+                            <div class="layui-input-inline"><textarea id="pay-alipay-private-key"
+                                    class="layui-textarea"></textarea></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">公钥</label>
+                            <div class="layui-input-inline"><textarea id="pay-alipay-public-key"
+                                    class="layui-textarea"></textarea></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-notify-url" class="layui-input"
+                                    placeholder="notify_url"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">返回地址</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-return-url" class="layui-input"
+                                    placeholder="return_url"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">服务商</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-is-provider" type="checkbox"
+                                    lay-skin="switch" lay-text="是|否"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">服务商PID</label>
+                            <div class="layui-input-inline"><input id="pay-alipay-provider-pid" class="layui-input"
+                                    placeholder="provider_pid"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-sm"
+                                    id="btn-save-alipay">保存支付宝配置</button></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>微信支付</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-enabled" type="checkbox"
+                                    lay-skin="switch" lay-text="开启|关闭"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">商户号</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-mch-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">API密钥</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-api-key" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppID</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-app-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-notify-url" class="layui-input"
+                                    placeholder="notify_url"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">服务商</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-is-provider" type="checkbox"
+                                    lay-skin="switch" lay-text="是|否"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">服务商商户号</label>
+                            <div class="layui-input-inline"><input id="pay-wechat-provider-mch-id" class="layui-input"
+                                    placeholder="provider_mch_id"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-sm"
+                                    id="btn-save-wechat-pay">保存微信支付配置</button></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="sec-oauth" class="config-section">
+                <fieldset class="layui-elem-field">
+                    <legend>QQ登录</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                            <div class="layui-input-inline"><input id="oauth-qq-enabled" type="checkbox"
+                                    lay-skin="switch" lay-text="开启|关闭"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppID</label>
+                            <div class="layui-input-inline"><input id="oauth-qq-app-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppKey</label>
+                            <div class="layui-input-inline"><input id="oauth-qq-app-key" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+                            <div class="layui-input-inline"><input id="oauth-qq-redirect-uri" class="layui-input"
+                                    placeholder="redirect_uri"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-sm"
+                                    id="btn-save-oauth-qq">保存QQ配置</button></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>微信登录</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                            <div class="layui-input-inline"><input id="oauth-wechat-enabled" type="checkbox"
+                                    lay-skin="switch" lay-text="开启|关闭"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppID</label>
+                            <div class="layui-input-inline"><input id="oauth-wechat-app-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppSecret</label>
+                            <div class="layui-input-inline"><input id="oauth-wechat-app-secret" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+                            <div class="layui-input-inline"><input id="oauth-wechat-redirect-uri" class="layui-input"
+                                    placeholder="redirect_uri"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-sm"
+                                    id="btn-save-oauth-wechat">保存微信配置</button></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field">
+                    <legend>支付宝登录</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item"><label class="layui-form-label">启用</label>
+                            <div class="layui-input-inline"><input id="oauth-alipay-enabled" type="checkbox"
+                                    lay-skin="switch" lay-text="开启|关闭"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">AppID</label>
+                            <div class="layui-input-inline"><input id="oauth-alipay-app-id" class="layui-input"></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">私钥</label>
+                            <div class="layui-input-inline"><textarea id="oauth-alipay-private-key"
+                                    class="layui-textarea"></textarea></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">公钥</label>
+                            <div class="layui-input-inline"><textarea id="oauth-alipay-public-key"
+                                    class="layui-textarea"></textarea></div>
+                        </div>
+                        <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+                            <div class="layui-input-inline"><input id="oauth-alipay-redirect-uri" class="layui-input"
+                                    placeholder="redirect_uri"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-sm"
+                                    id="btn-save-oauth-alipay">保存支付宝登录配置</button></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="sec-benchmark" class="config-section">
+                <form class="layui-form">
+                    <div class="layui-form-item"><label class="layui-form-label">内存限制(%)</label>
+                        <div class="layui-input-inline"><input id="benchmark-mem" type="number" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item"><label class="layui-form-label">CPU限制(%)</label>
+                        <div class="layui-input-inline"><input id="benchmark-cpu" type="number" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block"><button type="button" class="layui-btn"
+                                id="btn-save-benchmark">保存压测配置</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/static/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'table', 'layer'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+            var $ = layui.$;
+            var cfg = {};
+            var currentTab = new URLSearchParams(window.location.search).get('tab') || 'app';
+            var titleMap = {
+                app: '应用配置', admin: '管理员设置', database: '数据库配置', redis: 'Redis配置',
+                rabbitmq: 'RabbitMQ配置', nacos: 'Nacos配置', grpc: 'gRPC配置', security: '安全配置',
+                payment: '支付配置', oauth: '第三方登录配置', benchmark: '压测配置'
+            };
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            }
+
+            function api(url, data, method) {
+                return fetch(url, {
+                    method: method || 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': getCookie('csrf_token') },
+                    body: JSON.stringify(data || {})
+                }).then(function (res) { return res.json(); });
+            }
+
+            function showSection(tab) {
+                $('.config-section').removeClass('active');
+                $('#sec-' + tab).addClass('active');
+                $('#sectionTitle').text(titleMap[tab] || '配置');
+                if (tab === 'database') renderDbTable();
+            }
+
+            function setVal(id, value) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                if (el.type === 'checkbox') el.checked = !!value;
+                else el.value = value == null ? '' : value;
+            }
+
+            function fillFormValues() {
+                setVal('app-name', cfg.app && cfg.app.name);
+                setVal('app-port', cfg.app && cfg.app.port);
+                setVal('app-mode', cfg.app && cfg.app.mode);
+                setVal('app-debug', cfg.app && cfg.app.debug);
+                setVal('app-console', cfg.app && cfg.app.console);
+                setVal('app-auto-kill-port', cfg.app && cfg.app.auto_kill_port);
+                setVal('app-debug-toolbar', cfg.app && cfg.app.debug_toolbar);
+                setVal('redis-host', cfg.redis && cfg.redis.host);
+                setVal('redis-port', cfg.redis && cfg.redis.port);
+                setVal('redis-password', cfg.redis && cfg.redis.password);
+                setVal('redis-db', cfg.redis && cfg.redis.db);
+                setVal('redis-pool-size', cfg.redis && cfg.redis.pool_size);
+                setVal('redis-min-idle-conns', cfg.redis && cfg.redis.min_idle_conns);
+                setVal('redis-max-idle-conns', cfg.redis && cfg.redis.max_idle_conns);
+                setVal('mq-enabled', cfg.rabbitmq && cfg.rabbitmq.enabled);
+                setVal('mq-host', cfg.rabbitmq && cfg.rabbitmq.host);
+                setVal('mq-port', cfg.rabbitmq && cfg.rabbitmq.port);
+                setVal('mq-user', cfg.rabbitmq && cfg.rabbitmq.user);
+                setVal('mq-pass', cfg.rabbitmq && cfg.rabbitmq.pass);
+                setVal('mq-vhost', cfg.rabbitmq && cfg.rabbitmq.vhost);
+                setVal('mq-timeout', cfg.rabbitmq && cfg.rabbitmq.conn_timeout);
+                setVal('mq-heartbeat', cfg.rabbitmq && cfg.rabbitmq.heartbeat);
+                setVal('nacos-enabled', cfg.nacos && cfg.nacos.enabled);
+                setVal('nacos-ip', cfg.nacos && cfg.nacos.ip_addr);
+                setVal('nacos-port', cfg.nacos && cfg.nacos.port);
+                setVal('nacos-namespace', cfg.nacos && cfg.nacos.namespace);
+                setVal('nacos-data-id', cfg.nacos && cfg.nacos.data_id);
+                setVal('nacos-group', cfg.nacos && cfg.nacos.group);
+                setVal('grpc-enabled', cfg.grpc && cfg.grpc.enabled);
+                setVal('grpc-port', cfg.grpc && cfg.grpc.port);
+                setVal('grpc-service-name', cfg.grpc && cfg.grpc.service_name);
+                setVal('sec-enable-security-middleware', cfg.security && cfg.security.enable_security_middleware);
+                setVal('sec-enable-csrf-protection', cfg.security && cfg.security.enable_csrf_protection);
+                setVal('sec-enable-rate-limit', cfg.security && cfg.security.enable_rate_limit);
+                setVal('sec-rate-limit', cfg.security && cfg.security.rate_limit);
+                setVal('sec-enable-cors-domain-check', cfg.security && cfg.security.enable_cors_domain_check);
+                setVal('pay-alipay-enabled', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.enabled);
+                setVal('pay-alipay-app-id', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.app_id);
+                setVal('pay-alipay-private-key', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.app_private_key);
+                setVal('pay-alipay-public-key', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.alipay_public_key);
+                setVal('pay-alipay-notify-url', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.notify_url);
+                setVal('pay-alipay-return-url', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.return_url);
+                setVal('pay-alipay-is-provider', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.is_provider);
+                setVal('pay-alipay-provider-pid', cfg.payment && cfg.payment.alipay && cfg.payment.alipay.provider_pid);
+                setVal('pay-wechat-enabled', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.enabled);
+                setVal('pay-wechat-mch-id', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.mch_id);
+                setVal('pay-wechat-api-key', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.api_key);
+                setVal('pay-wechat-app-id', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.app_id);
+                setVal('pay-wechat-notify-url', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.notify_url);
+                setVal('pay-wechat-is-provider', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.is_provider);
+                setVal('pay-wechat-provider-mch-id', cfg.payment && cfg.payment.wechat_pay && cfg.payment.wechat_pay.provider_mch_id);
+                setVal('oauth-qq-enabled', cfg.oauth && cfg.oauth.qq && cfg.oauth.qq.enabled);
+                setVal('oauth-qq-app-id', cfg.oauth && cfg.oauth.qq && cfg.oauth.qq.app_id);
+                setVal('oauth-qq-app-key', cfg.oauth && cfg.oauth.qq && cfg.oauth.qq.app_key);
+                setVal('oauth-qq-redirect-uri', cfg.oauth && cfg.oauth.qq && cfg.oauth.qq.redirect_uri);
+                setVal('oauth-wechat-enabled', cfg.oauth && cfg.oauth.wechat && cfg.oauth.wechat.enabled);
+                setVal('oauth-wechat-app-id', cfg.oauth && cfg.oauth.wechat && cfg.oauth.wechat.app_id);
+                setVal('oauth-wechat-app-secret', cfg.oauth && cfg.oauth.wechat && cfg.oauth.wechat.app_secret);
+                setVal('oauth-wechat-redirect-uri', cfg.oauth && cfg.oauth.wechat && cfg.oauth.wechat.redirect_uri);
+                setVal('oauth-alipay-enabled', cfg.oauth && cfg.oauth.alipay && cfg.oauth.alipay.enabled);
+                setVal('oauth-alipay-app-id', cfg.oauth && cfg.oauth.alipay && cfg.oauth.alipay.app_id);
+                setVal('oauth-alipay-private-key', cfg.oauth && cfg.oauth.alipay && cfg.oauth.alipay.app_private_key);
+                setVal('oauth-alipay-public-key', cfg.oauth && cfg.oauth.alipay && cfg.oauth.alipay.alipay_public_key);
+                setVal('oauth-alipay-redirect-uri', cfg.oauth && cfg.oauth.alipay && cfg.oauth.alipay.redirect_uri);
+                setVal('benchmark-mem', cfg.benchmark && cfg.benchmark.mem_limit_percent);
+                setVal('benchmark-cpu', cfg.benchmark && cfg.benchmark.cpu_limit_percent);
+                form.render();
+            }
+
+            function driverSelect(current) {
+                var value = current || 'mysql';
+                var drivers = ['mysql', 'postgres', 'sqlite3', 'mssql'];
+                var options = drivers.map(function (item) {
+                    return '<option value="' + item + '"' + (item === value ? ' selected' : '') + '>' + item + '</option>';
+                }).join('');
+                if (drivers.indexOf(value) < 0) {
+                    options = '<option value="' + value + '" selected>' + value + '</option>' + options;
+                }
+                return '<select id="db-driver">' + options + '</select>';
+            }
+
+            function charsetListByDriver(driver) {
+                if (driver === 'postgres') return ['UTF8', 'LATIN1', 'SQL_ASCII'];
+                if (driver === 'sqlite3') return ['UTF-8', 'UTF-16le', 'UTF-16be'];
+                if (driver === 'mssql') return ['Chinese_PRC_CI_AS', 'Latin1_General_CI_AS', 'SQL_Latin1_General_CP1_CI_AS'];
+                return ['utf8mb4', 'utf8', 'latin1', 'gbk', 'gb2312', 'utf16'];
+            }
+
+            function charsetSelect(current, driver) {
+                var value = current || 'utf8mb4';
+                var list = charsetListByDriver(driver || 'mysql');
+                var options = list.map(function (item) {
+                    return '<option value="' + item + '"' + (item === value ? ' selected' : '') + '>' + item + '</option>';
+                }).join('');
+                if (list.indexOf(value) < 0) {
+                    options = '<option value="' + value + '" selected>' + value + '</option>' + options;
+                }
+                return '<select id="db-charset">' + options + '</select>';
+            }
+
+            function dbFormHtml(row, allowTypeEdit) {
+                var data = row || {};
+                var typeSelect = allowTypeEdit ? '<div class="layui-form-item"><label class="layui-form-label">类型</label><div class="layui-input-block"><select id="db-type"><option value="">请选择</option><option value="read">读数据库</option><option value="write">写数据库</option><option value="multi">多数据库</option></select></div></div><div class="layui-form-item" id="db-key-wrap" style="display:none;"><label class="layui-form-label">Key</label><div class="layui-input-block"><input id="db-key" class="layui-input" placeholder="请输入唯一标识，如 user_db"></div></div>' : '';
+                return '<form class="layui-form" style="padding:20px;">' + typeSelect +
+                    '<div class="layui-form-item"><label class="layui-form-label">驱动</label><div class="layui-input-block">' + driverSelect(data.driver) + '</div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">主机</label><div class="layui-input-block"><input id="db-host" class="layui-input" placeholder="请输入数据库主机，如 127.0.0.1" value="' + (data.host || '') + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">端口</label><div class="layui-input-block"><input id="db-port" type="number" class="layui-input" placeholder="请输入端口，如 3306" value="' + (data.port || 3306) + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">库名</label><div class="layui-input-block"><input id="db-name" class="layui-input" placeholder="请输入数据库名称" value="' + (data.name || '') + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">用户</label><div class="layui-input-block"><input id="db-user" class="layui-input" placeholder="请输入用户名" value="' + (data.user || '') + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">密码</label><div class="layui-input-block"><input id="db-password" type="password" class="layui-input" placeholder="请输入密码" value="' + (data.password || '') + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">字符集</label><div class="layui-input-block" id="db-charset-wrap">' + charsetSelect(data.charset, data.driver) + '</div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">最大连接</label><div class="layui-input-block"><input id="db-max-open" type="number" class="layui-input" placeholder="请输入最大连接数" value="' + (data.max_open_conns || 100) + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">最大空闲</label><div class="layui-input-block"><input id="db-max-idle" type="number" class="layui-input" placeholder="请输入最大空闲连接数" value="' + (data.max_idle_conns || 10) + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">生命周期</label><div class="layui-input-block"><input id="db-life" type="number" class="layui-input" placeholder="请输入连接生命周期（秒）" value="' + (data.conn_max_lifetime || 3600) + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">空闲超时</label><div class="layui-input-block"><input id="db-idle-time" type="number" class="layui-input" placeholder="请输入空闲超时（秒）" value="' + (data.conn_max_idletime || 300) + '"></div></div>' +
+                    '<div class="layui-form-item"><label class="layui-form-label">读写分离</label><div class="layui-input-block"><input id="db-rw-split" type="checkbox" ' + (data.rw_split ? 'checked' : '') + '></div></div>' +
+                    '</form>';
+            }
+
+            function bindDriverCharsetLinkage() {
+                $('#db-driver').off('change').on('change', function () {
+                    var selectedDriver = $(this).val() || 'mysql';
+                    var currentCharset = $('#db-charset').val();
+                    $('#db-charset-wrap').html(charsetSelect(currentCharset, selectedDriver));
+                    form.render('select');
+                });
+            }
+
+            function collectDbConfig() {
+                return {
+                    driver: $('#db-driver').val(), host: $('#db-host').val(), port: parseInt($('#db-port').val() || '0', 10),
+                    name: $('#db-name').val(), user: $('#db-user').val(), password: $('#db-password').val(),
+                    charset: $('#db-charset').val(), max_open_conns: parseInt($('#db-max-open').val() || '0', 10),
+                    max_idle_conns: parseInt($('#db-max-idle').val() || '0', 10), conn_max_lifetime: parseInt($('#db-life').val() || '0', 10),
+                    conn_max_idletime: parseInt($('#db-idle-time').val() || '0', 10), rw_split: $('#db-rw-split').is(':checked')
+                };
+            }
+
+            function renderDbTable() {
+                table.render({
+                    id: 'db-table',
+                    elem: '#db-table',
+                    url: '/admin/api/settings/databases/list',
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': getCookie('csrf_token') },
+                    cols: [[
+                        { field: 'type', title: '类型', width: 180 },
+                        { field: 'id', title: 'ID', width: 140 },
+                        { field: 'driver', title: '驱动', width: 90 },
+                        { field: 'host', title: '主机', width: 180 },
+                        { field: 'port', title: '端口', width: 90 },
+                        { field: 'name', title: '库名', width: 140 },
+                        { field: 'user', title: '用户', width: 120 },
+                        {
+                            title: '操作', width: 180, templet: function (d) {
+                                var edit = '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                if (d.id === 'main') return edit + '<span class="layui-btn layui-btn-xs layui-btn-disabled">主库不可删</span>';
+                                return edit + '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+                            }
+                        }
+                    ]],
+                    parseData: function (res) { return { code: res.code, msg: res.msg, count: res.data ? res.data.length : 0, data: res.data || [] }; }
+                });
+            }
+
+            $('#btn-add-db').on('click', function () {
+                layer.open({
+                    type: 1, title: '添加数据库', area: ['560px', '780px'], content: dbFormHtml({}, true), btn: ['保存', '取消'],
+                    success: function () {
+                        form.render();
+                        $('#db-type').on('change', function () { $('#db-key-wrap').toggle(this.value === 'multi'); }).trigger('change');
+                        bindDriverCharsetLinkage();
+                    },
+                    yes: function (index) {
+                        var dbType = $('#db-type').val();
+                        if (!dbType) {
+                            layer.msg('请选择数据库类型', { icon: 2 });
+                            return;
+                        }
+                        api('/admin/api/settings/database/add', { type: dbType, key: $('#db-key').val(), config: collectDbConfig() }).then(function (res) {
+                            if (res.code === 0) { layer.close(index); layer.msg('添加成功', { icon: 1 }); table.reload('db-table'); }
+                            else layer.alert(res.msg || '添加失败', { icon: 2 });
+                        });
+                    }
+                });
+            });
+
+            table.on('tool(db-table)', function (obj) {
+                var row = obj.data;
+                if (obj.event === 'edit') {
+                    layer.open({
+                        type: 1, title: '修改数据库', area: ['560px', '760px'], content: dbFormHtml(row, false), btn: ['保存', '取消'],
+                        success: function () {
+                            form.render();
+                            bindDriverCharsetLinkage();
+                        },
+                        yes: function (index) {
+                            api('/admin/api/settings/database/update', { id: row.id, type: row.key ? 'multi' : '', key: row.key, config: collectDbConfig() }).then(function (res) {
+                                if (res.code === 0) { layer.close(index); layer.msg('修改成功', { icon: 1 }); table.reload('db-table'); }
+                                else layer.alert(res.msg || '修改失败', { icon: 2 });
+                            });
+                        }
+                    });
+                    return;
+                }
+                if (obj.event === 'del') {
+                    layer.confirm('确认删除该配置？', function (index) {
+                        api('/admin/api/settings/database/remove', { id: row.id, type: row.key ? 'multi' : '', key: row.key }).then(function (res) {
+                            if (res.code === 0) { layer.close(index); table.reload('db-table'); layer.msg('删除成功', { icon: 1 }); }
+                            else layer.alert(res.msg || '删除失败', { icon: 2 });
+                        });
+                    });
+                }
+            });
+
+            $('#btn-save-app').on('click', function () {
+                api('/admin/api/settings/app', {
+                    config: {
+                        name: $('#app-name').val(), port: parseInt($('#app-port').val() || '0', 10), mode: $('#app-mode').val(),
+                        debug: $('#app-debug').is(':checked'), console: $('#app-console').is(':checked'),
+                        auto_kill_port: $('#app-auto-kill-port').is(':checked'), debug_toolbar: $('#app-debug-toolbar').is(':checked')
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-admin').on('click', function () {
+                var oldP = $('#admin-old-password').val(), newP = $('#admin-new-password').val(), confirmP = $('#admin-confirm-password').val();
+                if (!oldP || !newP) return layer.msg('原密码和新密码不能为空', { icon: 2 });
+                if (newP !== confirmP) return layer.msg('两次新密码不一致', { icon: 2 });
+                api('/admin/api/password', { old_password: oldP, new_password: newP }).then(function (res) {
+                    if (res.code === 0) { layer.msg('密码修改成功', { icon: 1 }); $('#admin-old-password,#admin-new-password,#admin-confirm-password').val(''); }
+                    else layer.alert(res.msg || '修改失败', { icon: 2 });
+                });
+            });
+
+            $('#btn-save-redis').on('click', function () {
+                api('/admin/api/settings/redis', {
+                    config: {
+                        host: $('#redis-host').val(), port: parseInt($('#redis-port').val() || '0', 10), password: $('#redis-password').val(),
+                        db: parseInt($('#redis-db').val() || '0', 10), pool_size: parseInt($('#redis-pool-size').val() || '0', 10),
+                        min_idle_conns: parseInt($('#redis-min-idle-conns').val() || '0', 10), max_idle_conns: parseInt($('#redis-max-idle-conns').val() || '0', 10)
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-rabbitmq').on('click', function () {
+                api('/admin/api/settings/rabbitmq', {
+                    config: {
+                        enabled: $('#mq-enabled').is(':checked'), host: $('#mq-host').val(), port: parseInt($('#mq-port').val() || '0', 10),
+                        user: $('#mq-user').val(), pass: $('#mq-pass').val(), vhost: $('#mq-vhost').val(),
+                        conn_timeout: parseInt($('#mq-timeout').val() || '0', 10), heartbeat: parseInt($('#mq-heartbeat').val() || '0', 10)
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-nacos').on('click', function () {
+                api('/admin/api/settings/nacos', {
+                    config: {
+                        enabled: $('#nacos-enabled').is(':checked'), ip_addr: $('#nacos-ip').val(), port: parseInt($('#nacos-port').val() || '0', 10),
+                        namespace: $('#nacos-namespace').val(), data_id: $('#nacos-data-id').val(), group: $('#nacos-group').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-grpc').on('click', function () {
+                api('/admin/api/settings/grpc', {
+                    config: {
+                        enabled: $('#grpc-enabled').is(':checked'), port: parseInt($('#grpc-port').val() || '0', 10), service_name: $('#grpc-service-name').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-security').on('click', function () {
+                api('/admin/api/settings/security', {
+                    config: {
+                        enable_security_middleware: $('#sec-enable-security-middleware').is(':checked'),
+                        enable_csrf_protection: $('#sec-enable-csrf-protection').is(':checked'),
+                        enable_rate_limit: $('#sec-enable-rate-limit').is(':checked'),
+                        rate_limit: parseInt($('#sec-rate-limit').val() || '0', 10),
+                        enable_cors_domain_check: $('#sec-enable-cors-domain-check').is(':checked')
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-alipay').on('click', function () {
+                api('/admin/api/settings/payment', {
+                    type: 'alipay', config: {
+                        enabled: $('#pay-alipay-enabled').is(':checked'), app_id: $('#pay-alipay-app-id').val(),
+                        app_private_key: $('#pay-alipay-private-key').val(), alipay_public_key: $('#pay-alipay-public-key').val(),
+                        notify_url: $('#pay-alipay-notify-url').val(), return_url: $('#pay-alipay-return-url').val(),
+                        is_provider: $('#pay-alipay-is-provider').is(':checked'), provider_pid: $('#pay-alipay-provider-pid').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-wechat-pay').on('click', function () {
+                api('/admin/api/settings/payment', {
+                    type: 'wechat_pay', config: {
+                        enabled: $('#pay-wechat-enabled').is(':checked'), mch_id: $('#pay-wechat-mch-id').val(), api_key: $('#pay-wechat-api-key').val(),
+                        app_id: $('#pay-wechat-app-id').val(), notify_url: $('#pay-wechat-notify-url').val(),
+                        is_provider: $('#pay-wechat-is-provider').is(':checked'), provider_mch_id: $('#pay-wechat-provider-mch-id').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-oauth-qq').on('click', function () {
+                api('/admin/api/settings/oauth', {
+                    type: 'qq', config: {
+                        enabled: $('#oauth-qq-enabled').is(':checked'), app_id: $('#oauth-qq-app-id').val(), app_key: $('#oauth-qq-app-key').val(),
+                        redirect_uri: $('#oauth-qq-redirect-uri').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-oauth-wechat').on('click', function () {
+                api('/admin/api/settings/oauth', {
+                    type: 'wechat', config: {
+                        enabled: $('#oauth-wechat-enabled').is(':checked'), app_id: $('#oauth-wechat-app-id').val(), app_secret: $('#oauth-wechat-app-secret').val(),
+                        redirect_uri: $('#oauth-wechat-redirect-uri').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-oauth-alipay').on('click', function () {
+                api('/admin/api/settings/oauth', {
+                    type: 'alipay', config: {
+                        enabled: $('#oauth-alipay-enabled').is(':checked'), app_id: $('#oauth-alipay-app-id').val(),
+                        app_private_key: $('#oauth-alipay-private-key').val(), alipay_public_key: $('#oauth-alipay-public-key').val(),
+                        redirect_uri: $('#oauth-alipay-redirect-uri').val()
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            $('#btn-save-benchmark').on('click', function () {
+                api('/admin/api/settings/benchmark', {
+                    config: {
+                        mem_limit_percent: parseInt($('#benchmark-mem').val() || '0', 10), cpu_limit_percent: parseInt($('#benchmark-cpu').val() || '0', 10)
+                    }
+                }).then(function (res) { layer.msg(res.msg || '保存完成', { icon: res.code === 0 ? 1 : 2 }); });
+            });
+
+            fetch('/admin/api/settings/get').then(function (res) { return res.json(); }).then(function (res) {
+                if (res.code !== 0) return;
+                cfg = res.data || {};
+                fillFormValues();
+                showSection(currentTab);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>{{.title}}</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/admin/static/layui/css/layui.css" media="all">
+  <style>
+    /* 全局变量 */
+    :root {
+      --primary-color: #0960bd;
+      --menu-bg: #001529;
+      --menu-text: rgba(255, 255, 255, 0.7);
+      --menu-active-bg: #1890ff;
+      --header-height: 48px;
+      --tabs-height: 40px;
+      /* Increased height */
+      --sider-width-primary: 80px;
+      /* Increased width */
+      --sider-width-secondary: 180px;
+      --sider-width-total: 260px;
+      --footer-height: 30px;
+    }
+
+    body,
+    html {
+      background-color: #f0f2f5;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .layui-layout-admin .layui-side {
+      width: var(--sider-width-total);
+      top: 0;
+      bottom: 0;
+      z-index: 1001;
+      background-color: #fff;
+      box-shadow: 2px 0 8px 0 rgba(29, 35, 41, .05);
+      transition: width .3s;
+      border-right: 1px solid #eee;
+    }
+
+    /* 左侧一级菜单栏 */
+    #app-sidebar-primary {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sider-width-primary);
+      background-color: #273352;
+      /* 深色一级菜单 */
+      z-index: 1002;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+    }
+
+    /* Logo */
+    .app-logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-logo i {
+      font-size: 32px;
+      color: #fff;
+    }
+
+    /* 一级菜单项 */
+    .primary-nav-item {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.65);
+      transition: all .3s;
+    }
+
+    .primary-nav-item:hover {
+      color: #fff;
+    }
+
+    .primary-nav-item.active {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+
+    .primary-nav-item i {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .primary-nav-item span {
+      font-size: 14px;
+      /* Bigger font */
+      transform: none;
+    }
+
+    /* 右侧二级菜单栏 */
+    #app-sidebar-secondary {
+      position: absolute;
+      top: 0;
+      left: var(--sider-width-primary);
+      bottom: 0;
+      width: var(--sider-width-secondary);
+      background-color: #fff;
+      padding: 10px 0;
+      overflow-y: auto;
+    }
+
+    .secondary-header {
+      padding: 0 16px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .secondary-nav-item {
+      display: flex;
+      align-items: center;
+      height: 38px;
+      line-height: 38px;
+      padding: 0 16px;
+      margin: 8px 8px;
+      border-radius: 4px;
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+
+    .secondary-nav-item:hover {
+      background-color: #f5f5f5;
+      color: var(--primary-color);
+    }
+
+    .secondary-nav-item.active {
+      background-color: #e6f7ff;
+      color: var(--primary-color);
+    }
+
+    .secondary-nav-item i {
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    /* Header 样式 */
+    .layui-layout-admin .layui-header {
+      position: fixed;
+      left: var(--sider-width-total);
+      top: 0;
+      right: 0;
+      height: var(--header-height);
+      background-color: #fff;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+      border-bottom: 1px solid #eee;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0;
+      transition: left .3s;
+    }
+
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .header-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      height: 100%;
+      cursor: pointer;
+      color: #666;
+      transition: all .3s;
+    }
+
+    .header-action:hover {
+      background-color: #f6f6f6;
+    }
+
+    .breadcrumb {
+      margin-left: 10px;
+      padding-left: 10px;
+    }
+
+    /* 重写 layui 面包屑样式 */
+    .layui-breadcrumb {
+      visibility: visible;
+      font-size: 14px;
+    }
+
+    .layui-breadcrumb a {
+      color: #999 !important;
+    }
+
+    .layui-breadcrumb a:hover {
+      color: var(--primary-color) !important;
+    }
+
+    .layui-breadcrumb a cite {
+      color: #333 !important;
+      font-style: normal;
+    }
+
+    .layui-breadcrumb span[lay-separator] {
+      margin: 0 8px;
+      color: #ccc;
+    }
+
+    /* 标签页 Tabs */
+    .layadmin-pagetabs {
+      position: fixed;
+      top: var(--header-height);
+      left: var(--sider-width-total);
+      right: 0;
+      height: var(--tabs-height);
+      background-color: #fff;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      z-index: 999;
+      transition: left .3s;
+      padding: 0 40px 0 0;
+    }
+
+    .layadmin-pagetabs .layui-tab {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .layadmin-pagetabs .layui-tab-title {
+      border: none;
+      height: var(--tabs-height);
+    }
+
+    .layadmin-pagetabs .layui-tab-title li {
+      line-height: var(--tabs-height);
+      border-right: 1px solid #f6f6f6;
+      background-color: #fff;
+      color: #666;
+      min-width: 0;
+      padding: 0 15px;
+      font-size: 12px;
+    }
+
+    .layadmin-pagetabs .layui-tab-title .layui-this {
+      background-color: #e6f7ff;
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .layadmin-pagetabs .layui-tab-title .layui-this:after {
+      display: none;
+    }
+
+    /* 页面主体 */
+    .layui-layout-admin .layui-body {
+      position: fixed;
+      top: calc(var(--header-height) + var(--tabs-height));
+      left: var(--sider-width-total);
+      right: 0;
+      bottom: 0;
+      z-index: 998;
+      background-color: #f0f2f5;
+      transition: left .3s;
+      overflow: hidden;
+    }
+
+    /* Iframe 容器 - 关键样式修复 */
+    .layadmin-tabsbody-item {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      display: none;
+      /* 默认隐藏 */
+      width: 100%;
+      height: 100%;
+    }
+
+    .layadmin-tabsbody-item.layui-show {
+      display: block;
+      /* 激活显示 */
+    }
+
+    .layadmin-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* 右侧操作栏 */
+    .tabs-control {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40px;
+      height: var(--tabs-height);
+      line-height: var(--tabs-height);
+      text-align: center;
+      background-color: #fff;
+      border-left: 1px solid #f6f6f6;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .tabs-control:hover {
+      background-color: #f6f6f6;
+    }
+
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* 底部版权 */
+    .layui-footer {
+      position: fixed;
+      left: var(--sider-width-total);
+      right: 0;
+      bottom: 0;
+      height: var(--footer-height);
+      line-height: var(--footer-height);
+      padding: 0 15px;
+      text-align: center;
+      background-color: #f0f2f5;
+      color: #999;
+      font-size: 12px;
+      transition: left .3s;
+      z-index: 990;
+    }
+
+    /* 右键菜单 */
+    .right-click-menu {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 5px 0;
+      z-index: 2000;
+      display: none;
+      min-width: 150px;
+      border-radius: 2px;
+    }
+
+    .right-click-menu li {
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #333;
+      display: flex;
+      align-items: center;
+    }
+
+    .right-click-menu li:hover {
+      background-color: #f0f0f0;
+      color: var(--primary-color);
+    }
+
+    .right-click-menu li i {
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    .right-click-menu li.disabled {
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .right-click-menu .menu-divider {
+      height: 1px;
+      background-color: #eee;
+      margin: 4px 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layui-layout layui-layout-admin">
+
+    <!-- 侧边栏 -->
+    <div class="layui-side">
+      <!-- 左侧一级菜单 -->
+      <div id="app-sidebar-primary">
+        <div class="app-logo">
+          <i class="layui-icon layui-icon-engine"></i>
+        </div>
+
+        <div id="primary-menu-container"></div>
+      </div>
+
+      <!-- 右侧二级菜单 -->
+      <div id="app-sidebar-secondary">
+        <div class="secondary-header" id="secondary-title">工作台</div>
+        <div id="secondary-menu-container"></div>
+      </div>
+    </div>
+
+    <!-- 头部 -->
+    <div class="layui-header">
+      <div class="header-left">
+        <div class="header-action" id="btn-shrink" title="折叠侧边栏">
+          <i class="layui-icon layui-icon-shrink-right"></i>
+        </div>
+        <div class="breadcrumb">
+          <span class="layui-breadcrumb" lay-separator="/">
+            <a href="javascript:;">首页</a>
+            <a href="javascript:;" id="breadcrumb-parent">工作台</a>
+            <a><cite id="breadcrumb-current">分析页</cite></a>
+          </span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-action" title="搜索">
+          <i class="layui-icon layui-icon-search"></i>
+        </div>
+        <div class="header-action" title="文档">
+          <i class="layui-icon layui-icon-read"></i>
+        </div>
+        <div class="header-action" title="全屏" id="btn-fullscreen">
+          <i class="layui-icon layui-icon-screen-full"></i>
+        </div>
+        <div class="header-action" title="消息">
+          <i class="layui-icon layui-icon-notice"></i>
+          <span class="layui-badge-dot" style="margin: -10px 0 0 -5px;"></span>
+        </div>
+        <div class="header-action" style="padding: 0 12px;" id="user-profile">
+          <svg t="1710000000000" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="1483" width="24" height="24" style="margin-right: 8px;">
+            <path d="M512 512m-208 0a208 208 0 1 0 416 0 208 208 0 1 0-416 0Z" fill="#1296db" p-id="1484"></path>
+            <path
+              d="M512 102.4a409.6 409.6 0 1 0 409.6 409.6 409.6 409.6 0 0 0-409.6-409.6z m0 761.6a352 352 0 1 1 352-352 352 352 0 0 1-352 352z"
+              fill="#1296db" p-id="1485"></path>
+            <path
+              d="M512 588.8c-137.6 0-262.4 67.2-316.8 172.8 38.4 51.2 92.8 89.6 156.8 108.8 35.2 9.6 70.4 16 108.8 16 182.4 0 339.2-124.8 387.2-297.6-54.4-105.6-179.2-172.8-316.8-172.8z"
+              fill="#1296db" p-id="1486"></path>
+          </svg>
+          <span style="font-size: 14px; color: #666;">管理员</span>
+        </div>
+        <div class="header-action" title="设置">
+          <i class="layui-icon layui-icon-set"></i>
+        </div>
+        <div class="header-action" title="更多操作" id="header-more">
+          <i class="layui-icon layui-icon-more-vertical"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="layadmin-pagetabs">
+      <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+        <ul class="layui-tab-title" id="LAY_app_tabsheader">
+          <li lay-id="/admin/welcome" lay-attr="/admin/welcome" class="layui-this">
+            <i class="layui-icon layui-icon-home"></i> 工作台
+          </li>
+        </ul>
+      </div>
+      <div class="tabs-control" id="tabs-control">
+        <i class="layui-icon layui-icon-down"></i>
+      </div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="layui-body" id="LAY_app_body">
+      <div class="layadmin-tabsbody-item layui-show" data-id="/admin/welcome">
+        <iframe src="/admin/welcome" frameborder="0" class="layadmin-iframe"></iframe>
+      </div>
+    </div>
+
+    <!-- 底部版权 -->
+    <div class="layui-footer">
+      <span>Copyright © 2026 Vigo Admin v1.0.0 All Rights Reserved.</span>
+    </div>
+
+    <!-- 右键菜单 -->
+    <ul class="right-click-menu" id="contextMenu">
+      <li data-type="refresh"><i class="layui-icon layui-icon-refresh"></i> 重新加载</li>
+      <li data-type="closeCurrent"><i class="layui-icon layui-icon-close"></i> 关闭标签页</li>
+      <li class="menu-divider"></li>
+      <li data-type="closeOther"><i class="layui-icon layui-icon-close-fill"></i> 关闭其它标签页</li>
+      <li data-type="closeAll"><i class="layui-icon layui-icon-delete"></i> 关闭全部标签页</li>
+      <li class="menu-divider"></li>
+      <li data-type="openNewWindow"><i class="layui-icon layui-icon-website"></i> 在新窗口打开</li>
+    </ul>
+  </div>
+
+  <script src="/admin/static/layui/layui.js"></script>
+  <script>
+    // 菜单配置数据
+    const MENU_DATA = [
+      {
+        id: 'dashboard',
+        title: '概览',
+        icon: 'layui-icon-console',
+        children: [
+          { title: '工作台', path: '/admin/welcome', icon: 'layui-icon-home' },
+          { title: '分析页', path: '/admin/welcome?t=analysis', icon: 'layui-icon-chart' }
+        ]
+      },
+      {
+        id: 'system',
+        title: '系统',
+        icon: 'layui-icon-set',
+        children: [
+          { title: '系统监控', path: '/admin/monitor', icon: 'layui-icon-engine' },
+          { title: '压测中心', path: '/admin/stress', icon: 'layui-icon-fire' },
+          { title: '用户管理', path: '/admin/welcome?t=user', icon: 'layui-icon-user' },
+          { title: '角色管理', path: '/admin/welcome?t=role', icon: 'layui-icon-group' }
+        ]
+      },
+      {
+        id: 'config',
+        title: '配置',
+        icon: 'layui-icon-set-fill',
+        children: [
+          { title: '应用配置', path: '/admin/settings?tab=app', icon: 'layui-icon-app' },
+          { title: '管理员设置', path: '/admin/settings?tab=admin', icon: 'layui-icon-password' },
+          { title: '数据库配置', path: '/admin/settings?tab=database', icon: 'layui-icon-layer' },
+          { title: 'Redis 配置', path: '/admin/settings?tab=redis', icon: 'layui-icon-util' },
+          { title: 'RabbitMQ 配置', path: '/admin/settings?tab=rabbitmq', icon: 'layui-icon-dialogue' },
+          { title: 'Nacos 配置', path: '/admin/settings?tab=nacos', icon: 'layui-icon-cloud' },
+          { title: 'gRPC 配置', path: '/admin/settings?tab=grpc', icon: 'layui-icon-link' },
+          { title: '安全配置', path: '/admin/settings?tab=security', icon: 'layui-icon-auz' },
+          { title: '支付配置', path: '/admin/settings?tab=payment', icon: 'layui-icon-rmb' },
+          { title: '第三方登录', path: '/admin/settings?tab=oauth', icon: 'layui-icon-login-wechat' },
+          { title: '压测配置', path: '/admin/settings?tab=benchmark', icon: 'layui-icon-fire' }
+        ]
+      },
+      {
+        id: 'service',
+        title: '服务',
+        icon: 'layui-icon-component',
+        children: [
+          { title: 'Nacos 服务', path: '/admin/nacos', icon: 'layui-icon-set-fill' },
+          { title: 'RabbitMQ', path: '/admin/rabbitmq', icon: 'layui-icon-dialogue' }
+        ]
+      }
+    ];
+
+    layui.use(['element', 'layer', 'dropdown'], function () {
+      var element = layui.element;
+      var dropdown = layui.dropdown;
+      var $ = layui.$;
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return '';
+      }
+
+      // 用户下拉菜单
+      dropdown.render({
+        elem: '#user-profile',
+        trigger: 'click',
+        data: [{
+          title: '修改密码',
+          id: 'password',
+          icon: 'layui-icon-password'
+        }, {
+          title: '退出登录',
+          id: 'logout',
+          icon: 'layui-icon-logout'
+        }],
+        click: function (obj) {
+          if (obj.id === 'password') {
+            const formHtml = `
+              <div style="padding:20px 20px 0 20px;">
+                <div class="layui-form-item">
+                  <label class="layui-form-label" style="width:90px;">原密码</label>
+                  <div class="layui-input-block" style="margin-left:120px;">
+                    <input type="password" id="old-password" autocomplete="off" class="layui-input" />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label" style="width:90px;">新密码</label>
+                  <div class="layui-input-block" style="margin-left:120px;">
+                    <input type="password" id="new-password" autocomplete="off" class="layui-input" />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label" style="width:90px;">确认密码</label>
+                  <div class="layui-input-block" style="margin-left:120px;">
+                    <input type="password" id="confirm-password" autocomplete="off" class="layui-input" />
+                  </div>
+                </div>
+              </div>
+            `;
+            layer.open({
+              type: 1,
+              title: '修改密码',
+              area: ['520px', '320px'],
+              content: formHtml,
+              btn: ['保存', '取消'],
+              yes: function (index) {
+                const oldPassword = $('#old-password').val();
+                const newPassword = $('#new-password').val();
+                const confirmPassword = $('#confirm-password').val();
+                if (!oldPassword || !newPassword) {
+                  layer.msg('原密码和新密码不能为空', { icon: 2 });
+                  return;
+                }
+                if (newPassword !== confirmPassword) {
+                  layer.msg('两次输入的新密码不一致', { icon: 2 });
+                  return;
+                }
+                fetch('/admin/api/password', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': getCookie('csrf_token')
+                  },
+                  body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword
+                  })
+                }).then(res => res.json()).then(res => {
+                  if (res.code === 0) {
+                    layer.close(index);
+                    layer.msg('密码修改成功', { icon: 1 });
+                  } else {
+                    layer.alert(res.msg || '密码修改失败', { icon: 2 });
+                  }
+                }).catch(err => {
+                  layer.alert('请求失败：' + err.message, { icon: 2 });
+                });
+              }
+            });
+          } else if (obj.id === 'logout') {
+            layer.confirm('确定要退出登录吗？', function (index) {
+              fetch('/admin/api/logout', {
+                method: 'POST',
+                headers: {
+                  'X-CSRF-Token': getCookie('csrf_token')
+                }
+              }).finally(() => {
+                layer.close(index);
+                window.location.href = '/admin/login';
+              });
+            });
+          }
+        }
+      });
+
+      function bindTabsDropdown(elemSelector) {
+        dropdown.render({
+          elem: elemSelector,
+          trigger: 'click',
+          data: [{
+            title: '关闭',
+            id: 'closeCurrent',
+            icon: 'layui-icon-close'
+          }, {
+            title: '固定',
+            id: 'pinCurrent',
+            icon: 'layui-icon-note'
+          }, {
+            title: '最大化',
+            id: 'maximizeCurrent',
+            icon: 'layui-icon-screen-full'
+          }, {
+            title: '重新加载',
+            id: 'refresh',
+            icon: 'layui-icon-refresh'
+          }, {
+            title: '在新窗口打开',
+            id: 'openNewWindow',
+            icon: 'layui-icon-website'
+          }, {
+            type: '-'
+          }, {
+            title: '关闭左侧标签页',
+            id: 'closeLeft',
+            icon: 'layui-icon-left'
+          }, {
+            title: '关闭右侧标签页',
+            id: 'closeRight',
+            icon: 'layui-icon-right'
+          }, {
+            title: '关闭其它标签页',
+            id: 'closeOther',
+            icon: 'layui-icon-close-fill'
+          }, {
+            title: '关闭全部标签页',
+            id: 'closeAll',
+            icon: 'layui-icon-delete'
+          }],
+          click: function (obj) {
+            var activeId = $('.layui-tab-title .layui-this').attr('lay-id');
+            if (!activeId) return;
+            currentTabId = activeId;
+
+            if (obj.id === 'closeCurrent') {
+              closeCurrentTab();
+              return;
+            }
+            if (obj.id === 'pinCurrent') {
+              layer.msg('当前版本暂不支持固定标签');
+              return;
+            }
+            if (obj.id === 'maximizeCurrent') {
+              if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+              } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+              }
+              return;
+            }
+            if (obj.id === 'refresh') {
+              refreshIframe();
+              return;
+            }
+            if (obj.id === 'openNewWindow') {
+              window.open(activeId);
+              return;
+            }
+            if (obj.id === 'closeLeft') {
+              closeLeftTabs();
+              return;
+            }
+            if (obj.id === 'closeRight') {
+              closeRightTabs();
+              return;
+            }
+            if (obj.id === 'closeOther') {
+              closeOtherTabs();
+              return;
+            }
+            if (obj.id === 'closeAll') {
+              closeAllTabs();
+              return;
+            }
+          }
+        });
+      }
+
+      bindTabsDropdown('#tabs-control');
+      bindTabsDropdown('#header-more');
+
+      // 初始化
+      function init() {
+        renderPrimaryMenu();
+        // 默认选中第一个
+        switchMenu(MENU_DATA[0].id);
+
+        // 全屏切换
+        $('#btn-fullscreen').on('click', function () {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            }
+          }
+        });
+      }
+
+      // 渲染一级菜单
+      function renderPrimaryMenu() {
+        const container = $('#primary-menu-container');
+        MENU_DATA.forEach((item, index) => {
+          const html = `
+            <div class="primary-nav-item" data-id="${item.id}" onclick="switchMenu('${item.id}')" title="${item.title}">
+              <i class="layui-icon ${item.icon}"></i>
+              <span>${item.title}</span>
+            </div>
+          `;
+          container.append(html);
+        });
+      }
+
+      // 切换一级菜单
+      window.switchMenu = function (id) {
+        $('.primary-nav-item').removeClass('active');
+        $(`.primary-nav-item[data-id="${id}"]`).addClass('active');
+
+        const menu = MENU_DATA.find(m => m.id === id);
+        if (!menu) return;
+
+        $('#secondary-title').text(menu.title);
+
+        const container = $('#secondary-menu-container');
+        container.empty();
+
+        if (menu.children && menu.children.length > 0) {
+          menu.children.forEach(sub => {
+            const html = `
+              <a class="secondary-nav-item" onclick="openTab('${sub.path}', '${sub.title}')">
+                <i class="layui-icon ${sub.icon || 'layui-icon-circle-dot'}"></i>
+                <span>${sub.title}</span>
+              </a>
+            `;
+            container.append(html);
+          });
+        }
+      };
+
+      // 查找菜单信息
+      function findMenuByPath(path) {
+        for (let m of MENU_DATA) {
+          if (m.children) {
+            for (let c of m.children) {
+              // 简单匹配，如果有参数可能需要更复杂的逻辑
+              if (c.path === path || path.startsWith(c.path + '?')) return { parent: m, item: c };
+            }
+          }
+        }
+        return null;
+      }
+
+      // 打开标签页
+      window.openTab = function (url, title) {
+        // 更新二级菜单高亮
+        $('.secondary-nav-item').removeClass('active');
+        if (event && event.currentTarget) {
+          $(event.currentTarget).addClass('active');
+        }
+
+        // 更新面包屑
+        var parentTitle = $('#secondary-title').text();
+        $('#breadcrumb-parent').text(parentTitle);
+        $('#breadcrumb-current').text(title);
+
+        // 检查 Tab 是否存在
+        var exist = false;
+        $('#LAY_app_tabsheader li').each(function () {
+          if ($(this).attr('lay-id') === url) {
+            exist = true;
+            return false;
+          }
+        });
+
+        if (exist) {
+          element.tabChange('layadmin-layout-tabs', url);
+        } else {
+          element.tabAdd('layadmin-layout-tabs', {
+            title: title,
+            id: url
+          });
+
+          // 创建 iframe 容器
+          // 关键：确保 iframe 高度 100% 且容器 absolute 撑满
+          var iframeHtml = `<div class="layadmin-tabsbody-item" data-id="${url}">
+                <iframe src="${url}" frameborder="0" class="layadmin-iframe"></iframe>
+            </div>`;
+          $('#LAY_app_body').append(iframeHtml);
+
+          element.tabChange('layadmin-layout-tabs', url);
+        }
+      };
+
+      // Tab 切换事件
+      element.on('tab(layadmin-layout-tabs)', function (data) {
+        var id = $(this).attr('lay-id');
+
+        // 更新面包屑和菜单状态
+        var menuInfo = findMenuByPath(id);
+        if (menuInfo) {
+          // 如果当前 Tab 属于另一个一级菜单，可能需要切换左侧（这里暂不自动切换一级，避免跳动太大，只更新面包屑）
+          $('#breadcrumb-parent').text(menuInfo.parent.title);
+          $('#breadcrumb-current').text(menuInfo.item.title);
+
+          // 尝试高亮左侧二级菜单
+          $('.secondary-nav-item').removeClass('active');
+          // 注意：这里可能匹配不到，因为二级菜单列表可能没渲染出来（如果在一级菜单A下点了Tab，现在切回一级菜单B的Tab）
+          // 只有当当前显示的二级菜单列表里有这个 item 时才高亮
+          $(`.secondary-nav-item[onclick*="'${menuInfo.item.path}'"]`).addClass('active');
+        }
+
+        // 隐藏所有
+        $('.layadmin-tabsbody-item').removeClass('layui-show');
+        // 显示当前
+        var current = $('.layadmin-tabsbody-item[data-id="' + id + '"]');
+        if (current.length > 0) {
+          current.addClass('layui-show');
+        } else {
+          // 容错：如果是默认页且没有 data-id 匹配（初始化时）
+          if (id === '/admin/welcome') {
+            $('.layadmin-tabsbody-item').first().addClass('layui-show');
+          }
+        }
+      });
+
+      // Tab 删除事件
+      element.on('tabDelete(layadmin-layout-tabs)', function (data) {
+        var id = this.parentNode.getAttribute('lay-id');
+        $('.layadmin-tabsbody-item[data-id="' + id + '"]').remove();
+      });
+
+      // 刷新当前页
+      window.refreshIframe = function () {
+        var activeId = $('.layui-tab-title .layui-this').attr('lay-id');
+        var iframe = $('.layadmin-tabsbody-item[data-id="' + activeId + '"] iframe');
+        if (iframe.length > 0) {
+          iframe.attr('src', iframe.attr('src'));
+        }
+      };
+
+      // 右键菜单逻辑
+      var contextMenu = $('#contextMenu');
+      var currentTabId = '';
+
+      // 阻止浏览器默认右键菜单
+      $(document).on('contextmenu', '.layui-tab-title li', function (e) {
+        e.preventDefault();
+        currentTabId = $(this).attr('lay-id');
+
+        // 显示菜单
+        contextMenu.css({
+          left: e.clientX + 'px',
+          top: e.clientY + 'px'
+        }).show();
+
+        // 激活当前Tab
+        if (!$(this).hasClass('layui-this')) {
+          element.tabChange('layadmin-layout-tabs', currentTabId);
+        }
+
+        return false;
+      });
+
+      // 点击其他地方隐藏菜单
+      $(document).on('click', function () {
+        contextMenu.hide();
+      });
+
+      function closeCurrentTab() {
+        if (currentTabId !== '/admin/welcome') {
+          element.tabDelete('layadmin-layout-tabs', currentTabId);
+        } else {
+          layer.msg('首页不能关闭');
+        }
+      }
+
+      function closeOtherTabs() {
+        $('.layui-tab-title li').each(function () {
+          var id = $(this).attr('lay-id');
+          if (id !== currentTabId && id !== '/admin/welcome') {
+            element.tabDelete('layadmin-layout-tabs', id);
+          }
+        });
+      }
+
+      function closeLeftTabs() {
+        var found = false;
+        $('.layui-tab-title li').each(function () {
+          var id = $(this).attr('lay-id');
+          if (id === currentTabId) {
+            found = true;
+            return false;
+          }
+          if (id !== '/admin/welcome') {
+            element.tabDelete('layadmin-layout-tabs', id);
+          }
+        });
+        if (!found) return;
+      }
+
+      function closeRightTabs() {
+        var found = false;
+        var ids = [];
+        $('.layui-tab-title li').each(function () {
+          var id = $(this).attr('lay-id');
+          if (id === currentTabId) {
+            found = true;
+            return;
+          }
+          if (found && id !== '/admin/welcome') {
+            ids.push(id);
+          }
+        });
+        ids.forEach(function (id) {
+          element.tabDelete('layadmin-layout-tabs', id);
+        });
+      }
+
+      function closeAllTabs() {
+        $('.layui-tab-title li').each(function () {
+          var id = $(this).attr('lay-id');
+          if (id !== '/admin/welcome') {
+            element.tabDelete('layadmin-layout-tabs', id);
+          }
+        });
+        element.tabChange('layadmin-layout-tabs', '/admin/welcome');
+      }
+
+      // 菜单点击事件
+      contextMenu.on('click', 'li', function () {
+        var type = $(this).data('type');
+        if (!type) return;
+
+        switch (type) {
+          case 'refresh':
+            refreshIframe();
+            break;
+          case 'closeCurrent':
+            closeCurrentTab();
+            break;
+          case 'closeOther':
+            closeOtherTabs();
+            break;
+          case 'closeAll':
+            closeAllTabs();
+            break;
+          case 'closeLeft':
+            closeLeftTabs();
+            break;
+          case 'closeRight':
+            closeRightTabs();
+            break;
+          case 'openNewWindow':
+            window.open(currentTabId);
+            break;
+        }
+      });
+
+      init();
+    });
+  </script>
+</body>
+
+</html>

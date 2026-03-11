@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.Title}}</title>
+  <script src="/admin/static/layui/layui.js"></script>
+  <script src="/admin/static/echarts/echarts.min.js"></script>
+  <script>
+    layui.use(['element', 'layer'], function () {
+      var element = layui.element;
+      var $ = layui.$;
+    });
+  </script>
+  <style>
+    /* 深色主题 */
+    :root {
+      --bg-color: #020617;
+      --card-bg: #111827;
+      --accent-color: #00d1b2;
+      --text-color: #f9fafb;
+      --secondary-text: #9ca3af;
+      --border-color: #374151;
+      --danger: #ff4d4f;
+      --success: #52c41a;
+      --warning: #faad14;
+      --list-bg: #1f2937;
+      --list-hover: #374151;
+    }
+
+    /* 浅色主题 */
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --accent-color: #00d1b2;
+      --text-color: #1e293b;
+      --secondary-text: #64748b;
+      --border-color: #e2e8f0;
+      --danger: #ff4d4f;
+      --success: #52c41a;
+      --warning: #faad14;
+      --list-bg: #f1f5f9;
+      --list-hover: #e2e8f0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(0, 209, 178, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(84, 112, 198, 0.05) 0px, transparent 50%);
+      color: var(--text-color);
+      padding: 20px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d1b2 0%, #5470c6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .info-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-card span {
+      font-size: 10px;
+      color: var(--secondary-text);
+      text-transform: uppercase;
+    }
+
+    .info-card strong {
+      font-size: 16px;
+      color: var(--text-color);
+    }
+
+    .container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .status-up {
+      background: rgba(82, 196, 26, 0.15);
+      color: #52c41a;
+    }
+
+    .status-down {
+      background: rgba(255, 77, 79, 0.15);
+      color: #ff4d4f;
+    }
+
+    .chart {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+    }
+
+    .col-4 {
+      grid-column: span 4;
+    }
+
+    .col-8 {
+      grid-column: span 8;
+    }
+
+    .row-2 {
+      grid-row: span 2;
+    }
+
+    .details-box {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--secondary-text);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .details-box b {
+      color: var(--text-color);
+    }
+
+    .audit-panel {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      background: var(--list-bg);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+
+    .list-item:hover {
+      background: var(--list-hover);
+      transform: translateX(5px);
+    }
+
+    .list-item .key {
+      color: var(--accent-color);
+      font-family: monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+
+    .list-item .tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-text);
+    }
+
+    .list-item .val {
+      color: var(--secondary-text);
+      font-size: 11px;
+    }
+
+    .score-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 4px solid var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+
+    .stat-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 1;
+      align-content: center;
+    }
+
+    .stat-box {
+      background: var(--list-bg);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-box .val {
+      font-size: 16px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .stat-box .lbl {
+      font-size: 10px;
+      color: var(--secondary-text);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-title">
+      <h1>Vigo 智慧监控系统</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="/admin"
+        style="background: var(--accent-color); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">返回首页</a>
+      <div id="serverTime" style="color: var(--secondary-text); font-size: 12px; font-family: monospace;">-</div>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-card"><span>系统环境</span><strong id="os">-</strong></div>
+    <div class="info-card"><span>节点名称</span><strong id="hostname">-</strong></div>
+    <div class="info-card"><span>框架版本</span><strong id="version">-</strong></div>
+    <div class="info-card"><span>稳定运行</span><strong id="uptime">-</strong></div>
+  </div>
+
+  <div class="container">
+    <!-- Redis Key List -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">Redis 实时键值列表 (TOP 10)</div>
+      </div>
+      <div class="audit-panel" id="redisKeyList">正在加载 Redis 数据...</div>
+    </div>
+
+    <!-- Resource Load -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">核心资源负载</div>
+      </div>
+      <div id="gaugeChart" class="chart"></div>
+      <div class="details-box">
+        CPU: <b id="cpuModel">-</b> | <b id="cpuCores">-</b> 核 | <b id="cpuMhz">-</b> MHz<br>
+        内存: <b id="memUsed">-</b> / <b id="memTotal">-</b>
+      </div>
+    </div>
+
+    <!-- Storage -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">存储空间 (全盘合计)</div>
+      </div>
+      <div id="diskChart" class="chart"></div>
+      <div class="details-box">已用: <b id="diskUsedText">-</b> | 总量: <b id="diskTotalText">-</b></div>
+    </div>
+
+    <!-- MQ Queue List -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">RabbitMQ 队列实时监控</div>
+      </div>
+      <div class="audit-panel" id="mqQueueList">正在加载 MQ 数据...</div>
+    </div>
+
+    <!-- Network -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">网络流量监控 (KB/s)</div>
+      </div>
+      <div id="netChart" class="chart"></div>
+    </div>
+
+    <!-- Middleware Status -->
+    <div class="card col-4">
+      <div class="card-header">
+        <div class="card-title">中间件状态 (Redis / MQ)</div>
+      </div>
+      <div class="stat-group">
+        <div class="stat-box"><span class="val" id="redisMem" style="color: #91cc75">-</span><span class="lbl">Redis
+            内存</span></div>
+        <div class="stat-box"><span class="val" id="redisClients" style="color: #fac858">-</span><span class="lbl">Redis
+            连接</span></div>
+        <div class="stat-box"><span class="val" id="mqMessages" style="color: #ee6666">-</span><span class="lbl">MQ
+            堆积</span></div>
+        <div class="stat-box"><span class="val" id="mqStatus" style="color: #73c0de">-</span><span class="lbl">MQ
+            状态</span></div>
+      </div>
+      <div class="details-box" style="font-size: 9px; margin-top: 5px;">MQ Source: <b id="mqDsn">-</b></div>
+    </div>
+  </div>
+
+  <script>
+    function initTheme() {
+      const savedTheme = localStorage.getItem('vigo-theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    }
+
+    initTheme();
+
+    const gaugeChart = echarts.init(document.getElementById('gaugeChart'));
+    const diskChart = echarts.init(document.getElementById('diskChart'));
+    const netChart = echarts.init(document.getElementById('netChart'));
+
+    let netData = { time: [], sent: [], recv: [] };
+    let lastNet = { sent: 0, recv: 0, time: 0 };
+
+    async function fetchData() {
+      try {
+        const res = await fetch('/admin/api/monitor/stats');
+        const json = await res.json();
+        const data = json.data;
+
+        document.getElementById('os').innerText = data.host.os;
+        document.getElementById('hostname').innerText = data.host.hostname;
+        document.getElementById('uptime').innerText = (data.host.uptime / 3600).toFixed(1) + "h";
+        document.getElementById('serverTime').innerText = data.host.time;
+        document.getElementById('version').innerText = 'v' + (data.version || '-');
+
+        // CPU/MEM
+        document.getElementById('cpuModel').innerText = data.cpu.model || 'Unknown';
+        document.getElementById('cpuCores').innerText = data.cpu.cores;
+        document.getElementById('cpuMhz').innerText = data.cpu.mhz.toFixed(0);
+        document.getElementById('memUsed').innerText = data.memory.used_format;
+        document.getElementById('memTotal').innerText = data.memory.total_format;
+        gaugeChart.setOption({ series: [{ type: 'gauge', center: ['25%', '50%'], radius: '80%', progress: { show: true }, detail: { fontSize: 14, formatter: '{value}%' }, data: [{ value: data.cpu.percent.toFixed(0), name: 'CPU' }] }, { type: 'gauge', center: ['75%', '50%'], radius: '80%', progress: { show: true }, detail: { fontSize: 14, formatter: '{value}%' }, data: [{ value: data.memory.percent.toFixed(0), name: 'MEM' }] }] });
+
+        // Disk
+        document.getElementById('diskUsedText').innerText = data.disk.used_format;
+        document.getElementById('diskTotalText').innerText = data.disk.total_format;
+        diskChart.setOption({ series: [{ type: 'pie', radius: ['40%', '70%'], data: [{ value: data.disk.used, name: '已用' }, { value: data.disk.total - data.disk.used, name: '可用' }] }] });
+
+        // Redis
+        const r = data.redis;
+        document.getElementById('redisMem').innerText = r.status === 'up' ? (r.used_memory_human || '-') : 'OFF';
+        document.getElementById('redisClients').innerText = r.status === 'up' ? (r.connected_clients || '-') : '-';
+
+        // MQ
+        const m = data.rabbitmq;
+        document.getElementById('mqMessages').innerText = m.status === 'up' ? m.messages : '-';
+        document.getElementById('mqStatus').innerText = m.status === 'up' ? 'ONLINE' : 'OFF';
+        document.getElementById('mqDsn').innerText = m.dsn || 'N/A';
+
+        // Redis Keys
+        const redisList = document.getElementById('redisKeyList');
+        if (data.redis_keys && data.redis_keys.length > 0) {
+          redisList.innerHTML = data.redis_keys.map(k => `
+                        <div class="list-item">
+                            <span class="key" title="${k}">${k}</span>
+                            <span class="tag">String</span>
+                        </div>
+                    `).join('');
+        } else {
+          redisList.innerHTML = '<div style="text-align:center; color: var(--secondary-text); margin-top: 20px;">暂无缓存键</div>';
+        }
+
+        // MQ Queues
+        const mqList = document.getElementById('mqQueueList');
+        if (data.mq_queues && data.mq_queues.length > 0) {
+          mqList.innerHTML = data.mq_queues.map(q => `
+                        <div class="list-item">
+                            <span class="key" title="${q.name}">${q.name}</span>
+                            <div style="text-align: right">
+                                <span class="tag" style="color: ${q.messages > 0 ? 'var(--danger)' : 'var(--success)'}">${q.messages} msg</span>
+                                <div class="val">${q.status}</div>
+                            </div>
+                        </div>
+                    `).join('');
+        } else {
+          mqList.innerHTML = '<div style="text-align:center; color: var(--secondary-text); margin-top: 20px;">暂无活跃队列</div>';
+        }
+
+        // Network
+        const now = Date.now();
+        if (lastNet.time > 0) {
+          const duration = (now - lastNet.time) / 1000;
+          if (duration > 0) {
+            const sentSpeed = (data.net.sent - lastNet.sent) / 1024 / duration;
+            const recvSpeed = (data.net.recv - lastNet.recv) / 1024 / duration;
+            netData.time.push(data.host.time);
+            netData.sent.push(Math.max(0, sentSpeed).toFixed(1));
+            netData.recv.push(Math.max(0, recvSpeed).toFixed(1));
+            if (netData.time.length > 30) { netData.time.shift(); netData.sent.shift(); netData.recv.shift(); }
+            netChart.setOption({ xAxis: { type: 'category', data: netData.time }, yAxis: { type: 'value' }, series: [{ name: '上行', type: 'line', data: netData.sent }, { name: '下行', type: 'line', data: netData.recv }] });
+          }
+        }
+        lastNet = { sent: data.net.sent, recv: data.net.recv, time: now };
+      } catch (e) { console.error(e); }
+    }
+    setInterval(fetchData, 2000); fetchData();
+    window.onresize = () => { gaugeChart.resize(); diskChart.resize(); netChart.resize(); };
+  </script>
+</body>
+
+</html>
