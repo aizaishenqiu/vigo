@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigo - 现代化企业级 SaaS 开发框架 v2.0</title>
+    <meta name="description" content="Vigo 是一个基于 Go 1.21+ 构建的现代化企业级 SaaS 开发框架，提供 MVC 架构、ORM、微服务、实时通讯等全套解决方案">
+    <meta name="keywords" content="Vigo, Go 框架，SaaS 框架，MVC, ORM，微服务，高性能">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00cc88;
+            --dark-bg: #0a0a0f;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c0;
+            --accent-color: #ff6b6b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .navbar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Hero 区域 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            background: radial-gradient(ellipse at center, rgba(0, 102, 204, 0.15) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 204, 136, 0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(0, 102, 204, 0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-slogan {
+            font-size: 1.8rem;
+            font-style: italic;
+            color: var(--secondary-color);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .hero-buttons .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* 特性区域 */
+        .features {
+            padding: 8rem 2rem;
+            background: var(--dark-bg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 102, 204, 0.2);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-list {
+            list-style: none;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        /* 性能对比 */
+        .performance {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, var(--card-bg) 100%);
+        }
+
+        .performance-comparison {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(0, 102, 204, 0.2);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        /* CTA 区域 */
+        .cta {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta .btn {
+            background: white;
+            color: var(--primary-color);
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+        }
+
+        .cta .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta .btn-outline {
+            background: transparent;
+            border-color: white;
+            color: white;
+        }
+
+        .cta .btn-outline:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--card-bg);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand">Vigo</div>
+        <ul class="navbar-menu">
+            <li><a href="#features">特性</a></li>
+            <li><a href="#performance">性能</a></li>
+            <li><a href="#docs">文档</a></li>
+            <li><a href="#community">社区</a></li>
+            <li><a href="/home" style="color: var(--secondary-color);">管理后台</a></li>
+        </ul>
+        <div class="navbar-buttons">
+            <a href="使用文档/00.目录/目录.md" class="btn btn-outline">文档</a>
+            <a href="https://github.com/vigo-framework/vigo" class="btn btn-primary">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🎉 v2.0.0 正式发布</div>
+            <h1 class="hero-title">Vigo - 现代化企业级 SaaS 开发框架</h1>
+            <p class="hero-subtitle">基于 Go 1.21+ 构建，集高性能、完整功能、易用性于一体，提供 MVC 架构、ORM、微服务、实时通讯等全套解决方案</p>
+            <p class="hero-slogan">"大道至简，开发由我"</p>
+            
+            <div class="hero-buttons">
+                <a href="/dashboard" class="btn btn-primary">🎯 控制面板</a>
+                <a href="/benchmark" class="btn btn-outline">⚡ 性能测试</a>
+                <a href="/docs/view?file=使用文档/01.入门指南/1.快速开始.md" class="btn btn-outline">🚀 快速开始</a>
+                <a href="/docs/view?file=使用文档/00.目录/目录.md" class="btn btn-outline">📖 查看文档</a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number">15 万+</div>
+                    <div class="stat-label">QPS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10 万+</div>
+                    <div class="stat-label">并发连接</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">&lt;10ms</div>
+                    <div class="stat-label">启动时间</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15-25MB</div>
+                    <div class="stat-label">内存占用</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能模块区域 -->
+    <section class="features" style="padding: 4rem 2rem; background: var(--card-bg);">
+        <div class="section-header">
+            <h2 class="section-title" style="font-size: 2.5rem;">功能模块</h2>
+            <p class="section-subtitle">快速访问所有功能页面，一站式开发体验</p>
+        </div>
+
+        <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 1200px; margin: 0 auto;">
+            <!-- 测试中心 -->
+            <a href="/dashboard" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">控制面板</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">统一控制台，集成所有功能模块</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 102, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--primary-color);">首页</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 102, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--primary-color);">导航</span>
+                </div>
+            </a>
+
+            <a href="/benchmark" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">压力测试</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">QPS、Redis、MySQL、MQ 压测</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 107, 107, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--accent-color);">WebSocket</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 107, 107, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--accent-color);">实时</span>
+                </div>
+            </a>
+
+            <a href="/performance" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">性能测试</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">数据库基准测试、SQL 诊断</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 136, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--secondary-color);">Benchmark</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 136, 0.2); border-radius: 4px; font-size: 0.85rem; color: var(--secondary-color);">SQL</span>
+                </div>
+            </a>
+
+            <a href="/monitor" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">🖥️</div>
+                <h3 class="feature-title">系统监控</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">CPU、内存、磁盘、网络实时监控</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: #00cccc;">监控</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(0, 204, 204, 0.2); border-radius: 4px; font-size: 0.85rem; color: #00cccc;">大屏</span>
+                </div>
+            </a>
+
+            <a href="/migration" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">数据迁移</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">数据库版本控制、迁移管理</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">Migration</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">版本</span>
+                </div>
+            </a>
+
+            <a href="/rabbitmq" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📨</div>
+                <h3 class="feature-title">RabbitMQ</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">队列管理、交换机、消息发布</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 167, 38, 0.2); border-radius: 4px; font-size: 0.85rem; color: #ffa726;">MQ</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(255, 167, 38, 0.2); border-radius: 4px; font-size: 0.85rem; color: #ffa726;">队列</span>
+                </div>
+            </a>
+
+            <a href="/nacos" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">☁️</div>
+                <h3 class="feature-title">Nacos</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">配置中心、服务注册与发现</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">配置</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">服务</span>
+                </div>
+            </a>
+
+            <a href="/docs" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">📄</div>
+                <h3 class="feature-title">API 文档</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Swagger UI、在线调试接口</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">Swagger</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(139, 92, 246, 0.2); border-radius: 4px; font-size: 0.85rem; color: #8b5cf6;">文档</span>
+                </div>
+            </a>
+
+            <a href="/health" class="feature-card" style="text-decoration: none; color: inherit;">
+                <div class="feature-icon">✅</div>
+                <h3 class="feature-title">健康检查</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">轻量级/完整健康检查接口</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">Health</span>
+                    <span style="padding: 0.25rem 0.75rem; background: rgba(76, 175, 80, 0.2); border-radius: 4px; font-size: 0.85rem; color: #4caf50;">监控</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- 特性区域 -->
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2 class="section-title">核心特性</h2>
+            <p class="section-subtitle">为企业提供全方位的技术支撑，让开发更高效、系统更稳定</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- 特性 1: MVC 架构 -->
+            <div class="feature-card">
+                <div class="feature-icon">🏗️</div>
+                <h3 class="feature-title">MVC 架构</h3>
+                <ul class="feature-list">
+                    <li>Controller-Service-Model 清晰分层</li>
+                    <li>IoC 容器依赖注入</li>
+                    <li>完整中间件链支持</li>
+                    <li>灵活的路由系统</li>
+                    <li>内置模板引擎</li>
+                </ul>
+            </div>
+
+            <!-- 特性 2: ORM 系统 -->
+            <div class="feature-card">
+                <div class="feature-icon">🗄️</div>
+                <h3 class="feature-title">ThinkPHP/Laravel风格 ORM</h3>
+                <ul class="feature-list">
+                    <li>链式操作查询构造器</li>
+                    <li>模型关联（HasOne/HasMany）</li>
+                    <li>多数据库支持（MySQL/PG/SQLite/MSSQL）</li>
+                    <li>读写分离 + 分库分表</li>
+                    <li>乐观锁 + 分布式锁</li>
+                </ul>
+            </div>
+
+            <!-- 特性 3: 微服务 -->
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">微服务架构</h3>
+                <ul class="feature-list">
+                    <li>gRPC 高性能 RPC 框架</li>
+                    <li>Nacos 服务注册与发现</li>
+                    <li>配置中心（Nacos/Apollo）</li>
+                    <li>负载均衡（4 种算法）</li>
+                    <li>熔断降级 + 链路追踪</li>
+                </ul>
+            </div>
+
+            <!-- 特性 4: 缓存系统 -->
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">多级缓存系统</h3>
+                <ul class="feature-list">
+                    <li>BigCache 内存缓存</li>
+                    <li>Redis 分布式缓存</li>
+                    <li>多级缓存 + 标签管理</li>
+                    <li>缓存预热 + 自动刷新</li>
+                    <li>缓存穿透/雪崩防护</li>
+                </ul>
+            </div>
+
+            <!-- 特性 5: 消息队列 -->
+            <div class="feature-card">
+                <div class="feature-icon">📨</div>
+                <h3 class="feature-title">消息队列</h3>
+                <ul class="feature-list">
+                    <li>RabbitMQ 完整支持</li>
+                    <li>Redis 队列</li>
+                    <li>Database 队列</li>
+                    <li>延迟队列</li>
+                    <li>消息持久化</li>
+                </ul>
+            </div>
+
+            <!-- 特性 6: 安全防护 -->
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">全方位安全防护</h3>
+                <ul class="feature-list">
+                    <li>XSS 自动过滤</li>
+                    <li>SQL 注入防护</li>
+                    <li>CSRF Token 验证</li>
+                    <li>分布式限流</li>
+                    <li>JWT 认证</li>
+                    <li>IP 黑白名单</li>
+                </ul>
+            </div>
+
+            <!-- 特性 7: 监控运维 -->
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">监控运维</h3>
+                <ul class="feature-list">
+                    <li>Prometheus 指标收集</li>
+                    <li>系统性能监控</li>
+                    <li>数据库连接池监控</li>
+                    <li>实时日志系统</li>
+                    <li>多渠道告警通知</li>
+                </ul>
+            </div>
+
+            <!-- 特性 8: 开发工具 -->
+            <div class="feature-card">
+                <div class="feature-icon">🛠️</div>
+                <h3 class="feature-title">开发工具链</h3>
+                <ul class="feature-list">
+                    <li>vigoctl 代码生成器</li>
+                    <li>CRUD 一键生成</li>
+                    <li>热重载支持</li>
+                    <li>Swagger API 文档</li>
+                    <li>调试工具栏</li>
+                </ul>
+            </div>
+
+            <!-- 特性 9: 第三方集成 -->
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <h3 class="feature-title">第三方服务集成</h3>
+                <ul class="feature-list">
+                    <li>支付（支付宝/微信）</li>
+                    <li>OSS（阿里云/七牛云/腾讯云）</li>
+                    <li>短信（阿里云/腾讯云）</li>
+                    <li>邮件 SMTP</li>
+                    <li>WebSocket 实时通讯</li>
+                    <li>GraphQL 支持</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 性能对比区域 -->
+    <section id="performance" class="performance">
+        <div class="section-header">
+            <h2 class="section-title">性能对比</h2>
+            <p class="section-subtitle">与主流框架的性能对比测试数据</p>
+        </div>
+
+        <div class="performance-comparison">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>场景</th>
+                        <th>Vigo</th>
+                        <th>Gin</th>
+                        <th>go-zero</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Hello World</strong></td>
+                        <td class="highlight">150,000+ QPS</td>
+                        <td>120,000+ QPS</td>
+                        <td>130,000+ QPS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Query</strong></td>
+                        <td class="highlight">50,000+ QPS</td>
+                        <td>40,000+ QPS</td>
+                        <td>45,000+ QPS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON API</strong></td>
+                        <td class="highlight">100,000+ QPS</td>
+                        <td>90,000+ QPS</td>
+                        <td>95,000+ QPS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache Operation</strong></td>
+                        <td class="highlight">200,000+ QPS</td>
+                        <td>180,000+ QPS</td>
+                        <td>190,000+ QPS</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="Vigo 与 Gin go-zero 对比分析.md" class="btn btn-primary">查看完整对比分析 →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA 区域 -->
+    <section class="cta">
+        <h2 class="cta-title">准备好开始使用 Vigo 了吗？</h2>
+        <p class="cta-subtitle">立即开始构建您的高性能企业级应用</p>
+        <div class="cta-buttons">
+                <a href="/benchmark" class="btn">⚡ 性能测试</a>
+                <a href="/docs/view?file=使用文档/01.入门指南/1.快速开始.md" class="btn">🚀 快速开始</a>
+                <a href="/docs/view?file=使用文档/00.目录/目录.md" class="btn btn-outline">📖 浏览文档</a>
+            </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer id="docs" class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>关于 Vigo</h4>
+                <p style="color: var(--text-secondary); line-height: 1.8;">
+                    Vigo 是一个基于 Go 1.21+ 构建的现代化企业级 SaaS 开发框架，提供完整的 MVC 架构、ORM、微服务等解决方案。
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h4>快速链接</h4>
+                <ul class="footer-links">
+                    <li><a href="使用文档/01.入门指南/1.快速开始.md">快速开始</a></li>
+                    <li><a href="使用文档/00.目录/目录.md">文档中心</a></li>
+                    <li><a href="Vigo 与 Gin go-zero 对比分析.md">框架对比</a></li>
+                    <li><a href="使用文档/04.安全防护/07.安全防护体系总结.md">安全防护</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>核心功能</h4>
+                <ul class="footer-links">
+                    <li><a href="使用文档/03.数据库/00.数据库文档目录.md">数据库 ORM</a></li>
+                    <li><a href="使用文档/10.微服务架构/01.微服务架构概述.md">微服务</a></li>
+                    <li><a href="使用文档/04.安全防护/01.日志处理.md">监控运维</a></li>
+                    <li><a href="使用文档/06.架构设计/01.容器与依赖注入.md">架构设计</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section" id="community">
+                <h4>社区</h4>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/vigo-framework/vigo">GitHub</a></li>
+                    <li><a href="README_EN.md">English Version</a></li>
+                    <li><a href="使用文档/00.目录/框架简介.md">框架简介</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Vigo Framework. Made with ❤️ by Vigo Team</p>
+            <p style="margin-top: 0.5rem;">遵循 Apache 2.0 开源许可协议发布</p>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(10, 10, 15, 0.98)';
+                navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 15, 0.95)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
