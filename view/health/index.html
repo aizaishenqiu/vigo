@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康检查 - Vigo</title>
+    <style>
+        :root {
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-badge.healthy {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .status-badge.unhealthy {
+            background: rgba(239, 68, 68, 0.3);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.success { background: #10b981; }
+        .status-dot.error { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--info), var(--success));
+            border-radius: 2px;
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .status-item {
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .status-item.success {
+            background: var(--success-light);
+            border-color: var(--success);
+        }
+
+        .status-item.error {
+            background: var(--danger-light);
+            border-color: var(--danger);
+        }
+
+        .status-item.warning {
+            background: var(--warning-light);
+            border-color: var(--warning);
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-icon {
+            font-size: 24px;
+        }
+
+        /* Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--info);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Response Time */
+        .response-time {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .response-time.good { color: var(--success); }
+        .response-time.medium { color: var(--warning); }
+        .response-time.bad { color: var(--danger); }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--info);
+            border: 2px solid var(--info);
+        }
+
+        .btn-secondary:hover {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.9;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 36px; }
+            .card { padding: 24px; }
+            .status-grid { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💚 健康检查</h1>
+            <p>实时监控系统健康状态</p>
+            <div id="statusBadge" class="status-badge healthy">
+                <span class="status-dot success"></span>
+                <span>系统健康</span>
+            </div>
+        </div>
+
+        <!-- Service Status -->
+        <div class="card">
+            <h2 class="card-title">服务状态</h2>
+            <div class="status-grid">
+                <div class="status-item success" id="appStatus">
+                    <div class="status-label">应用服务</div>
+                    <div class="status-value">
+                        <span class="status-icon">✅</span>
+                        <span>运行正常</span>
+                    </div>
+                </div>
+                
+                <div class="status-item" id="dbStatus">
+                    <div class="status-label">数据库</div>
+                    <div class="status-value">
+                        <span class="status-icon">⏳</span>
+                        <span>检测中...</span>
+                    </div>
+                </div>
+                
+                <div class="status-item" id="redisStatus">
+                    <div class="status-label">Redis 缓存</div>
+                    <div class="status-value">
+                        <span class="status-icon">⏳</span>
+                        <span>检测中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="card">
+            <h2 class="card-title">性能指标</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="responseTime">-</div>
+                    <div class="metric-label">响应时间</div>
+                    <div class="response-time" id="responseTimeLabel">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="uptime">-</div>
+                    <div class="metric-label">运行时间</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="timestamp">-</div>
+                    <div class="metric-label">检查时间</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="card">
+            <h2 class="card-title">系统信息</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">框架名称</div>
+                    <div class="status-value">
+                        <span class="status-icon">🚀</span>
+                        <span>Vigo</span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">框架版本</div>
+                    <div class="status-value">
+                        <span class="status-icon">📦</span>
+                        <span>v2.0.12</span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Go 版本</div>
+                    <div class="status-value">
+                        <span class="status-icon">🔧</span>
+                        <span>1.21+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <h2 class="card-title">操作</h2>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="checkHealth()">
+                    <span>🔄</span>
+                    <span>重新检查</span>
+                </button>
+                <a href="/" class="btn btn-secondary">
+                    <span>🏠</span>
+                    <span>返回首页</span>
+                </a>
+                <a href="/docs/swagger/" class="btn btn-secondary">
+                    <span>📖</span>
+                    <span>API 文档</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by <strong>Vigo Framework</strong></p>
+            <p style="margin-top: 8px; font-size: 14px;">
+                <a href="/">首页</a> · 
+                <a href="/docs/swagger/">API 文档</a> · 
+                <a href="/health/full">完整检查</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 格式化运行时间
+        function formatUptime(seconds) {
+            if (!seconds || seconds < 0) return '-';
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (days > 0) return `${days}天${hours}时`;
+            if (hours > 0) return `${hours}时${minutes}分`;
+            if (minutes > 0) return `${minutes}分${secs}秒`;
+            return `${secs}秒`;
+        }
+
+        // 格式化响应时间标签
+        function formatResponseTime(ms) {
+            if (!ms) return '-';
+            if (ms < 100) return '< 100ms';
+            if (ms < 500) return '100-500ms';
+            if (ms < 1000) return '500ms-1s';
+            return '> 1s';
+        }
+
+        // 获取响应时间级别
+        function getResponseTimeClass(ms) {
+            if (!ms) return '';
+            if (ms < 100) return 'good';
+            if (ms < 500) return 'good';
+            if (ms < 1000) return 'medium';
+            return 'bad';
+        }
+
+        // 检查健康状态
+        async function checkHealth() {
+            const startTime = Date.now();
+            
+            try {
+                // 调用健康检查 API
+                const response = await fetch('/health/full', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                const responseTime = Date.now() - startTime;
+                
+                // 更新响应时间
+                document.getElementById('responseTime').textContent = responseTime + 'ms';
+                document.getElementById('responseTimeLabel').textContent = formatResponseTime(responseTime);
+                document.getElementById('responseTimeLabel').className = 'response-time ' + getResponseTimeClass(responseTime);
+                
+                // 更新时间戳
+                const now = new Date();
+                document.getElementById('timestamp').textContent = now.toLocaleTimeString('zh-CN');
+                
+                // 更新数据库状态
+                const dbStatus = document.getElementById('dbStatus');
+                if (data.database === 'up') {
+                    dbStatus.className = 'status-item success';
+                    dbStatus.innerHTML = `
+                        <div class="status-label">数据库</div>
+                        <div class="status-value">
+                            <span class="status-icon">✅</span>
+                            <span>连接正常</span>
+                        </div>
+                    `;
+                } else if (data.database === 'down') {
+                    dbStatus.className = 'status-item error';
+                    dbStatus.innerHTML = `
+                        <div class="status-label">数据库</div>
+                        <div class="status-value">
+                            <span class="status-icon">❌</span>
+                            <span>连接失败</span>
+                        </div>
+                    `;
+                } else {
+                    dbStatus.className = 'status-item warning';
+                    dbStatus.innerHTML = `
+                        <div class="status-label">数据库</div>
+                        <div class="status-value">
+                            <span class="status-icon">⚠️</span>
+                            <span>未配置</span>
+                        </div>
+                    `;
+                }
+                
+                // 更新 Redis 状态
+                const redisStatus = document.getElementById('redisStatus');
+                if (data.redis === 'up') {
+                    redisStatus.className = 'status-item success';
+                    redisStatus.innerHTML = `
+                        <div class="status-label">Redis 缓存</div>
+                        <div class="status-value">
+                            <span class="status-icon">✅</span>
+                            <span>连接正常</span>
+                        </div>
+                    `;
+                } else if (data.redis === 'down') {
+                    redisStatus.className = 'status-item error';
+                    redisStatus.innerHTML = `
+                        <div class="status-label">Redis 缓存</div>
+                        <div class="status-value">
+                            <span class="status-icon">❌</span>
+                            <span>连接失败</span>
+                        </div>
+                    `;
+                } else {
+                    redisStatus.className = 'status-item warning';
+                    redisStatus.innerHTML = `
+                        <div class="status-label">Redis 缓存</div>
+                        <div class="status-value">
+                            <span class="status-icon">⚠️</span>
+                            <span>未配置</span>
+                        </div>
+                    `;
+                }
+                
+                // 更新总体状态
+                const statusBadge = document.getElementById('statusBadge');
+                if (data.status === 'healthy') {
+                    statusBadge.className = 'status-badge healthy';
+                    statusBadge.innerHTML = `
+                        <span class="status-dot success"></span>
+                        <span>系统健康</span>
+                    `;
+                } else {
+                    statusBadge.className = 'status-badge unhealthy';
+                    statusBadge.innerHTML = `
+                        <span class="status-dot error"></span>
+                        <span>系统异常</span>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('健康检查失败:', error);
+                
+                // 显示错误状态
+                document.getElementById('dbStatus').className = 'status-item error';
+                document.getElementById('dbStatus').innerHTML = `
+                    <div class="status-label">数据库</div>
+                    <div class="status-value">
+                        <span class="status-icon">❌</span>
+                        <span>检查失败</span>
+                    </div>
+                `;
+                
+                document.getElementById('redisStatus').className = 'status-item error';
+                document.getElementById('redisStatus').innerHTML = `
+                    <div class="status-label">Redis 缓存</div>
+                    <div class="status-value">
+                        <span class="status-icon">❌</span>
+                        <span>检查失败</span>
+                    </div>
+                `;
+                
+                const statusBadge = document.getElementById('statusBadge');
+                statusBadge.className = 'status-badge unhealthy';
+                statusBadge.innerHTML = `
+                    <span class="status-dot error"></span>
+                    <span>检查失败</span>
+                `;
+                
+                document.getElementById('responseTimeLabel').textContent = '请求失败';
+                document.getElementById('responseTimeLabel').className = 'response-time bad';
+            }
+        }
+
+        // 页面加载时自动检查
+        document.addEventListener('DOMContentLoaded', function() {
+            checkHealth();
+            // 每 30 秒自动刷新
+            setInterval(checkHealth, 30000);
+        });
+    </script>
+</body>
+</html>

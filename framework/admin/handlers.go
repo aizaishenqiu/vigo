@@ -480,3 +480,10 @@ func systemRealtimeStats(c *mvc.Context) {
 		"data": stats,
 	})
 }
+
+// ==================== 压力测试页面处理器 ====================
+
+// stressHandler 压力测试中心页面
+func stressHandler(c *mvc.Context) {
+	renderView(c, "views/stress.html", map[string]interface{}{"title": "压测中心"})
+}

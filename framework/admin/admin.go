@@ -131,6 +131,7 @@ func RegisterRoutes(r *mvc.Router) {
 	r.GET(basePath+"/", indexHandler)
 	r.GET(basePath+"/welcome", welcomeHandler)
 	r.GET(basePath+"/monitor", systemMonitor)
+	r.GET(basePath+"/stress", stressHandler)
 	r.GET(basePath+"/settings", settingsHandler)
 	r.GET(basePath+"/nacos", nacosIndex)
 	r.GET(basePath+"/rabbitmq", rabbitmqIndex)
@@ -170,6 +171,11 @@ func RegisterRoutes(r *mvc.Router) {
 	r.POST(basePath+"/api/rabbitmq/exchange", rabbitmqExchangeCreate)
 	r.DELETE(basePath+"/api/rabbitmq/exchange", rabbitmqExchangeDelete)
 	r.GET(basePath+"/api/rabbitmq/status", rabbitmqStatusStub)
+
+	// API 路由 - 压力测试
+	r.GET(basePath+"/api/stress/results", stressTestResults)
+	r.DELETE(basePath+"/api/stress/result", stressTestDelete)
+	r.POST(basePath+"/api/stress/clear", stressTestClear)
 
 	fmt.Printf("Admin panel registered at %s\n", basePath)
 }

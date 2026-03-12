@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-color: #ffffff;
+            --bg-sidebar: #f9fafb;
+            --bg-toc: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: #e5e7eb;
+            --code-bg: #f3f4f6;
+            --sidebar-width: 280px;
+            --toc-width: 240px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* 顶部导航 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .navbar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        /* 主容器 */
+        .doc-layout {
+            display: flex;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* 左侧边栏 - 文件树 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+        }
+
+        .tree-node {
+            list-style: none;
+        }
+
+        .tree-node-item {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .tree-node-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .tree-node-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .tree-node-icon {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .tree-node-children {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .tree-node-expandable .tree-node-item {
+            font-weight: 500;
+        }
+
+        /* 中间内容区 */
+        .doc-main {
+            margin-left: var(--sidebar-width);
+            margin-right: var(--toc-width);
+            padding: 3rem 4rem;
+            max-width: calc(100% - var(--sidebar-width) - var(--toc-width));
+        }
+
+        .markdown-body {
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .markdown-body h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .markdown-body h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .markdown-body h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+        }
+
+        .markdown-body h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .markdown-body p {
+            margin: 1rem 0;
+        }
+
+        .markdown-body code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+            font-size: 0.875em;
+            color: #e11d48;
+        }
+
+        .markdown-body pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .markdown-body pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .markdown-body ul,
+        .markdown-body ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .markdown-body li {
+            margin: 0.5rem 0;
+        }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .markdown-body a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .markdown-body th,
+        .markdown-body td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        .markdown-body th {
+            background: var(--bg-sidebar);
+            font-weight: 600;
+        }
+
+        /* 右侧目录 */
+        .toc {
+            position: fixed;
+            right: 0;
+            top: 60px;
+            bottom: 0;
+            width: var(--toc-width);
+            background: var(--bg-toc);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .toc-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list-item {
+            margin: 0.5rem 0;
+        }
+
+        .toc-list-link {
+            display: block;
+            padding: 0.4rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .toc-list-link:hover {
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .toc-list-link.active {
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .toc-list-item ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .doc-main {
+                margin-right: 0;
+                max-width: calc(100% - var(--sidebar-width));
+            }
+
+            .toc {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .doc-main {
+                margin-left: 0;
+                padding: 2rem;
+                max-width: 100%;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Vigo 文档</a>
+        <ul class="navbar-menu">
+            <li><a href="/">官网首页</a></li>
+            <li><a href="/docs">文档目录</a></li>
+            <li><a href="/dashboard">控制面板</a></li>
+            <li><a href="/benchmark">性能测试</a></li>
+        </ul>
+    </nav>
+
+    <div class="doc-layout">
+        <!-- 左侧边栏 - 文件树导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">文档目录</div>
+                <ul class="tree-node">
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>00.目录</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/00.目录/目录.md" class="tree-node-item">📄 目录</a></li>
+                        <li><a href="/docs/view?file=使用文档/00.目录/框架简介.md" class="tree-node-item">📄 框架简介</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>01.入门指南</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/01.入门指南/0.极速上手指南.md" class="tree-node-item">📄 极速上手指南</a></li>
+                        <li><a href="/docs/view?file=使用文档/01.入门指南/1.快速开始.md" class="tree-node-item">📄 快速开始</a></li>
+                        <li><a href="/docs/view?file=使用文档/01.入门指南/简介.md" class="tree-node-item">📄 简介</a></li>
+                        <li><a href="/docs/view?file=使用文档/01.入门指南/02.config.yaml 配置文件详解.md" class="tree-node-item">📄 config.yaml 详解</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>02.核心功能</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/02.核心功能/01.路由与控制器.md" class="tree-node-item">📄 路由与控制器</a></li>
+                        <li><a href="/docs/view?file=使用文档/02.核心功能/02.配置管理.md" class="tree-node-item">📄 配置管理</a></li>
+                        <li><a href="/docs/view?file=使用文档/02.核心功能/03.视图与模板.md" class="tree-node-item">📄 视图与模板</a></li>
+                        <li><a href="/docs/view?file=使用文档/02.核心功能/04.API 文档.md" class="tree-node-item">📄 API 文档</a></li>
+                        <li><a href="/docs/view?file=使用文档/02.核心功能/05.开发工具.md" class="tree-node-item">📄 开发工具</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>03.数据库</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/03.数据库/01.连接数据库.md" class="tree-node-item">📄 连接数据库</a></li>
+                        <li><a href="/docs/view?file=使用文档/03.数据库/02.读写分离.md" class="tree-node-item">📄 读写分离</a></li>
+                        <li><a href="/docs/view?file=使用文档/03.数据库/03.查询构造器.md" class="tree-node-item">📄 查询构造器</a></li>
+                        <li><a href="/docs/view?file=使用文档/03.数据库/04.查询操作详解.md" class="tree-node-item">📄 查询操作详解</a></li>
+                        <li><a href="/docs/view?file=使用文档/03.数据库/05.写入操作详解.md" class="tree-node-item">📄 写入操作详解</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>04.安全防护</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/04.安全防护/01.日志处理.md" class="tree-node-item">📄 日志处理</a></li>
+                        <li><a href="/docs/view?file=使用文档/04.安全防护/02.缓存管理.md" class="tree-node-item">📄 缓存管理</a></li>
+                        <li><a href="/docs/view?file=使用文档/04.安全防护/03.事件系统.md" class="tree-node-item">📄 事件系统</a></li>
+                        <li><a href="/docs/view?file=使用文档/04.安全防护/04.中间件.md" class="tree-node-item">📄 中间件</a></li>
+                        <li><a href="/docs/view?file=使用文档/04.安全防护/05.验证器.md" class="tree-node-item">📄 验证器</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>05.服务组件</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/05.服务组件/01.RabbitMQ 消息队列.md" class="tree-node-item">📄 RabbitMQ 消息队列</a></li>
+                        <li><a href="/docs/view?file=使用文档/05.服务组件/02.Nacos 服务管理.md" class="tree-node-item">📄 Nacos 服务管理</a></li>
+                        <li><a href="/docs/view?file=使用文档/05.服务组件/03.WebSocket 实时通讯.md" class="tree-node-item">📄 WebSocket 实时通讯</a></li>
+                        <li><a href="/docs/view?file=使用文档/05.服务组件/04.gRPC 微服务.md" class="tree-node-item">📄 gRPC 微服务</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>06.架构设计</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/06.架构设计/01.容器与依赖注入.md" class="tree-node-item">📄 容器与依赖注入</a></li>
+                        <li><a href="/docs/view?file=使用文档/06.架构设计/02.门面.md" class="tree-node-item">📄 门面</a></li>
+                        <li><a href="/docs/view?file=使用文档/06.架构设计/04.门面 Facade 使用详解.md" class="tree-node-item">📄 门面 Facade</a></li>
+                        <li><a href="/docs/view?file=使用文档/06.架构设计/05.自定义插件开发.md" class="tree-node-item">📄 自定义插件开发</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>07.高级特性</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/01.Gateway.md" class="tree-node-item">📄 Gateway</a></li>
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/02.gRPC.md" class="tree-node-item">📄 gRPC</a></li>
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/03.Nacos.md" class="tree-node-item">📄 Nacos</a></li>
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/04.RabbitMQ.md" class="tree-node-item">📄 RabbitMQ</a></li>
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/05.WebSocket.md" class="tree-node-item">📄 WebSocket</a></li>
+                        <li><a href="/docs/view?file=使用文档/07.高级特性/06.多租户.md" class="tree-node-item">📄 多租户</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>08.部署运维</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/08.部署运维/01.压力测试指南.md" class="tree-node-item">📄 压力测试指南</a></li>
+                        <li><a href="/docs/view?file=使用文档/08.部署运维/02.端口管理.md" class="tree-node-item">📄 端口管理</a></li>
+                        <li><a href="/docs/view?file=使用文档/08.部署运维/03.Docker 部署指南.md" class="tree-node-item">📄 Docker 部署指南</a></li>
+                        <li><a href="/docs/view?file=使用文档/08.部署运维/05.打包发布指南.md" class="tree-node-item">📄 打包发布指南</a></li>
+                        <li><a href="/docs/view?file=使用文档/08.部署运维/06.性能压测报告.md" class="tree-node-item">📄 性能压测报告</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>09.MVC 架构</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/09.MVC 架构/01.MVC 架构概述.md" class="tree-node-item">📄 MVC 架构概述</a></li>
+                        <li><a href="/docs/view?file=使用文档/09.MVC 架构/02.控制器 Controller 操作.md" class="tree-node-item">📄 控制器 Controller</a></li>
+                        <li><a href="/docs/view?file=使用文档/09.MVC 架构/03.模型 Model 操作.md" class="tree-node-item">📄 模型 Model 操作</a></li>
+                        <li><a href="/docs/view?file=使用文档/09.MVC 架构/04.视图 View 操作.md" class="tree-node-item">📄 视图 View 操作</a></li>
+                        <li><a href="/docs/view?file=使用文档/09.MVC 架构/05.路由使用详解.md" class="tree-node-item">📄 路由使用详解</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>10.微服务架构</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/10.微服务架构/01.微服务架构概述.md" class="tree-node-item">📄 微服务架构概述</a></li>
+                        <li><a href="/docs/view?file=使用文档/10.微服务架构/02.单体服务架构.md" class="tree-node-item">📄 单体服务架构</a></li>
+                        <li><a href="/docs/view?file=使用文档/10.微服务架构/03.单体服务迁移到微服务.md" class="tree-node-item">📄 迁移到微服务</a></li>
+                        <li><a href="/docs/view?file=使用文档/10.微服务架构/04.链路追踪使用指南.md" class="tree-node-item">📄 链路追踪</a></li>
+                        <li><a href="/docs/view?file=使用文档/10.微服务架构/05.指标监控使用指南.md" class="tree-node-item">📄 指标监控</a></li>
+                    </ul>
+
+                    <li class="tree-node-item" onclick="toggleNode(this)">
+                        <span class="tree-node-icon">📁</span>
+                        <span>11.其他</span>
+                    </li>
+                    <ul class="tree-node-children">
+                        <li><a href="/docs/view?file=使用文档/11.其他/01.代码生成工具使用指南.md" class="tree-node-item">📄 代码生成工具</a></li>
+                        <li><a href="/docs/view?file=使用文档/11.其他/02.Nacos 配置中心使用指南.md" class="tree-node-item">📄 Nacos 配置中心</a></li>
+                        <li><a href="/docs/view?file=使用文档/11.其他/03.Nacos 服务发现使用指南.md" class="tree-node-item">📄 Nacos 服务发现</a></li>
+                        <li><a href="/docs/view?file=使用文档/11.其他/04.Redis 缓存适配器使用指南.md" class="tree-node-item">📄 Redis 缓存适配器</a></li>
+                        <li><a href="/docs/view?file=使用文档/11.其他/05.分布式限流器使用指南.md" class="tree-node-item">📄 分布式限流器</a></li>
+                    </ul>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- 文档内容 -->
+        <main class="doc-main">
+            <div class="markdown-body">
+                {{.content}}
+            </div>
+        </main>
+
+        <!-- 右侧目录 - 本文目录 -->
+        <aside class="toc" id="toc">
+            <div class="toc-title">本文目录</div>
+            <ul class="toc-list" id="toc-list">
+                <!-- 动态生成 -->
+            </ul>
+        </aside>
+    </div>
+
+    <script>
+        // 切换节点展开/折叠
+        function toggleNode(element) {
+            const parent = element.parentElement;
+            const children = parent.querySelector('.tree-node-children');
+            if (children) {
+                children.style.display = children.style.display === 'none' ? 'block' : 'none';
+                const icon = element.querySelector('.tree-node-icon');
+                if (icon) {
+                    icon.textContent = children.style.display === 'none' ? '📁' : '📂';
+                }
+            }
+        }
+
+        // 提取标题生成目录
+        function generateTOC() {
+            const markdownBody = document.querySelector('.markdown-body');
+            const tocList = document.getElementById('toc-list');
+            if (!markdownBody || !tocList) return;
+
+            const headers = markdownBody.querySelectorAll('h1, h2, h3, h4');
+            if (headers.length === 0) return;
+
+            let tocHTML = '';
+            headers.forEach((header, index) => {
+                const id = 'header-' + index;
+                header.id = id;
+                
+                const level = header.tagName.toLowerCase();
+                const text = header.textContent.trim();
+                
+                if (level === 'h1') {
+                    tocHTML += `<li class="toc-list-item"><a href="#${id}" class="toc-list-link">${text}</a></li>`;
+                } else if (level === 'h2') {
+                    tocHTML += `<li class="toc-list-item"><a href="#${id}" class="toc-list-link">${text}</a></li>`;
+                } else if (level === 'h3') {
+                    tocHTML += `<li class="toc-list-item" style="padding-left: 1rem;"><a href="#${id}" class="toc-list-link">${text}</a></li>`;
+                } else if (level === 'h4') {
+                    tocHTML += `<li class="toc-list-item" style="padding-left: 2rem;"><a href="#${id}" class="toc-list-link">${text}</a></li>`;
+                }
+            });
+
+            tocList.innerHTML = tocHTML;
+
+            // 监听滚动高亮当前标题
+            window.addEventListener('scroll', () => {
+                let current = '';
+                headers.forEach((header) => {
+                    const headerTop = header.offsetTop - 100;
+                    if (window.scrollY >= headerTop) {
+                        current = header.id;
+                    }
+                });
+
+                document.querySelectorAll('.toc-list-link').forEach((link) => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // 页面加载完成后生成目录
+        document.addEventListener('DOMContentLoaded', generateTOC);
+    </script>
+</body>
+</html>
