@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 	"vigo/config"
+	"vigo/framework/db"
 	"vigo/framework/mvc"
+	"vigo/framework/redis"
 )
 
 // ==================== 登录/认证 API 处理器 ====================
@@ -494,21 +496,59 @@ func stressTestStats(c *mvc.Context) {
 	// 获取系统统计
 	sysStats := getRealSystemStats()
 
-	// 构建返回数据
+	// 获取压测数据
+	var stressData map[string]interface{}
+	runningTests := GlobalStressManager.GetRunningTests()
+
+	if len(runningTests) > 0 {
+		// 获取第一个运行中的测试数据
+		test := runningTests[0]
+
+		// 解析延迟字符串为数值（ms）
+		avgLatency := parseFloat64(test.AvgLatency)
+		p95Latency := parseFloat64(test.P99Latency)
+		p99Latency := parseFloat64(test.MaxLatency)
+
+		stressData = map[string]interface{}{
+			"qps":         test.QPS,
+			"latency":     avgLatency,
+			"p95":         p95Latency,
+			"p99":         p99Latency,
+			"mysqlOps":    0, // TODO: 从实际数据库连接池获取
+			"redisOps":    0, // TODO: 从实际 Redis 连接池获取
+			"mqOps":       0, // TODO: 从实际 MQ 连接池获取
+			"successRate": (1 - test.ErrorRate) * 100,
+			"failedRate":  test.ErrorRate * 100,
+		}
+	} else {
+		stressData = map[string]interface{}{
+			"qps":         0,
+			"latency":     0,
+			"p95":         0,
+			"p99":         0,
+			"mysqlOps":    0,
+			"redisOps":    0,
+			"mqOps":       0,
+			"successRate": 0,
+			"failedRate":  0,
+		}
+	}
+
+	// 合并数据
 	stats := map[string]interface{}{
-		"qps":         0,
-		"latency":     0,
-		"p95":         0,
-		"p99":         0,
-		"mysqlOps":    0,
-		"redisOps":    0,
-		"mqOps":       0,
+		"qps":         stressData["qps"],
+		"latency":     stressData["latency"],
+		"p95":         stressData["p95"],
+		"p99":         stressData["p99"],
+		"mysqlOps":    stressData["mysqlOps"],
+		"redisOps":    stressData["redisOps"],
+		"mqOps":       stressData["mqOps"],
 		"cpu":         sysStats.CPU.Usage,
-		"memUsed":     sysStats.Memory.Used * 1024 * 1024, // 转换为字节
+		"memUsed":     sysStats.Memory.Used * 1024 * 1024,
 		"memTotal":    sysStats.Memory.Total * 1024 * 1024,
 		"netSpeed":    sysStats.Network.SentRate + sysStats.Network.RecvRate,
-		"successRate": 0,
-		"failedRate":  0,
+		"successRate": stressData["successRate"],
+		"failedRate":  stressData["failedRate"],
 	}
 
 	c.Json(200, map[string]interface{}{
@@ -516,6 +556,18 @@ func stressTestStats(c *mvc.Context) {
 		"msg":  "success",
 		"data": stats,
 	})
+}
+
+// parseFloat64 解析字符串为 float64
+func parseFloat64(s string) float64 {
+	if s == "" {
+		return 0
+	}
+	// 去除单位
+	s = strings.TrimSuffix(s, "ms")
+	s = strings.TrimSuffix(s, "s")
+	val, _ := strconv.ParseFloat(s, 64)
+	return val
 }
 
 // stressTestServices 检测服务状态
@@ -526,18 +578,37 @@ func stressTestServices(c *mvc.Context) {
 		"mq":    false,
 	}
 
-	// 检测 MySQL 连接
+	// 检测 MySQL 连接（尝试 ping）
 	if config.App.Database.Host != "" {
-		services["mysql"] = true
+		if db := db.GetWriteDB(); db != nil {
+			if err := db.Ping(); err == nil {
+				services["mysql"] = true
+			}
+		}
 	}
 
-	// 检测 Redis 连接
+	// 检测 Redis 连接（尝试 ping）
 	if config.App.Redis.Host != "" {
-		services["redis"] = true
+		redisClient := redis.New(redis.Config{
+			Host:         config.App.Redis.Host,
+			Port:         config.App.Redis.Port,
+			Password:     config.App.Redis.Password,
+			DB:           config.App.Redis.DB,
+			PoolSize:     config.App.Redis.PoolSize,
+			MinIdleConns: config.App.Redis.MinIdleConns,
+			MaxIdleConns: config.App.Redis.MaxIdleConns,
+			Cluster: redis.ClusterConfig{
+				Enabled: config.App.Redis.Cluster.Enabled,
+				Addrs:   config.App.Redis.Cluster.Addrs,
+			},
+		})
+		if err := redisClient.Connect(); err == nil {
+			services["redis"] = true
+		}
 	}
 
-	// 检测 RabbitMQ 连接
-	if config.App.RabbitMQ.Host != "" {
+	// 检测 RabbitMQ 连接（检查配置）
+	if config.App.RabbitMQ.Host != "" && config.App.RabbitMQ.User != "" {
 		services["mq"] = true
 	}
 

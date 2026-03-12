@@ -433,6 +433,19 @@ func (m *StressTestManager) ClearAllResults() error {
 	return nil
 }
 
+// GetRunningTests 获取所有运行中的测试
+func (m *StressTestManager) GetRunningTests() []*StressTestProgress {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	tests := make([]*StressTestProgress, 0, len(m.running))
+	for _, progress := range m.running {
+		tests = append(tests, progress)
+	}
+
+	return tests
+}
+
 // handleStressUpdate 处理压力测试 WebSocket 更新
 func handleStressUpdate(msg WSMessage) {
 	if msg.Action == "start" {
