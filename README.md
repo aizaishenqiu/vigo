@@ -40,6 +40,7 @@
 - **低延迟**: 平均响应时间 **< 1ms**
 - **低资源**: 内存占用仅 **15-25MB**
 - **快启动**: 冷启动时间 **< 10ms**
+- **自研路由**: 基于 Radix Tree 的高性能路由系统
 
 ### 🛠️ 功能完善
 
@@ -59,6 +60,15 @@
 - ✅ 一键 CRUD 生成（Scaffold）
 - ✅ 调试工具栏 + 性能分析器
 - ✅ 查询日志 + 内存分析
+
+#### 自研 MVC 框架
+
+- ✅ 基于 Radix Tree 的高性能路由
+- ✅ 支持动态参数和通配符路由
+- ✅ 路由分组和中间件
+- ✅ 视图引擎和模板渲染
+- ✅ 请求上下文管理
+- ✅ 对象池优化性能
 
 #### 第三方服务集成
 
@@ -245,10 +255,10 @@ go build -o vigo main.go
 
 #### 5. 访问应用
 
-- 🌐 **应用主页**: http://localhost:8080
-- 📊 **系统监控**: http://localhost:8080/monitor
-- 🧪 **压力测试**: http://localhost:8080/benchmark
-- 📖 **API 文档**: http://localhost:8080/docs
+- 🌐 **应用主页**: <http://localhost:8080>
+- 📊 **系统监控**: <http://localhost:8080/monitor>
+- 🧪 **压力测试**: <http://localhost:8080/benchmark>
+- 📖 **API 文档**: <http://localhost:8080/docs>
 
 ---
 
@@ -273,14 +283,14 @@ vigo make:middleware Auth
 package main
 
 import (
-	"vigo/framework/model"
+ "vigo/framework/model"
 )
 
 type User struct {
-	*model.Model
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+ *model.Model
+ ID   int64  `json:"id"`
+ Name string `json:"name"`
+ Age  int    `json:"age"`
 }
 
 // 创建用户
@@ -304,10 +314,10 @@ import "vigo/framework/config"
 
 // 创建 Nacos 配置
 nacosCfg, _ := config.NewNacosConfig(&config.NacosConfigOptions{
-	ServerAddr:  "127.0.0.1:8848",
-	DataId:      "app.yaml",
-	Group:       "DEFAULT_GROUP",
-	Format:      "yaml",
+ ServerAddr:  "127.0.0.1:8848",
+ DataId:      "app.yaml",
+ Group:       "DEFAULT_GROUP",
+ Format:      "yaml",
 })
 
 // 加载配置
@@ -327,7 +337,7 @@ import "vigo/framework/cache"
 
 // 创建缓存适配器
 redisCache := cache.NewRedisCacheAdapter(client, &cache.RedisCacheOptions{
-	Prefix: "app:",
+ Prefix: "app:",
 })
 
 // 设置缓存
@@ -347,18 +357,18 @@ import "vigo/framework/limiter"
 
 // 创建限流器
 limiter := limiter.NewDistributedLimiter(&limiter.DistributedLimiterOptions{
-	Client:   redisClient,
-	Key:      "api:limit:user:1",
-	Rate:     100,
-	Burst:    200,
-	Interval: time.Second,
+ Client:   redisClient,
+ Key:      "api:limit:user:1",
+ Rate:     100,
+ Burst:    200,
+ Interval: time.Second,
 })
 
 // 使用限流器
 if limiter.Allow() {
-	// 处理请求
+ // 处理请求
 } else {
-	// 拒绝请求
+ // 拒绝请求
 }
 ```
 
@@ -369,12 +379,12 @@ import "vigo/framework/scheduler"
 
 // 创建调度器
 sched := scheduler.NewScheduler(&scheduler.SchedulerOptions{
-	Location: time.Local,
+ Location: time.Local,
 })
 
 // 添加定时任务（每天凌晨 2 点）
 sched.AddTask("daily-report", "0 0 2 * * *", func() {
-	generateReport()
+ generateReport()
 })
 
 // 启动调度器
@@ -546,7 +556,7 @@ services:
 - 💬 QQ 群：1085098216
 - 📖 **官方文档**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
 - 🌐 **官网文档**: [官网文档](https://doc.foucui.cn)
-- 📧 **联系我们**: yjk150@qq.com
+- 📧 **联系我们**: <yjk150@qq.com>
 - 🐙 **代码仓库**: [Gitee](https://gitee.com/yjk100_admin/vigo) | [GitHub](https://github.com/aizaishenqiu/vigo)
 
 ---

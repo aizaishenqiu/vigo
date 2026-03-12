@@ -40,6 +40,7 @@
 - **Low Latency**: Average response time **< 1ms**
 - **Low Resource**: Memory usage only **15-25MB**
 - **Fast Startup**: Cold startup time **< 10ms**
+- **Custom Router**: High-performance Radix Tree based routing system
 
 ### 🛠️ Comprehensive Features
 
@@ -59,6 +60,15 @@
 - ✅ One-click CRUD generation (Scaffold)
 - ✅ Debug toolbar + performance profiler
 - ✅ Query logging + memory analysis
+
+#### Custom MVC Framework
+
+- ✅ High-performance Radix Tree based routing
+- ✅ Dynamic parameters and wildcard routes support
+- ✅ Route groups and middleware
+- ✅ View engine and template rendering
+- ✅ Request context management
+- ✅ Object pool optimization
 
 #### Third-party Service Integration
 
@@ -344,7 +354,7 @@ services:
 - 💬 QQ Group: 1085098216
 - 📖 **Official Docs**: [使用文档/00.目录/目录.md](使用文档/00.目录/目录.md)
 - 🌐 **Website**: [Website](https://doc.foucui.cn)
-- 📧 **Contact Us**: yjk150@qq.com
+- 📧 **Contact Us**: <yjk150@qq.com>
 - 🐙 **Repository**: [Gitee](https://gitee.com/yjk100_admin/vigo) | [GitHub](https://github.com/aizaishenqiu/vigo)
 
 ---

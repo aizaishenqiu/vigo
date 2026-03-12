@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Vigo Framework</title>
@@ -12,75 +13,88 @@
       background-color: #f0f2f5;
       padding: 15px;
     }
+
     .layui-card {
       border-radius: 4px;
-      box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
       transition: all .3s;
     }
+
     .layui-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
     }
+
     .hero-section {
-        background: #fff;
-        padding: 50px;
-        text-align: center;
-        border-radius: 4px;
-        margin-bottom: 15px;
+      background: #fff;
+      padding: 50px;
+      text-align: center;
+      border-radius: 4px;
+      margin-bottom: 15px;
     }
+
     .hero-title {
-        font-size: 36px;
-        color: #333;
-        margin-bottom: 20px;
-        font-weight: 600;
-        letter-spacing: 1px;
+      font-size: 36px;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
     }
+
     .hero-desc {
-        font-size: 16px;
-        color: #666;
-        max-width: 800px;
-        margin: 0 auto;
-        line-height: 1.8;
+      font-size: 16px;
+      color: #666;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
     }
+
     .feature-card {
-        padding: 30px 20px;
-        text-align: center;
-        height: 100%;
-        box-sizing: border-box;
+      padding: 30px 20px;
+      text-align: center;
+      height: 100%;
+      box-sizing: border-box;
     }
+
     .feature-icon {
-        font-size: 48px;
-        color: #1890ff;
-        margin-bottom: 20px;
-        display: inline-block;
-        padding: 15px;
-        background: rgba(24, 144, 255, 0.1);
-        border-radius: 50%;
+      font-size: 48px;
+      color: #1890ff;
+      margin-bottom: 20px;
+      display: inline-block;
+      padding: 15px;
+      background: rgba(24, 144, 255, 0.1);
+      border-radius: 50%;
     }
+
     .feature-title {
-        font-size: 20px;
-        color: #333;
-        margin-bottom: 15px;
-        font-weight: 500;
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 500;
     }
+
     .feature-desc {
-        color: #888;
-        font-size: 14px;
-        line-height: 1.6;
+      color: #888;
+      font-size: 14px;
+      line-height: 1.6;
     }
+
     .module-tag {
-        margin: 5px;
-        padding: 5px 10px;
-        font-size: 14px;
+      margin: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
     }
+
     .tech-stack-card {
-        margin-top: 15px;
+      margin-top: 15px;
     }
+
     .layui-card-header {
-        font-weight: 600;
-        font-size: 16px;
+      font-weight: 600;
+      font-size: 16px;
     }
   </style>
 </head>
+
 <body>
   <!-- Hero Section -->
   <div class="layui-card hero-section">
@@ -106,14 +120,16 @@
     </div>
     <div class="layui-col-md4">
       <div class="layui-card feature-card">
-        <i class="layui-icon layui-icon-component feature-icon" style="color: #52c41a; background: rgba(82, 196, 26, 0.1);"></i>
+        <i class="layui-icon layui-icon-component feature-icon"
+          style="color: #52c41a; background: rgba(82, 196, 26, 0.1);"></i>
         <h3 class="feature-title">微服务架构</h3>
         <p class="feature-desc">原生支持微服务治理，内置服务注册发现（Nacos）、配置中心、负载均衡、熔断降级等核心组件。</p>
       </div>
     </div>
     <div class="layui-col-md4">
       <div class="layui-card feature-card">
-        <i class="layui-icon layui-icon-util feature-icon" style="color: #fa8c16; background: rgba(250, 140, 22, 0.1);"></i>
+        <i class="layui-icon layui-icon-util feature-icon"
+          style="color: #fa8c16; background: rgba(250, 140, 22, 0.1);"></i>
         <h3 class="feature-title">极致开发体验</h3>
         <p class="feature-desc">提供完善的 CLI 工具、代码生成器和 Admin 管理后台，统一的代码规范和最佳实践，让开发变得简单愉悦。</p>
       </div>
@@ -124,7 +140,7 @@
   <div class="layui-card tech-stack-card">
     <div class="layui-card-header">核心组件与技术栈</div>
     <div class="layui-card-body" style="padding: 20px;">
-      <span class="layui-badge layui-bg-blue module-tag">Gin / Chi Router</span>
+      <span class="layui-badge layui-bg-blue module-tag">Radix Tree Router</span>
       <span class="layui-badge layui-bg-green module-tag">GORM v2</span>
       <span class="layui-badge layui-bg-cyan module-tag">Go-Redis</span>
       <span class="layui-badge layui-bg-orange module-tag">RabbitMQ</span>
@@ -135,15 +151,16 @@
       <span class="layui-badge layui-bg-gray module-tag">OpenTelemetry</span>
       <span class="layui-badge layui-bg-blue module-tag">JWT Auth</span>
       <span class="layui-badge layui-bg-orange module-tag">Casbin RBAC</span>
-      <span class="layui-badge layui-bg-cyan module-tag">Layui Admin</span>
+      <span class="layui-badge layui-bg-cyan module-tag">Layui </span>
     </div>
   </div>
 
   <script src="/admin/static/layui/layui.js"></script>
   <script>
-    layui.use(['element'], function(){
+    layui.use(['element'], function () {
       var element = layui.element;
     });
   </script>
 </body>
+
 </html>
