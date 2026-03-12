@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 	"vigo/config"
@@ -490,7 +491,10 @@ func stressHandler(c *mvc.Context) {
 
 // stressTestStats 获取实时统计（给前端轮询使用）
 func stressTestStats(c *mvc.Context) {
-	// 这里返回模拟数据，实际应该从 GlobalStressManager 获取
+	// 获取系统统计
+	sysStats := getRealSystemStats()
+
+	// 构建返回数据
 	stats := map[string]interface{}{
 		"qps":         0,
 		"latency":     0,
@@ -499,13 +503,14 @@ func stressTestStats(c *mvc.Context) {
 		"mysqlOps":    0,
 		"redisOps":    0,
 		"mqOps":       0,
-		"cpu":         0,
-		"memUsed":     0,
-		"memTotal":    0,
-		"netSpeed":    0,
+		"cpu":         sysStats.CPU.Usage,
+		"memUsed":     sysStats.Memory.Used * 1024 * 1024, // 转换为字节
+		"memTotal":    sysStats.Memory.Total * 1024 * 1024,
+		"netSpeed":    sysStats.Network.SentRate + sysStats.Network.RecvRate,
 		"successRate": 0,
 		"failedRate":  0,
 	}
+
 	c.Json(200, map[string]interface{}{
 		"code": 0,
 		"msg":  "success",
@@ -520,6 +525,22 @@ func stressTestServices(c *mvc.Context) {
 		"redis": false,
 		"mq":    false,
 	}
+
+	// 检测 MySQL 连接
+	if config.App.Database.Host != "" {
+		services["mysql"] = true
+	}
+
+	// 检测 Redis 连接
+	if config.App.Redis.Host != "" {
+		services["redis"] = true
+	}
+
+	// 检测 RabbitMQ 连接
+	if config.App.RabbitMQ.Host != "" {
+		services["mq"] = true
+	}
+
 	c.Json(200, map[string]interface{}{
 		"code": 0,
 		"msg":  "success",
@@ -529,15 +550,33 @@ func stressTestServices(c *mvc.Context) {
 
 // stressTestStart 启动压测（placeholder，实际逻辑在 stress.go 中）
 func stressTestStart(c *mvc.Context) {
+	// 支持表单和 JSON 两种格式
 	var req StressTestReq
-	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
-		c.Json(400, map[string]interface{}{
-			"code": 400,
-			"msg":  "无效的请求",
-		})
-		return
+
+	contentType := c.Request.Header.Get("Content-Type")
+	if contentType == "application/json" {
+		if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
+			c.Json(400, map[string]interface{}{
+				"code": 400,
+				"msg":  "无效的请求",
+			})
+			return
+		}
+	} else {
+		// 表单格式
+		c.Request.ParseForm()
+		req.URL = c.Request.FormValue("url")
+		req.Method = c.Request.FormValue("method")
+		req.Concurrency, _ = strconv.Atoi(c.Request.FormValue("concurrency"))
+		req.TotalRequests, _ = strconv.Atoi(c.Request.FormValue("total_requests"))
+		req.Timeout, _ = strconv.Atoi(c.Request.FormValue("timeout"))
+		req.Body = c.Request.FormValue("body")
+		req.ContentType = c.Request.FormValue("content_type")
 	}
 
+	if req.URL == "" {
+		req.URL = "http://localhost:8080/"
+	}
 	if req.Concurrency <= 0 {
 		req.Concurrency = 10
 	}
