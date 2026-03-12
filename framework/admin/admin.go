@@ -176,6 +176,11 @@ func RegisterRoutes(r *mvc.Router) {
 	r.GET(basePath+"/api/stress/results", stressTestResults)
 	r.DELETE(basePath+"/api/stress/result", stressTestDelete)
 	r.POST(basePath+"/api/stress/clear", stressTestClear)
+	r.GET(basePath+"/api/stress/stats", stressTestStats)
+	r.GET(basePath+"/api/stress/services", stressTestServices)
+	r.POST(basePath+"/api/stress/start", stressTestStart)
+	r.POST(basePath+"/api/stress/stop", stressTestStop)
+	r.POST(basePath+"/api/stress/reset", stressTestReset)
 
 	fmt.Printf("Admin panel registered at %s\n", basePath)
 }

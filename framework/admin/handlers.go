@@ -487,3 +487,108 @@ func systemRealtimeStats(c *mvc.Context) {
 func stressHandler(c *mvc.Context) {
 	renderView(c, "views/stress.html", map[string]interface{}{"title": "压测中心"})
 }
+
+// stressTestStats 获取实时统计（给前端轮询使用）
+func stressTestStats(c *mvc.Context) {
+	// 这里返回模拟数据，实际应该从 GlobalStressManager 获取
+	stats := map[string]interface{}{
+		"qps":         0,
+		"latency":     0,
+		"p95":         0,
+		"p99":         0,
+		"mysqlOps":    0,
+		"redisOps":    0,
+		"mqOps":       0,
+		"cpu":         0,
+		"memUsed":     0,
+		"memTotal":    0,
+		"netSpeed":    0,
+		"successRate": 0,
+		"failedRate":  0,
+	}
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "success",
+		"data": stats,
+	})
+}
+
+// stressTestServices 检测服务状态
+func stressTestServices(c *mvc.Context) {
+	services := map[string]bool{
+		"mysql": false,
+		"redis": false,
+		"mq":    false,
+	}
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "success",
+		"data": services,
+	})
+}
+
+// stressTestStart 启动压测（placeholder，实际逻辑在 stress.go 中）
+func stressTestStart(c *mvc.Context) {
+	var req StressTestReq
+	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
+		c.Json(400, map[string]interface{}{
+			"code": 400,
+			"msg":  "无效的请求",
+		})
+		return
+	}
+
+	if req.Concurrency <= 0 {
+		req.Concurrency = 10
+	}
+	if req.TotalRequests <= 0 {
+		req.TotalRequests = 100
+	}
+	if req.Timeout <= 0 {
+		req.Timeout = 30
+	}
+	if req.Method == "" {
+		req.Method = "GET"
+	}
+
+	testID, err := GlobalStressManager.StartStressTest(req)
+	if err != nil {
+		c.Json(500, map[string]interface{}{
+			"code": 500,
+			"msg":  "启动失败：" + err.Error(),
+		})
+		return
+	}
+
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "启动成功",
+		"data": map[string]string{
+			"test_id": testID,
+		},
+	})
+}
+
+// stressTestStop 停止压测
+func stressTestStop(c *mvc.Context) {
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "停止成功",
+	})
+}
+
+// stressTestReset 重置压测数据
+func stressTestReset(c *mvc.Context) {
+	if err := GlobalStressManager.ClearAllResults(); err != nil {
+		c.Json(500, map[string]interface{}{
+			"code": 500,
+			"msg":  "重置失败：" + err.Error(),
+		})
+		return
+	}
+
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "重置成功",
+	})
+}
