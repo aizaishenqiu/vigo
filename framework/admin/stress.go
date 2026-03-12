@@ -44,6 +44,9 @@ type StressTestProgress struct {
 	P99Latency    string  `json:"p99_latency"`    // P99 延迟
 	ErrorRate     float64 `json:"error_rate"`     // 错误率
 	StartTime     int64   `json:"start_time"`     // 开始时间
+	ActiveWorkers int32   `json:"active_workers"` // 活跃 worker 数
+	Concurrency   int     `json:"concurrency"`    // 配置的并发数
+	Timeout       int     `json:"timeout"`        // 超时时间（秒）
 }
 
 // StressTestManager 压力测试管理器
@@ -190,6 +193,10 @@ func (m *StressTestManager) StartStressTest(req StressTestReq) (string, error) {
 func (m *StressTestManager) runStressTest(testID string, req StressTestReq, progress *StressTestProgress) {
 	startTime := time.Now()
 
+	// 保存配置
+	progress.Concurrency = req.Concurrency
+	progress.Timeout = req.Timeout
+
 	// 创建客户端
 	client := &http.Client{
 		Timeout: time.Duration(req.Timeout) * time.Second,
@@ -256,10 +263,12 @@ func (m *StressTestManager) runStressTest(testID string, req StressTestReq, prog
 	for i := 0; i < req.TotalRequests; i++ {
 		sem <- struct{}{}
 		wg.Add(1)
+		atomic.AddInt32(&progress.ActiveWorkers, 1)
 
 		go func(idx int) {
 			defer func() {
 				<-sem
+				atomic.AddInt32(&progress.ActiveWorkers, -1)
 				wg.Done()
 			}()
 

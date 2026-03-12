@@ -509,10 +509,16 @@ func stressTestStats(c *mvc.Context) {
 		p95Latency := parseFloat64(test.P99Latency)
 		p99Latency := parseFloat64(test.MaxLatency)
 
-		// 计算剩余请求数
+		// 计算剩余请求数和剩余时间
 		remaining := float64(test.TotalRequests) - float64(test.Completed)
 		if remaining < 0 {
 			remaining = 0
+		}
+
+		// 计算剩余时间（基于当前 QPS）
+		remainingTime := 0.0
+		if test.QPS > 0 {
+			remainingTime = remaining / test.QPS
 		}
 
 		stressData = map[string]interface{}{
@@ -520,7 +526,7 @@ func stressTestStats(c *mvc.Context) {
 			"latency":     avgLatency,
 			"p95":         p95Latency,
 			"p99":         p99Latency,
-			"workers":     test.QPS, // 用 QPS 近似表示活跃 worker 数
+			"workers":     test.ActiveWorkers, // 活跃 worker 数
 			"remaining":   remaining,
 			"total":       test.TotalRequests,
 			"mysqlOps":    0, // TODO: 从实际数据库连接池获取
@@ -529,20 +535,24 @@ func stressTestStats(c *mvc.Context) {
 			"successRate": (1 - test.ErrorRate) * 100,
 			"failedRate":  test.ErrorRate * 100,
 		}
+
+		// 添加剩余时间字段
+		stressData["remaining_time"] = remainingTime
 	} else {
 		stressData = map[string]interface{}{
-			"qps":         0,
-			"latency":     0,
-			"p95":         0,
-			"p99":         0,
-			"workers":     0,
-			"remaining":   0,
-			"total":       0,
-			"mysqlOps":    0,
-			"redisOps":    0,
-			"mqOps":       0,
-			"successRate": 0,
-			"failedRate":  0,
+			"qps":            0,
+			"latency":        0,
+			"p95":            0,
+			"p99":            0,
+			"workers":        0,
+			"remaining":      0,
+			"total":          0,
+			"mysqlOps":       0,
+			"redisOps":       0,
+			"mqOps":          0,
+			"successRate":    0,
+			"failedRate":     0,
+			"remaining_time": 0,
 		}
 	}
 
