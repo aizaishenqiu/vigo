@@ -181,6 +181,7 @@ func RegisterRoutes(r *mvc.Router) {
 	r.POST(basePath+"/api/stress/start", stressTestStart)
 	r.POST(basePath+"/api/stress/stop", stressTestStop)
 	r.POST(basePath+"/api/stress/reset", stressTestReset)
+	r.POST(basePath+"/api/stress/start-http", stressTestStartHTTP)
 
 	fmt.Printf("Admin panel registered at %s\n", basePath)
 }

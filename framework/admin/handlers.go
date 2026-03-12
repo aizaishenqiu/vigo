@@ -631,3 +631,51 @@ func stressTestReset(c *mvc.Context) {
 		"msg":  "重置成功",
 	})
 }
+
+// stressTestStartHTTP 启动 HTTP 压测
+func stressTestStartHTTP(c *mvc.Context) {
+	c.Request.ParseForm()
+
+	concurrency, _ := strconv.Atoi(c.Request.FormValue("concurrency"))
+	duration, _ := strconv.Atoi(c.Request.FormValue("duration"))
+	targetURL := c.Request.FormValue("target_url")
+	method := c.Request.FormValue("method")
+
+	if targetURL == "" {
+		targetURL = "http://localhost:8080/"
+	}
+	if concurrency <= 0 {
+		concurrency = 10
+	}
+	if duration <= 0 {
+		duration = 10
+	}
+	if method == "" {
+		method = "GET"
+	}
+
+	req := StressTestReq{
+		URL:           targetURL,
+		Method:        method,
+		Concurrency:   concurrency,
+		TotalRequests: concurrency * duration * 10, // 根据时长和并发计算总请求数
+		Timeout:       duration,
+	}
+
+	testID, err := GlobalStressManager.StartStressTest(req)
+	if err != nil {
+		c.Json(500, map[string]interface{}{
+			"code": 500,
+			"msg":  "启动失败：" + err.Error(),
+		})
+		return
+	}
+
+	c.Json(200, map[string]interface{}{
+		"code": 0,
+		"msg":  "启动成功",
+		"data": map[string]string{
+			"test_id": testID,
+		},
+	})
+}
