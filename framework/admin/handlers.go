@@ -509,11 +509,20 @@ func stressTestStats(c *mvc.Context) {
 		p95Latency := parseFloat64(test.P99Latency)
 		p99Latency := parseFloat64(test.MaxLatency)
 
+		// 计算剩余请求数
+		remaining := float64(test.TotalRequests) - float64(test.Completed)
+		if remaining < 0 {
+			remaining = 0
+		}
+
 		stressData = map[string]interface{}{
 			"qps":         test.QPS,
 			"latency":     avgLatency,
 			"p95":         p95Latency,
 			"p99":         p99Latency,
+			"workers":     test.QPS, // 用 QPS 近似表示活跃 worker 数
+			"remaining":   remaining,
+			"total":       test.TotalRequests,
 			"mysqlOps":    0, // TODO: 从实际数据库连接池获取
 			"redisOps":    0, // TODO: 从实际 Redis 连接池获取
 			"mqOps":       0, // TODO: 从实际 MQ 连接池获取
@@ -526,6 +535,9 @@ func stressTestStats(c *mvc.Context) {
 			"latency":     0,
 			"p95":         0,
 			"p99":         0,
+			"workers":     0,
+			"remaining":   0,
+			"total":       0,
 			"mysqlOps":    0,
 			"redisOps":    0,
 			"mqOps":       0,
@@ -540,6 +552,9 @@ func stressTestStats(c *mvc.Context) {
 		"latency":     stressData["latency"],
 		"p95":         stressData["p95"],
 		"p99":         stressData["p99"],
+		"workers":     stressData["workers"],
+		"remaining":   stressData["remaining"],
+		"total":       stressData["total"],
 		"mysqlOps":    stressData["mysqlOps"],
 		"redisOps":    stressData["redisOps"],
 		"mqOps":       stressData["mqOps"],

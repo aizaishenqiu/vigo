@@ -438,9 +438,25 @@ func (m *StressTestManager) GetRunningTests() []*StressTestProgress {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	tests := make([]*StressTestProgress, 0, len(m.running))
+	tests := make([]*StressTestProgress, 0, len(m.running)+len(m.results))
+
+	// 先添加运行中的测试
 	for _, progress := range m.running {
 		tests = append(tests, progress)
+	}
+
+	// 如果没有运行中的测试，返回最近完成的结果
+	if len(tests) == 0 && len(m.results) > 0 {
+		// 找到最近完成的一个测试
+		var latest *StressTestProgress
+		for _, progress := range m.results {
+			if latest == nil || progress.StartTime > latest.StartTime {
+				latest = progress
+			}
+		}
+		if latest != nil {
+			tests = append(tests, latest)
+		}
 	}
 
 	return tests

@@ -1,0 +1,17 @@
+{
+  "id": "stress_1773317859532036300",
+  "status": "completed",
+  "total_requests": 100,
+  "completed": 100,
+  "success": 100,
+  "failed": 0,
+  "total_bytes": 5111786,
+  "duration": "709.19ms",
+  "qps": 141.0051012825542,
+  "avg_latency": "334.69ms",
+  "min_latency": "174.96ms",
+  "max_latency": "534.23ms",
+  "p99_latency": "534.23ms",
+  "error_rate": 0,
+  "start_time": 1773317859532
+}
